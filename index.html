@@ -125,7 +125,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .out{background:none;border:0;font-family:var(--pixel);font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 10px}
 .lp{position:relative;width:170px;height:170px;border-radius:50%;background:repeating-radial-gradient(circle,#1b1a1e 0 2px,#2a292e 2px 4px);box-shadow:0 6px 16px rgba(0,0,0,.3);overflow:hidden;animation:spin 5s linear infinite;animation-play-state:paused}
 .lp.on{animation-play-state:running}
-.lp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.lp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transform:scale(1.35)}
 .lp::after{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--lcd);box-shadow:0 0 0 4px rgba(0,0,0,.55)}
 .lp .ring{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 0 30%,rgba(0,0,0,.18) 31%,transparent 33%,transparent 60%,rgba(255,255,255,.08) 61%,transparent 63%)}
 .ctrl{display:flex;gap:8px;width:100%}
@@ -163,8 +163,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .photo{border:1px solid var(--line);background:var(--tint);min-height:60px;display:grid;place-items:center}
 .photo img{width:100%;display:block}
 .photo span{font-family:var(--pixel);font-size:12px;color:var(--muted);padding:20px}
-#yt-box{position:absolute;left:0;top:0;width:1px;height:1px;opacity:.01;overflow:hidden;pointer-events:none}
-#yt-box.show{left:22px;right:22px;top:auto;bottom:62px;width:auto;height:180px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
+#yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
+#yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
 </style>
 </head>
@@ -259,6 +259,7 @@ async function loadMe(u) {
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; syncPlayer(); if (S.screen === 'music') render() });
   subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
+  preparePlayer();
 }
 function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
@@ -431,7 +432,8 @@ function render() {
         : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button>` : ''}
       ${S.joined ? `<button class="out" id="leave">그만 듣기</button>` : ''}
       <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크 붙여넣기"><button>OK</button></form>
-      <div class="err" id="err"></div>
+      <div class="err" id="err">${esc(S.ytErr || '')}</div>
+      ${S.needTap ? '<p class="hint">브라우저가 소리를 막았어요. 아래 영상의 재생 버튼을 한 번 직접 눌러 주세요.</p>' : ''}
       ${S.joined ? `<button class="out" id="vid">${S.showVideo ? '영상 숨기기' : '소리가 안 나면 영상 보기'}</button>` : ''}
       <div class="sect" style="padding:0">LISTENING NOW · ${live.length}</div>
       <div class="listeners">${live.map(l => `<span>${esc(l.nick)}${l.uid === S.me.uid ? ' (나)' : ''}</span>`).join('') || '<span>아무도 없어요</span>'}</div>
@@ -446,8 +448,11 @@ function render() {
       const u = $('#yturl').value.trim();
       const m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/) || u.match(/^([\w-]{11})$/);
       if (!m) { $('#err').textContent = '유튜브 링크를 확인해 주세요.'; return }
-      await setRoom({ videoId: m[1], playing: true, startAt: Date.now(), pos: 0 });
-      if (!S.joined) joinRoom();
+      const startAt = Date.now();
+      S.ytErr = '';
+      if (!S.joined) { S.joined = true; heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000) }
+      startNow(m[1], 0);
+      await setRoom({ videoId: m[1], playing: true, startAt, pos: 0 });
     };
   }
 }
@@ -552,59 +557,93 @@ async function doJoin() {
 }
 
 /* ===== 같이 듣기 ===== */
-let player = null, playerReady = false, beat = null, lastVid = null;
+let player = null, playerReady = false, beat = null, lastVid = null, checkT = null;
+const YT_ERR = { 2: '링크가 올바르지 않아요.', 5: '이 영상은 재생할 수 없어요.', 100: '삭제되었거나 비공개인 영상이에요.', 101: '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어요. 다른 링크(가사 영상, 음원만 있는 영상 등)를 써 보세요.', 150: '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어요. 다른 링크(가사 영상, 음원만 있는 영상 등)를 써 보세요.' };
 function loadYT() {
   return new Promise(res => {
     if (window.YT?.Player) return res();
-    window.onYouTubeIframeAPIReady = res;
-    const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { prev?.(); res() };
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) { const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s) }
   });
 }
-async function joinRoom() {
-  S.joined = true; render();
+// 플레이어는 미리 준비해 두고, "같이 듣기"를 누르는 그 순간 바로 재생을 시작해야 브라우저가 소리를 허락해요
+async function preparePlayer() {
+  if (player) return;
   await loadYT();
-  if (!player) {
-    player = new YT.Player('yt', {
-      width: '100%', height: '100%', playerVars: { playsinline: 1, controls: 0, rel: 0 },
-      events: {
-        onReady: () => { playerReady = true; lastVid = null; syncPlayer() },
-        onStateChange: e => { if (e.data === YT.PlayerState.ENDED && S.room?.playing) setRoom({ ...S.room, playing: false, pos: 0 }) }
-      }
-    });
-  } else syncPlayer();
+  if (player) return;
+  player = new YT.Player('yt', {
+    width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0 },
+    events: {
+      onReady: () => { playerReady = true; lastVid = null; syncPlayer() },
+      onStateChange: e => {
+        if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
+        if (e.data === YT.PlayerState.ENDED && S.room?.playing) setRoom({ ...S.room, playing: false, pos: 0 });
+      },
+      onError: e => { S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.'; if (S.screen === 'music') render() }
+    }
+  });
+}
+function startNow(videoId, t) { // 클릭한 순간에 바로 호출
+  if (!playerReady) return;
+  try {
+    player.unMute(); player.setVolume(100);
+    if (videoId !== lastVid) { lastVid = videoId; player.loadVideoById({ videoId, startSeconds: t }) }
+    else { player.seekTo(t, true); player.playVideo() }
+  } catch { }
+  clearTimeout(checkT);
+  checkT = setTimeout(() => { // 몇 초 지나도 재생이 안 되면 플레이어를 직접 누르게 보여 줌
+    const st = player?.getPlayerState?.();
+    if (S.joined && S.room?.playing && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) {
+      S.showVideo = true; $('#yt-box').classList.add('show'); S.needTap = true; if (S.screen === 'music') render();
+    }
+  }, 3500);
+}
+function joinRoom() {
+  S.joined = true; S.ytErr = '';
+  const r = S.room;
+  if (r?.videoId && r.playing) startNow(r.videoId, target(r));
+  else if (!playerReady) preparePlayer();
+  render();
   heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000);
 }
 function heartbeat() { if (S.me && S.joined) setDoc(doc(db, 'room', 'main', 'listeners', S.me.uid), { nick: S.me.nick, at: serverTimestamp() }).catch(() => { }) }
 function leaveRoom() {
-  clearInterval(beat); beat = null;
+  clearInterval(beat); beat = null; clearTimeout(checkT);
   if (S.joined && S.me) deleteDoc(doc(db, 'room', 'main', 'listeners', S.me.uid)).catch(() => { });
-  S.joined = false; S.showVideo = false; $('#yt-box')?.classList.remove('show');
+  S.joined = false; S.showVideo = false; S.needTap = false; $('#yt-box')?.classList.remove('show');
   try { player?.pauseVideo() } catch { }
 }
 addEventListener('pagehide', leaveRoom);
 function target(r) { return r.playing ? Math.max(0, (Date.now() - r.startAt) / 1000) : (r.pos || 0) }
 function syncPlayer() {
   const r = S.room;
-  if (!S.joined || !player || !playerReady || !r?.videoId) return;
+  if (!player || !playerReady || !r?.videoId) return;
   const t = target(r);
+  if (!S.joined) { // 듣기 전에는 곡만 준비
+    if (r.videoId !== lastVid) { lastVid = r.videoId; player.cueVideoById({ videoId: r.videoId, startSeconds: t }) }
+    return;
+  }
   if (r.videoId !== lastVid) {
-    lastVid = r.videoId;
+    lastVid = r.videoId; S.ytErr = '';
     if (r.playing) player.loadVideoById({ videoId: r.videoId, startSeconds: t });
     else player.cueVideoById({ videoId: r.videoId, startSeconds: t });
     return;
   }
   const cur = player.getCurrentTime?.() || 0;
-  if (Math.abs(cur - t) > 2) player.seekTo(t, true);
-  r.playing ? player.playVideo() : player.pauseVideo();
+  if (r.playing && Math.abs(cur - t) > 2) player.seekTo(t, true);
+  const st = player.getPlayerState?.();
+  if (r.playing && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) player.playVideo();
+  if (!r.playing && st === YT.PlayerState.PLAYING) player.pauseVideo();
 }
-setInterval(() => { if (S.room?.playing) syncPlayer() }, 10000);
+setInterval(() => { if (S.room?.playing && S.joined) syncPlayer() }, 10000);
 function setRoom(d) {
   return setDoc(doc(db, 'room', 'main'), { videoId: d.videoId, playing: d.playing, startAt: d.startAt ?? Date.now(), pos: d.pos ?? 0, by: S.me.uid, byNick: S.me.nick, at: serverTimestamp() }).catch(() => toast('저장하지 못했어요'));
 }
 function togglePlay() {
   const r = S.room; if (!r) return;
-  if (r.playing) setRoom({ ...r, playing: false, pos: target(r) });
-  else setRoom({ ...r, playing: true, startAt: Date.now() - (r.pos || 0) * 1000 });
+  if (r.playing) { try { player?.pauseVideo() } catch { } setRoom({ ...r, playing: false, pos: target(r) }) }
+  else { const startAt = Date.now() - (r.pos || 0) * 1000; startNow(r.videoId, r.pos || 0); setRoom({ ...r, playing: true, startAt }) }
 }
 
 /* ===== 공통 ===== */
