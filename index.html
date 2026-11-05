@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -696,6 +697,7 @@ async function doJoin() {
 }
 
 /* ===== 같이 듣기 ===== */
+const retryN = {};
 let player = null, playerReady = false, beat = null, lastVid = null, checkT = null;
 const YT_ERR = { 2: '링크가 올바르지 않아요.', 5: '이 영상은 재생할 수 없어요.', 100: '삭제되었거나 비공개인 영상이에요.', 101: '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어요. 다른 링크(가사 영상, 음원만 있는 영상 등)를 써 보세요.', 150: '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어요. 다른 링크(가사 영상, 음원만 있는 영상 등)를 써 보세요.' };
 function loadYT() {
@@ -712,7 +714,7 @@ async function preparePlayer() {
   await loadYT();
   if (player) return;
   player = new YT.Player('yt', {
-    width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0 },
+    width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, origin: location.origin, widget_referrer: location.href },
     events: {
       onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
       onStateChange: e => {
@@ -733,9 +735,11 @@ async function preparePlayer() {
         } else if (S.joined && r?.playing && !r.ext && r.videoId === vid && e.data === 100) {
           // 삭제됐거나 비공개인 곡만 다음 곡으로 넘김
           S.ytErr += ' 다음 곡으로 넘길게요.'; advance(vid);
-        } else if (S.joined && r?.playing && !r.ext && r.videoId === vid && e.data === 5) {
-          // 일시적인 재생 오류: 넘기지 않고 같은 곡을 다시 불러옴
-          S.ytErr = ''; try { player.loadVideoById({ videoId: vid, startSeconds: target(r) }) } catch { }
+        } else if (S.joined && r?.playing && !r.ext && r.videoId === vid && [5, 152, 153].includes(e.data)) {
+          // 일시적인 오류: 넘기지 않고 같은 곡을 한 번 다시 불러옴. 그래도 안 되면 대신 틀 영상을 찾음
+          retryN[vid] = (retryN[vid] || 0) + 1;
+          if (retryN[vid] <= 1) { S.ytErr = ''; try { player.loadVideoById({ videoId: vid, startSeconds: target(r) }) } catch { } }
+          else { S.ytErr = ''; fixBlocked(vid) }
         }
         if (S.screen === 'music') render();
       }
