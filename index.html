@@ -523,7 +523,13 @@ function render() {
       const idle = !S.room?.videoId || !S.room.playing;
       if (idle) startNow(id, 0);          // 아무것도 안 나오고 있으면 바로 재생
       $('#yturl').value = '';
-      const title = await ytTitle(id), item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
+      const info = await ytInfo(id), title = info.title;
+      if (info.blocked || info.missing) {
+        if (idle && lastVid === id) { try { player.stopVideo() } catch { } lastVid = null }
+        S.ytErr = info.blocked ? '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어서 넣지 않았어요. 같은 노래의 다른 영상 링크를 써 보세요.' : '없거나 비공개인 영상이에요.';
+        render(); return;
+      }
+      const item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
       await roomTx(cur => {
         if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, playing: true, startAt: srvNow(), pos: 0 };
         const qq = [...(cur.queue || [])];
@@ -658,7 +664,12 @@ async function preparePlayer() {
         if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
         if (e.data === YT.PlayerState.ENDED && S.joined && S.room?.playing) advance(S.room.videoId);
       },
-      onError: e => { S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.'; if (S.screen === 'music') render() }
+      onError: e => {
+        S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.';
+        // 재생할 수 없는 곡이면 멈춰 있지 않고 다음 곡으로 넘김
+        if (S.joined && S.room?.playing && [100, 101, 150, 5].includes(e.data)) { S.ytErr += ' 다음 곡으로 넘길게요.'; advance(S.room.videoId) }
+        if (S.screen === 'music') render();
+      }
     }
   });
 }
@@ -755,11 +766,19 @@ function advance(endedId) { // 곡이 끝나면(또는 NEXT) 다음 곡으로
     return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, playing: true, startAt: srvNow(), pos: 0, queue: qq };
   });
 }
-async function ytTitle(id) {
-  for (const u of [`https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`, `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${id}`]) {
-    try { const r = await fetch(u); if (r.ok) { const j = await r.json(); if (j.title) return String(j.title).slice(0, 100) } } catch { }
-  }
-  return '';
+// 제목을 가져오면서, 다른 사이트 재생이 막힌 영상인지도 미리 확인 (막힌 영상은 유튜브가 401/403으로 답함)
+async function ytInfo(id) {
+  try {
+    const r = await fetch(`https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`);
+    if (r.status === 401 || r.status === 403) return { blocked: true, title: '' };
+    if (r.status === 404) return { missing: true, title: '' };
+    if (r.ok) { const j = await r.json(); return { title: String(j.title || '').slice(0, 100) } }
+  } catch { }
+  try {
+    const r = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${id}`);
+    if (r.ok) { const j = await r.json(); if (j.title) return { title: String(j.title).slice(0, 100) } }
+  } catch { }
+  return { title: '' };
 }
 function togglePlay() {
   const r = S.room; if (!r) return;
