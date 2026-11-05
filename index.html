@@ -296,6 +296,7 @@ async function loadMe(u) {
   subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
   preparePlayer();
+  getProbe().catch(() => { });
   measureClock(false);
 }
 function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
@@ -565,34 +566,39 @@ function render() {
       if (!m) { $('#err').textContent = '유튜브 링크를 확인해 주세요.'; return }
       const id = m[1]; S.ytErr = '';
       if (!S.joined) { S.joined = true; heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000) }
-      const idle = !S.room?.videoId || !S.room.playing;
-      if (idle) startNow(id, 0);          // 아무것도 안 나오고 있으면 바로 재생
       $('#yturl').value = '';
-      const info = await ytInfo(id), title = info.title;
-      if (info.blocked || info.missing) {
-        if (idle && lastVid === id) { try { player.stopVideo() } catch { } lastVid = null }
-        if (info.blocked) {
-          const alt = YT_KEY ? await findAltFor(id, '', [id]) : null;
-          if (alt) {
-            const it = { videoId: alt.id, title: alt.title, by: S.me.uid, pick: S.me.nick };
-            await roomTx(cur => {
-              if (!cur.videoId || !cur.playing) return { ...cur, ...it, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
-              const qq = [...(cur.queue || [])]; if (qq.length >= 30) return null; qq.push(it); return { ...cur, queue: qq };
-            });
-            toast('막힌 영상이라 같은 노래의 다른 영상으로 넣었어요'); render(); return;
+      $('#err').textContent = '재생되는 영상인지 확인하는 중이에요…';
+      // 넣기 전에 미리 확인: 막힌 영상이면 처음부터 대신 틀 영상으로 넣음
+      const [info, test] = await Promise.all([ytInfo(id), testPlayable(id)]);
+      $('#err').textContent = '';
+      if (info.missing || test === 'missing') { S.ytErr = '없거나 비공개인 영상이에요.'; render(); return }
+      let vid = id, title = info.title, swapped = false;
+      if (info.blocked || test === 'blocked') {
+        $('#err').textContent = '막힌 영상이라 같은 노래의 다른 영상을 찾는 중이에요…';
+        let alt = null;
+        if (YT_KEY) {
+          const tried = [id];
+          for (let k = 0; k < 3 && !alt; k++) { // 찾은 영상도 미리 확인해서, 되는 것만 넣음
+            const cand = await findAltFor(id, title, tried);
+            if (!cand) break;
+            tried.push(cand.id);
+            if ((await testPlayable(cand.id)) !== 'blocked') alt = cand;
           }
-          S.extPending = { id, title: '' };
-        } else S.ytErr = '없거나 비공개인 영상이에요.';
-        render(); return;
+        }
+        $('#err').textContent = '';
+        if (!alt) { S.extPending = { id, title: title || '' }; render(); return }
+        vid = alt.id; title = title || alt.title; swapped = true;
       }
-      const item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
+      const idle = !S.room?.videoId || !S.room.playing;
+      if (idle) startNow(vid, 0);
+      const item = { videoId: vid, title, by: S.me.uid, pick: S.me.nick };
       await roomTx(cur => {
-        if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
+        if (!cur.videoId || !cur.playing) return { ...cur, ...item, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
         const qq = [...(cur.queue || [])];
         if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
       });
-      toast(idle ? '바로 재생해요' : '다음 곡 목록에 넣었어요');
+      toast(swapped ? '막힌 영상이라 같은 노래의 다른 영상으로 넣었어요' : idle ? '바로 재생해요' : '다음 곡 목록에 넣었어요');
     };
   }
 }
@@ -928,6 +934,36 @@ async function fixBlocked(vid) {
     return { ...cur, fix: '', ext: true, dur: cur.dur || 0 };
   });
   if (alt) toast('막힌 영상이라 같은 노래의 다른 영상으로 바꿨어요');
+}
+// 숨겨 둔 두 번째 플레이어(소리 끔)로 영상을 잠깐 틀어 봐서, 이 사이트에서 재생되는지 미리 확인
+let probe = null, probeReady = null, probeCb = null, probeQ = Promise.resolve();
+function getProbe() {
+  if (probeReady) return probeReady;
+  probeReady = loadYT().then(() => new Promise(res => {
+    const d = document.createElement('div'); d.id = 'ytprobe'; $('#yt-box').appendChild(d);
+    probe = new YT.Player('ytprobe', {
+      width: '240', height: '200', playerVars: { playsinline: 1, mute: 1, rel: 0, origin: location.origin, widget_referrer: location.href },
+      events: { onReady: () => res(probe), onStateChange: e => probeCb?.('state', e.data), onError: e => probeCb?.('error', e.data) }
+    });
+  }));
+  return probeReady;
+}
+function testPlayable(id) {
+  const run = async () => {
+    let p; try { p = await getProbe() } catch { return 'unknown' }
+    return new Promise(res => {
+      let done = false;
+      const fin = v => { if (done) return; done = true; probeCb = null; clearTimeout(to); try { p.stopVideo() } catch { } res(v) };
+      probeCb = (k, v) => {
+        if (k === 'error') fin([101, 150, 152, 153].includes(v) ? 'blocked' : v === 100 ? 'missing' : 'unknown');
+        else if (v === YT.PlayerState.PLAYING) fin('ok');
+      };
+      const to = setTimeout(() => fin('unknown'), 7000); // 확인이 오래 걸리면 일단 넣고, 재생할 때 다시 확인
+      try { p.mute(); p.loadVideoById(id) } catch { fin('unknown') }
+    });
+  };
+  probeQ = probeQ.then(run, run);
+  return probeQ;
 }
 function fmtT(sec) { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') }
 function parseDur(v) {
