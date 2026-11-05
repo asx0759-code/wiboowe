@@ -136,6 +136,14 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .lcdwrap{position:relative}
 .home-btn{width:54px;height:54px;border-radius:50%;margin:16px auto 0;background:linear-gradient(145deg,var(--shell-hi),var(--shell-lo));box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.2);border:0;display:block;cursor:pointer}
 
+
+.av{overflow:hidden;padding:0;position:relative}
+.av img,.mini img{width:100%;height:100%;object-fit:cover;display:block;max-width:none}
+.avbtn{cursor:pointer}
+.cam-badge{position:absolute;right:0;bottom:0;width:16px;height:16px;background:#000;color:#fff;font-size:12px;line-height:16px;text-align:center;font-family:var(--pixel)}
+.me > div{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+.mini{flex:none;width:28px;height:28px;overflow:hidden;background:var(--tint);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--pixel);font-size:13px;color:var(--pink-deep)}
+.who{display:flex;align-items:center;gap:8px;min-width:0}
 #yt-box{position:absolute;left:0;top:0;width:1px;height:1px;opacity:.01;overflow:hidden;pointer-events:none}
 #yt-box.show{left:22px;right:22px;top:auto;bottom:62px;width:auto;height:180px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
@@ -170,7 +178,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ===== Firebase 설정 (weboowe) ===== */
 const firebaseConfig = {
@@ -194,6 +202,7 @@ const LOCK = '<svg width="18" height="20" viewBox="0 0 18 20"><rect x="2" y="9" 
 const S = {
   me: null, screen: 'login', authTab: 'login', owner: null, open: null, vis: 'pub', to: null,
   users: {},          // uid -> nick
+  photos: {},         // uid -> 프로필 사진
   mine: [],           // messages to me
   other: [],          // messages to the guestbook being viewed
   priv: {},           // message id -> private content (secret ones I can read)
@@ -223,13 +232,13 @@ async function loadMe(u) {
   const snap = await getDoc(doc(db, 'users', u.uid)).catch(() => null);
   if (!snap || !snap.exists()) { await signOut(auth); return }
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
-  subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; q.forEach(d => S.users[d.id] = d.data().nick); render() });
+  subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; q.forEach(d => { S.users[d.id] = d.data().nick; if (d.data().photo) S.photos[d.id] = d.data().photo }); render() });
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); render() });
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; syncPlayer(); if (S.screen === 'music') render() });
   subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
 }
-function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {} }
+function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 function loadPriv(arr) {
   arr.filter(m => m.secret && !S.priv[m.id] && (m.to === S.me?.uid || m.from === S.me?.uid)).forEach(m => {
@@ -279,12 +288,16 @@ function render() {
     h.textContent = 'Home';
     const others = Object.entries(S.users).filter(([u]) => u !== S.me.uid).sort((a, b) => a[1].localeCompare(b[1]));
     v.innerHTML = `<div class="homewrap">
-      <div class="me"><div class="av">${esc([...S.me.nick][0])}</div><div><b>${esc(S.me.nick)}</b><span>MY INBOX · ${S.mine.length} MSG · ${S.mine.filter(m => !m.read).length} NEW</span></div></div>
+      <div class="me"><button class="av avbtn" id="avbtn" aria-label="프로필 사진 바꾸기">${avatar(S.me.uid)}<span class="cam-badge">+</span></button><div><b>${esc(S.me.nick)}</b><span>MY INBOX · ${S.mine.length} MSG · ${S.mine.filter(m => !m.read).length} NEW</span>${S.photos[S.me.uid] ? '<button class="out" id="rmph" style="padding:4px 0">사진 지우기</button>' : '<span>사진을 누르면 프로필 사진을 바꿀 수 있어요</span>'}</div></div>
+      <input type="file" id="phfile" accept="image/*" hidden>
       <div class="sect">FRIENDS' INBOX</div>
-      ${others.length ? others.map(([u, n], i) => `<button class="row" data-u="${u}"><span class="num">${i + 1}</span>${ENV_C}<span class="ttl">${esc(n)}의 방명록</span></button>`).join('') : '<div class="empty">아직 다른 친구가 없어요.<br>초대 코드를 알려 주세요!</div>'}
+      ${others.length ? others.map(([u, n], i) => `<button class="row" data-u="${u}"><span class="num">${i + 1}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}의 방명록</span></button>`).join('') : '<div class="empty">아직 다른 친구가 없어요.<br>초대 코드를 알려 주세요!</div>'}
       <div class="foot"><button class="out" id="out">log out</button></div></div>`;
     v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('inbox', { owner: b.dataset.u }));
     $('#out').onclick = () => signOut(auth);
+    $('#avbtn').onclick = () => $('#phfile').click();
+    $('#phfile').onchange = e => { const f = e.target.files[0]; if (f) setPhoto(f) };
+    if ($('#rmph')) $('#rmph').onclick = async () => { try { await updateDoc(doc(db, 'users', S.me.uid), { photo: deleteField() }); toast('사진을 지웠어요') } catch { toast('지우지 못했어요') } };
     return;
   }
 
@@ -315,7 +328,7 @@ function render() {
     const isOwner = m.to === S.me.uid, canDel = isOwner || m.from === S.me.uid;
     if (isOwner && !m.read) updateDoc(doc(db, 'messages', m.id), { read: true }).catch(() => { });
     v.innerHTML = `<div class="letter">
-      <div class="from"><b>From. ${esc(c.fromNick)}</b><span>${fmt(m.createdAt)}</span></div>
+      <div class="from"><span class="who"><span class="mini">${avatar(m.from, c.fromNick)}</span><b>From. ${esc(c.fromNick)}</b></span><span>${fmt(m.createdAt)}</span></div>
       <span class="chip ${m.secret ? '' : 'pub'}">${m.secret ? 'SECRET' : 'PUBLIC'}</span>
       <div class="text"><b>${esc(c.title)}</b>\n${esc(c.body)}</div>
       ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}</small>${esc(c.reply)}</div>` : ''}
@@ -404,6 +417,26 @@ function render() {
   }
 }
 
+/* ===== 프로필 사진 ===== */
+function avatar(uid, nick) {
+  const p = S.photos[uid];
+  if (p) return `<img src="${p}" alt="">`;
+  return esc([...(S.users[uid] || nick || '?')][0]);
+}
+async function setPhoto(file) {
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file) });
+    const side = Math.min(img.naturalWidth, img.naturalHeight), size = 160;
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    c.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+    URL.revokeObjectURL(img.src);
+    let q = 0.85, url = c.toDataURL('image/jpeg', q);
+    while (url.length > 60000 && q > 0.3) { q -= 0.15; url = c.toDataURL('image/jpeg', q) }
+    await updateDoc(doc(db, 'users', S.me.uid), { photo: url });
+    toast('프로필 사진을 바꿨어요');
+  } catch { toast('사진을 올리지 못했어요') }
+}
+
 /* ===== 가입 / 로그인 ===== */
 const ERR = {
   'auth/email-already-in-use': '이미 있는 닉네임이에요.',
@@ -443,7 +476,7 @@ async function doJoin() {
   } catch (e) {
     await deleteUser(cred.user).catch(() => signOut(auth));
     signingUp = false; S.busy = false;
-    showErr('초대 코드가 맞지 않아요.');
+    showErr(e.code === 'permission-denied' ? '초대 코드가 맞지 않아요. (' + e.code + ')' : '가입하지 못했어요. (' + (e.code || e.message) + ')');
   }
 }
 
