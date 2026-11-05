@@ -9,9 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Poor+Story&display=swap">
 <style>
-@font-face{font-family:"PF Stardust";src:url("PFStardust.woff") format("woff");font-weight:400;font-display:swap}
-@font-face{font-family:"PF Stardust";src:url("PFStardust-Bold.woff") format("woff");font-weight:700;font-display:swap}
-@font-face{font-family:"MaruMinya JP";src:url("MaruMinya.woff2") format("woff2");font-display:swap;unicode-range:U+3000-303F,U+3040-309F,U+30A0-30FF,U+31F0-31FF,U+3400-4DBF,U+4E00-9FFF,U+F900-FAFF,U+FF00-FFEF}
+@font-face{font-family:"MaruMinya JP";src:url("MaruMinya.woff2") format("woff2");font-display:swap}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0}
@@ -22,8 +20,8 @@ body{margin:0}
   --pink:#2b2a2f; --pink-deep:#111013; --pink-soft:#6b6a72;
   --lcd:#ffffff; --line:#dcdbe0; --ink:#1a191c; --muted:#85848c;
   --bar:#ececef; --sky-text:#3a393f; --tint:#f2f1f4; --rule:#e6e5ea; --acc:#c9c8cf;
-  --pixel:"MaruMinya JP","PF Stardust","DotGothic16","Courier New",monospace;
-  --hand:"MaruMinya JP","PF Stardust","Poor Story","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --pixel:"MaruMinya JP","DotGothic16","Courier New",monospace;
+  --hand:"MaruMinya JP","Poor Story","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   color-scheme:light;
 }
 html,body{height:100%}
@@ -51,7 +49,7 @@ body{
   background:var(--lcd);border:3px solid #000;border-radius:4px;
   height:560px;display:flex;flex-direction:column;overflow:hidden;
 }
-.status{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:linear-gradient(#f6f6f7,var(--bar));border-bottom:1px solid var(--line);font-family:var(--pixel);font-size:13px}
+.status{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:linear-gradient(#f6f6f7,var(--bar));border-bottom:1px solid var(--line);font-family:var(--pixel);font-size:12px}
 .status .icons{display:flex;gap:6px;align-items:center}
 .bat{width:30px;height:12px;border:2px solid #222;border-radius:2px;position:relative;padding:1px}
 .bat::after{content:"";position:absolute;right:-5px;top:2px;width:3px;height:5px;background:#222}
@@ -71,7 +69,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .row svg{flex:none}
 .ttl{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
 .ttl.secret{color:var(--muted)}
-.row .meta{font-family:var(--pixel);font-size:11px;color:var(--muted);flex:none}
+.row .meta{font-family:var(--pixel);font-size:12px;color:var(--muted);flex:none}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:15px}
 
 /* forms */
@@ -80,7 +78,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .field label{font-family:var(--pixel);font-size:12px;color:var(--muted);letter-spacing:.06em}
 .field input,.field textarea,.field select{font-family:var(--hand);font-size:16px;border:2px solid var(--line);background:#fff;padding:6px 10px;color:var(--ink);border-radius:0}
 .field textarea{resize:none;height:130px;line-height:1.6;background:repeating-linear-gradient(#fff 0 26px,var(--rule) 26px 27px);background-attachment:local}
-.count{font-family:var(--pixel);font-size:11px;color:var(--muted);text-align:right}
+.count{font-family:var(--pixel);font-size:12px;color:var(--muted);text-align:right}
 .btn{font-family:var(--pixel);font-size:16px;color:#fff;background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));border:0;padding:11px;cursor:pointer;box-shadow:0 3px 0 #000}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #000}
 .tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--line)}
@@ -90,27 +88,27 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .seg button{font-family:var(--hand);font-size:15px;background:#fff;border:0;padding:6px;cursor:pointer;color:var(--pink-deep)}
 .seg button.on{background:var(--pink);color:#fff}
 .hint{font-size:12px;color:var(--muted);line-height:1.6}
-.err{font-size:13px;color:var(--pink-deep);min-height:1em}
+.err{font-size:12px;color:var(--pink-deep);min-height:1em}
 
 /* read */
 .letter{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .from{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dashed var(--acc);padding-bottom:6px;gap:8px}
 .from b{font-size:17px}
-.from span{font-family:var(--pixel);font-size:11px;color:var(--muted)}
-.chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--pixel);font-size:11px;color:#fff;background:var(--pink-deep);padding:2px 6px;align-self:flex-start}
+.from span{font-family:var(--pixel);font-size:12px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--pixel);font-size:12px;color:#fff;background:var(--pink-deep);padding:2px 6px;align-self:flex-start}
 .chip.pub{background:var(--muted)}
 .text{font-size:16px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
 .reply{background:var(--tint);border-left:4px solid var(--pink);padding:8px 10px;font-size:15px;line-height:1.4}
-.reply small{display:block;font-family:var(--pixel);font-size:11px;color:var(--pink-deep);margin-bottom:2px}
+.reply small{display:block;font-family:var(--pixel);font-size:12px;color:var(--pink-deep);margin-bottom:2px}
 .reply-form{display:flex;gap:6px}
 .reply-form input{flex:1;min-width:0;font-family:var(--hand);font-size:15px;border:2px solid var(--line);padding:4px 8px}
-.reply-form button{font-family:var(--pixel);font-size:13px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
+.reply-form button{font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
 
 /* home */
 .me{display:flex;gap:12px;align-items:center;padding:14px;border-bottom:2px solid var(--line);background:linear-gradient(#fff,var(--tint))}
 .av{width:52px;height:52px;background:var(--pink);border:2px solid var(--pink-deep);display:grid;place-items:center;font-family:var(--pixel);font-size:22px;color:#fff;flex:none}
 .me b{font-size:19px;display:block}
-.me span{font-family:var(--pixel);font-size:11px;color:var(--muted)}
+.me span{font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .sect{font-family:var(--pixel);font-size:12px;color:var(--muted);padding:10px 14px 4px;letter-spacing:.06em}
 
 /* music */
@@ -124,18 +122,18 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
 .homewrap{min-height:100%;display:flex;flex-direction:column}
 .foot{margin-top:auto;padding:28px 14px 12px;text-align:center}
-.out{background:none;border:0;font-family:var(--pixel);font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 10px}
+.out{background:none;border:0;font-family:var(--pixel);font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 10px}
 .lp{position:relative;width:150px;height:150px;flex:none;border-radius:50%;background:repeating-radial-gradient(circle,#1b1a1e 0 2px,#2a292e 2px 4px);box-shadow:0 6px 16px rgba(0,0,0,.3);overflow:hidden;animation:spin 5s linear infinite;animation-play-state:paused}
 .lp.on{animation-play-state:running}
 .lp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transform:scale(1.35)}
 .lp::after{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--lcd);box-shadow:0 0 0 4px rgba(0,0,0,.55)}
 .lp .ring{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 0 30%,rgba(0,0,0,.18) 31%,transparent 33%,transparent 60%,rgba(255,255,255,.08) 61%,transparent 63%)}
 .ctrl{display:flex;gap:8px;width:100%}
-.ctrl input{flex:1;min-width:0;font-family:var(--hand);font-size:13px;border:2px solid var(--line);padding:6px 8px}
-.ctrl button,.play{font-family:var(--pixel);font-size:13px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
+.ctrl input{flex:1;min-width:0;font-family:var(--hand);font-size:12px;border:2px solid var(--line);padding:6px 8px}
+.ctrl button,.play{font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
 .play{padding:8px 22px;font-size:15px;box-shadow:0 3px 0 #000}
 @media (prefers-reduced-motion:reduce){.lp{animation:none}}
-.toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:rgba(34,32,36,.88);color:#fff;font-family:var(--pixel);font-size:13px;padding:8px 14px;white-space:nowrap}
+.toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:rgba(34,32,36,.88);color:#fff;font-family:var(--pixel);font-size:12px;padding:8px 14px;white-space:nowrap}
 .lcdwrap{position:relative}
 .home-btn{width:54px;height:54px;border-radius:50%;margin:16px auto 0;background:linear-gradient(145deg,var(--shell-hi),var(--shell-lo));box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.2);border:0;display:block;cursor:pointer}
 
@@ -145,7 +143,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .avbtn{cursor:pointer}
 .cam-badge{position:absolute;right:0;bottom:0;width:16px;height:16px;background:#000;color:#fff;font-size:12px;line-height:16px;text-align:center;font-family:var(--pixel)}
 .me > div{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
-.mini{flex:none;width:28px;height:28px;overflow:hidden;background:var(--tint);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--pixel);font-size:13px;color:var(--pink-deep)}
+.mini{flex:none;width:28px;height:28px;overflow:hidden;background:var(--tint);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--pixel);font-size:12px;color:var(--pink-deep)}
 .who{display:flex;align-items:center;gap:8px;min-width:0}
 
 .crop{position:absolute;inset:3px;z-index:20;background:rgba(10,10,12,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
@@ -157,7 +155,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .crop-btns{display:flex;gap:10px}
 .crop-btns button{font-family:var(--pixel);font-size:14px;padding:8px 22px;border:2px solid #fff;background:none;color:#fff;cursor:pointer}
 .crop-btns #ck{background:#fff;color:#000}
-.crop-hint{font-family:var(--pixel);font-size:11px;color:#aaa;margin:0}
+.crop-hint{font-family:var(--pixel);font-size:12px;color:#aaa;margin:0}
 .attach{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .attach .out{padding:4px 0;font-size:12px}
 #prev{display:flex;align-items:center;gap:8px}
@@ -170,9 +168,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .play.ghost{background:#fff;color:var(--pink-deep);box-shadow:0 3px 0 #000;border:2px solid var(--pink-deep)}
 .qlist{width:100%;text-align:left;border-top:2px solid var(--line);padding-top:8px}
 .qrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
-.qrow .num{width:22px;height:22px;font-size:11px}
-.qt{flex:1;min-width:0;font-size:13px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.qt small{display:block;font-family:var(--pixel);font-size:10px;color:var(--muted)}
+.qrow .num{width:22px;height:22px;font-size:12px}
+.qt{flex:1;min-width:0;font-size:12px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.qt small{display:block;font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .qrow .out{font-size:16px;text-decoration:none;padding:2px 8px}
 .links{display:flex;gap:4px 14px;flex-wrap:wrap;justify-content:center}
 .links .out{padding:4px 0}
@@ -182,8 +180,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .btn:disabled{opacity:.6}
 
 /* 수정 */
-.edited{font-family:var(--pixel);font-size:10px;color:var(--muted);align-self:flex-end}
-.out.inline{padding:0;font-size:11px;color:var(--pink-deep)}
+.edited{font-family:var(--pixel);font-size:12px;color:var(--muted);align-self:flex-end}
+.out.inline{padding:0;font-size:12px;color:var(--pink-deep)}
 .ghostbtn{background:none!important;color:var(--muted)!important;font-size:16px!important}
 /* 모바일: 페이지 전체는 고정하고, 폰 화면 안쪽만 스크롤 */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
@@ -294,6 +292,7 @@ async function loadMe(u) {
   subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
   preparePlayer();
+  measureClock(false);
 }
 function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
@@ -475,7 +474,7 @@ function render() {
 
   if (S.screen === 'music') {
     h.textContent = 'Listen Together';
-    const r = S.room, t = r?.videoId, now = Date.now(), q = r?.queue || [];
+    const r = S.room, t = r?.videoId, now = srvNow(), q = r?.queue || [];
     const live = S.listeners.filter(l => now - ms(l.at) < 75000);
     v.innerHTML = `<div class="now">
       <div class="lp ${r?.playing ? 'on' : ''}" aria-hidden="true">${t ? `<img src="https://i.ytimg.com/vi/${t}/hqdefault.jpg" alt="">` : ''}<div class="ring"></div></div>
@@ -487,6 +486,7 @@ function render() {
       </div>
       <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크로 곡 추가"><button>ADD</button></form>
       <div class="err" id="err">${esc(S.ytErr || '')}</div>
+      ${S.loadingYT && S.joined ? '<p class="hint">플레이어를 준비하는 중이에요…</p>' : ''}
       ${S.needTap ? '<p class="hint">브라우저가 소리를 막았어요. 아래 영상의 재생 버튼을 한 번 직접 눌러 주세요.</p>' : ''}
       <div class="qlist">
         <div class="sect" style="padding:0 0 4px">NEXT UP · ${q.length}</div>
@@ -525,7 +525,7 @@ function render() {
       $('#yturl').value = '';
       const title = await ytTitle(id), item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
       await roomTx(cur => {
-        if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, playing: true, startAt: Date.now(), pos: 0 };
+        if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, playing: true, startAt: srvNow(), pos: 0 };
         const qq = [...(cur.queue || [])];
         if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
@@ -653,7 +653,7 @@ async function preparePlayer() {
   player = new YT.Player('yt', {
     width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0 },
     events: {
-      onReady: () => { playerReady = true; lastVid = null; syncPlayer() },
+      onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
       onStateChange: e => {
         if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
         if (e.data === YT.PlayerState.ENDED && S.joined && S.room?.playing) advance(S.room.videoId);
@@ -680,12 +680,29 @@ function startNow(videoId, t) { // 클릭한 순간에 바로 호출
 function joinRoom() {
   S.joined = true; S.ytErr = '';
   const r = S.room;
-  if (r?.videoId && r.playing) startNow(r.videoId, target(r));
-  else if (!playerReady) preparePlayer();
+  if (!playerReady) { S.loadingYT = true; preparePlayer() }   // 준비되는 대로 바로 재생 (onReady → syncPlayer)
+  else if (r?.videoId && r.playing) startNow(r.videoId, target(r));
   render();
   heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000);
 }
-function heartbeat() { if (S.me && S.joined) setDoc(doc(db, 'room', 'main', 'listeners', S.me.uid), { nick: S.me.nick, at: serverTimestamp() }).catch(() => { }) }
+// 기기마다 시계가 조금씩 달라서, 서버 시계에 맞춰 위치를 계산해요
+let clockOff = 0, clockN = 0;
+const srvNow = () => Date.now() + clockOff;
+async function measureClock(keep) {
+  if (!S.me) return;
+  const ref = doc(db, 'room', 'main', 'listeners', S.me.uid);
+  try {
+    const t0 = Date.now();
+    await setDoc(ref, { nick: S.me.nick, at: serverTimestamp() });
+    const t1 = Date.now(), d = await getDoc(ref), at = d.data()?.at;
+    if (at?.toMillis && t1 - t0 < 3000) {
+      const off = at.toMillis() - (t0 + t1) / 2;
+      clockOff = clockN ? clockOff * 0.7 + off * 0.3 : off; clockN++;
+    }
+    if (!keep && !S.joined) await deleteDoc(ref);
+  } catch { }
+}
+function heartbeat() { if (S.me && S.joined) measureClock(true) }
 function leaveRoom() {
   clearInterval(beat); beat = null; clearTimeout(checkT);
   if (S.wake) { S.wake = false; try { wakeLock?.release() } catch { } wakeLock = null }
@@ -694,7 +711,7 @@ function leaveRoom() {
   try { player?.pauseVideo() } catch { }
 }
 addEventListener('pagehide', leaveRoom);
-function target(r) { return r.playing ? Math.max(0, (Date.now() - r.startAt) / 1000) : (r.pos || 0) }
+function target(r) { return r.playing ? Math.max(0, (srvNow() - r.startAt) / 1000) : (r.pos || 0) }
 function syncPlayer() {
   const r = S.room;
   if (!player || !playerReady || !r?.videoId) return;
@@ -709,9 +726,9 @@ function syncPlayer() {
     else player.cueVideoById({ videoId: r.videoId, startSeconds: t });
     return;
   }
-  const cur = player.getCurrentTime?.() || 0;
-  if (r.playing && Math.abs(cur - t) > 2) player.seekTo(t, true);
-  const st = player.getPlayerState?.();
+  const cur = player.getCurrentTime?.() || 0, st = player.getPlayerState?.(), dur = player.getDuration?.() || 0;
+  // 재생 중일 때만, 5초 넘게 어긋났을 때만 위치를 맞춰요 (불러오는 중엔 건드리지 않음)
+  if (r.playing && st === YT.PlayerState.PLAYING && Math.abs(cur - t) > 5 && (!dur || t < dur - 2)) player.seekTo(t, true);
   if (r.playing && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) player.playVideo();
   if (!r.playing && st === YT.PlayerState.PLAYING) player.pauseVideo();
 }
@@ -724,7 +741,7 @@ function roomTx(fn) {
     const n = fn(cur); if (!n) return;
     tx.set(ref, {
       videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing,
-      startAt: n.startAt ?? Date.now(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
+      startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
       by: S.me.uid, at: serverTimestamp()
     });
   }).catch(() => toast('저장하지 못했어요'));
@@ -735,7 +752,7 @@ function advance(endedId) { // 곡이 끝나면(또는 NEXT) 다음 곡으로
     if (endedId && (cur.videoId !== endedId || !cur.playing)) return null; // 이미 다른 사람이 넘김
     const qq = [...(cur.queue || [])], next = qq.shift();
     if (!next) return { ...cur, playing: false, pos: 0, queue: [] };
-    return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, playing: true, startAt: Date.now(), pos: 0, queue: qq };
+    return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, playing: true, startAt: srvNow(), pos: 0, queue: qq };
   });
 }
 async function ytTitle(id) {
@@ -747,7 +764,7 @@ async function ytTitle(id) {
 function togglePlay() {
   const r = S.room; if (!r) return;
   if (r.playing) { try { player?.pauseVideo() } catch { } roomTx(cur => cur.playing ? { ...cur, playing: false, pos: target(cur) } : null) }
-  else { startNow(r.videoId, r.pos || 0); roomTx(cur => cur.playing ? null : { ...cur, playing: true, startAt: Date.now() - (cur.pos || 0) * 1000 }) }
+  else { startNow(r.videoId, r.pos || 0); roomTx(cur => cur.playing ? null : { ...cur, playing: true, startAt: srvNow() - (cur.pos || 0) * 1000 }) }
 }
 // 화면 켜두기: 휴대폰 화면이 꺼지면 재생이 멈추는 걸 막아 줌
 let wakeLock = null;
