@@ -570,8 +570,18 @@ function render() {
       const info = await ytInfo(id), title = info.title;
       if (info.blocked || info.missing) {
         if (idle && lastVid === id) { try { player.stopVideo() } catch { } lastVid = null }
-        if (info.blocked) S.extPending = { id, title: '' };
-        else S.ytErr = '없거나 비공개인 영상이에요.';
+        if (info.blocked) {
+          const alt = YT_KEY ? await findAltFor(id, '', [id]) : null;
+          if (alt) {
+            const it = { videoId: alt.id, title: alt.title, by: S.me.uid, pick: S.me.nick };
+            await roomTx(cur => {
+              if (!cur.videoId || !cur.playing) return { ...cur, ...it, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
+              const qq = [...(cur.queue || [])]; if (qq.length >= 30) return null; qq.push(it); return { ...cur, queue: qq };
+            });
+            toast('막힌 영상이라 같은 노래의 다른 영상으로 넣었어요'); render(); return;
+          }
+          S.extPending = { id, title: '' };
+        } else S.ytErr = '없거나 비공개인 영상이에요.';
         render(); return;
       }
       const item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
@@ -707,18 +717,25 @@ async function preparePlayer() {
       onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
       onStateChange: e => {
         if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (ytPop && !S.room?.ext) { try { ytPop.close() } catch { } ytPop = null; popVid = null } if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
-        if (e.data === YT.PlayerState.ENDED && S.joined && S.room?.playing) advance(S.room.videoId);
+        if (e.data === YT.PlayerState.ENDED) {
+          // 내 플레이어에서 끝난 곡이 '지금 곡'과 같고, 서버 시간으로도 정말 끝날 때가 됐을 때만 넘김
+          const r = S.room, vid = lastVid, dur = player.getDuration?.() || 0;
+          if (S.joined && r?.playing && !r.ext && r.videoId === vid && (!dur || target(r) >= dur - 5)) advance(vid);
+        }
       },
       onError: e => {
         S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.';
         const r = S.room, vid = lastVid;
         if (r && !r.ext && r.videoId === vid && [101, 150].includes(e.data)) {
-          // 다른 사이트 재생이 막힌 곡: 유튜브에서 같이 듣기로 바꿈
+          // 다른 사이트 재생이 막힌 곡: 같은 노래의 다른 영상을 찾아 바꿔 틀고, 없으면 유튜브에서 같이 듣기로
           S.ytErr = '';
-          roomTx(cur => cur.videoId === vid && !cur.ext ? { ...cur, ext: true, dur: cur.dur || 0 } : null);
-        } else if (S.joined && r?.playing && !r.ext && [100, 5].includes(e.data)) {
-          // 삭제됐거나 재생할 수 없는 곡이면 다음 곡으로 넘김
-          S.ytErr += ' 다음 곡으로 넘길게요.'; advance(r.videoId);
+          fixBlocked(vid);
+        } else if (S.joined && r?.playing && !r.ext && r.videoId === vid && e.data === 100) {
+          // 삭제됐거나 비공개인 곡만 다음 곡으로 넘김
+          S.ytErr += ' 다음 곡으로 넘길게요.'; advance(vid);
+        } else if (S.joined && r?.playing && !r.ext && r.videoId === vid && e.data === 5) {
+          // 일시적인 재생 오류: 넘기지 않고 같은 곡을 다시 불러옴
+          S.ytErr = ''; try { player.loadVideoById({ videoId: vid, startSeconds: target(r) }) } catch { }
         }
         if (S.screen === 'music') render();
       }
@@ -804,8 +821,10 @@ function roomTx(fn) {
   return runTransaction(db, async tx => {
     const snap = await tx.get(ref), cur = snap.exists() ? snap.data() : {};
     const n = fn(cur); if (!n) return;
+    const keep = n.videoId === cur.videoId || n.alt; // 곡이 바뀌면 대체 영상 찾기 기록은 초기화
     tx.set(ref, {
       videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing, ext: !!n.ext, dur: n.dur || 0,
+      fix: keep ? (n.fix || '') : '', tried: keep ? (n.tried || []).slice(-6) : [],
       startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
       by: S.me.uid, at: serverTimestamp()
     });
@@ -864,6 +883,47 @@ function followPopup() {
   if (r.playing && r.videoId !== popVid) {
     try { ytPop.location.href = `https://www.youtube.com/watch?v=${r.videoId}&t=${Math.floor(target(r))}s`; popVid = r.videoId } catch { }
   }
+}
+/* ----- 막힌 영상 대신 틀 영상 찾기 (YouTube Data API) ----- */
+// Google Cloud에서 만든 API 키를 넣어 주세요. 비워 두면 이 기능은 꺼지고, 막힌 곡은 유튜브에서 열기로만 들어요.
+const YT_KEY = 'AIzaSyAscu5JxdCJ6ALwX1D82dT6NR-m6IYm6Jo';
+async function ytApi(path) {
+  const r = await fetch(`https://www.googleapis.com/youtube/v3/${path}&key=${YT_KEY}`);
+  if (!r.ok) throw new Error('api ' + r.status);
+  return r.json();
+}
+async function findAltFor(vid, title, tried) {
+  try {
+    let q = title;
+    if (!q) { const v = await ytApi(`videos?part=snippet&id=${vid}`); q = v.items?.[0]?.snippet?.title || '' }
+    if (!q) return null;
+    q = q.replace(/\[[^\]]*\]|\([^)]*(m\/?v|music video|official|뮤직비디오|teaser)[^)]*\)/gi, ' ').replace(/\s+/g, ' ').trim();
+    // 다른 사이트에서도 재생되는 영상만 검색 (videoEmbeddable + videoSyndicated)
+    const res = await ytApi(`search?part=snippet&type=video&maxResults=8&videoEmbeddable=true&videoSyndicated=true&q=${encodeURIComponent(q)}`);
+    const items = (res.items || []).filter(i => i.id?.videoId && !tried.includes(i.id.videoId));
+    if (!items.length) return null;
+    const topic = items.find(i => /- Topic$/.test(i.snippet?.channelTitle || ''));
+    const pick = topic || items.find(i => /lyric|가사|audio|오디오/i.test(i.snippet?.title || '')) || items[0];
+    const dec = t => { const d = document.createElement('textarea'); d.innerHTML = t; return d.value };
+    return { id: pick.id.videoId, title: title || dec(pick.snippet.title).slice(0, 100) };
+  } catch { return null }
+}
+async function fixBlocked(vid) {
+  // 한 사람만 찾도록 먼저 "내가 찾을게" 표시를 남김 (여러 명이 동시에 검색하지 않게)
+  let mine = false;
+  await roomTx(cur => {
+    if (cur.videoId !== vid || cur.ext || cur.fix) return null;
+    mine = true; return { ...cur, fix: S.me.uid, tried: [...(cur.tried || []), vid] };
+  });
+  if (!mine) return;
+  const r = S.room, tried = [...(r?.tried || []), vid];
+  const alt = YT_KEY && tried.length <= 4 ? await findAltFor(vid, r?.title || '', tried) : null;
+  await roomTx(cur => {
+    if (cur.videoId !== vid) return null;
+    if (alt) return { ...cur, alt: true, videoId: alt.id, title: cur.title || alt.title, fix: '', tried: [...(cur.tried || []), vid], startAt: srvNow(), pos: 0 };
+    return { ...cur, fix: '', ext: true, dur: cur.dur || 0 };
+  });
+  if (alt) toast('막힌 영상이라 같은 노래의 다른 영상으로 바꿨어요');
 }
 function fmtT(sec) { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') }
 function parseDur(v) {
