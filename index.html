@@ -179,6 +179,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.adm-who{display:block;font-family:var(--pixel);font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
 .vol{display:flex;align-items:center;gap:8px;width:100%;max-width:260px;font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .vol input{flex:1;min-width:0;accent-color:var(--pink-deep);height:20px}
 .vol #volv{width:26px;text-align:right;font-variant-numeric:tabular-nums}
@@ -236,7 +237,7 @@ input,textarea,select{font-size:16px!important}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, writeBatch, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, writeBatch, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ===== Firebase 설정 (weboowe) ===== */
 const firebaseConfig = {
@@ -299,6 +300,7 @@ async function loadMe(u) {
   const snap = await getDoc(doc(db, 'users', u.uid)).catch(() => null);
   if (!snap || !snap.exists()) { await signOut(auth); return }
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
+  S.isAdmin = false; getDoc(doc(db, 'admins', u.uid)).then(d => { S.isAdmin = d.exists(); refresh() }).catch(() => { });
   subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; S.crops = {}; q.forEach(d => { const u = d.data(); S.users[d.id] = u.nick; if (u.photo) S.photos[d.id] = u.photo; if (u.crop) S.crops[d.id] = u.crop }); refresh() });
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); refresh() });
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
@@ -307,7 +309,7 @@ async function loadMe(u) {
   getProbe().catch(() => { });
   measureClock(false);
 }
-function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
+function cleanup() { S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 function loadPriv(arr) {
   arr.filter(m => m.secret && !S.priv[m.id] && (m.to === S.me?.uid || m.from === S.me?.uid)).forEach(m => {
@@ -361,9 +363,10 @@ function render() {
       <input type="file" id="phfile" accept="image/*" hidden>
       <div class="sect">FRIENDS' INBOX</div>
       ${others.length ? others.map(([u, n], i) => `<button class="row" data-u="${u}"><span class="num">${i + 1}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}의 방명록</span></button>`).join('') : '<div class="empty">아직 다른 친구가 없어요.<br>초대 코드를 알려 주세요!</div>'}
-      <div class="foot"><button class="out" id="out">log out</button></div></div>`;
+      <div class="foot">${S.isAdmin ? '<button class="out" id="adm">admin</button>' : ''}<button class="out" id="out">log out</button></div></div>`;
     v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('inbox', { owner: b.dataset.u }));
     $('#out').onclick = () => signOut(auth);
+    if ($('#adm')) $('#adm').onclick = () => { go('admin'); loadAdmin() };
     $('#avbtn').onclick = () => $('#phfile').click();
     $('#phfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(f) };
     if ($('#rmph')) $('#rmph').onclick = async () => { try { await updateDoc(doc(db, 'users', S.me.uid), { photo: deleteField(), crop: deleteField() }); toast('사진을 지웠어요') } catch { toast('지우지 못했어요') } };
@@ -482,6 +485,42 @@ function render() {
       try { await b.commit(); toast(S.users[dest] + '에게 보냈어요'); go('inbox', { owner: dest, to: null, vis: 'pub', attach: null }) }
       catch { $('#err').textContent = '보내지 못했어요. 잠시 후 다시 해 주세요.' }
     };
+    return;
+  }
+
+  if (S.screen === 'admin') {
+    back('Admin');
+    $('#back').onclick = () => go('home');
+    const A = S.adm || {};
+    const nm = u => esc(S.users[u] || '(탈퇴)');
+    v.innerHTML = `<div class="sect">ALL MESSAGES · ${(A.list || []).length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
+      + (A.loading ? '<div class="empty">불러오는 중…</div>' : A.err ? `<div class="empty">${esc(A.err)}</div>`
+      : (A.list || []).length ? A.list.map((m, i) => {
+        const c = m.secret ? A.priv[m.id] : m;
+        return `<button class="row" data-aid="${m.id}"><span class="num">${i + 1}</span>${m.secret ? LOCK : ENV_O}<span class="ttl">${c ? esc(c.title) : '(내용 없음)'}<small class="adm-who">${nm(m.from)} → ${nm(m.to)} · ${fmt(m.createdAt)}</small></span>${m.hasImage ? '<span class="meta">IMG</span>' : ''}</button>`;
+      }).join('') : '<div class="empty">메시지가 없어요</div>');
+    if ($('#areload')) $('#areload').onclick = loadAdmin;
+    v.querySelectorAll('[data-aid]').forEach(b => b.onclick = () => go('admin-read', { admOpen: b.dataset.aid }));
+    return;
+  }
+
+  if (S.screen === 'admin-read') {
+    back('Admin');
+    $('#back').onclick = () => go('admin');
+    const A = S.adm || {}, m = (A.list || []).find(x => x.id === S.admOpen), c = m && (m.secret ? A.priv[m.id] : m);
+    if (!m || !c) { v.innerHTML = '<div class="empty">메시지를 찾을 수 없어요</div>'; return }
+    if (m.hasImage && !(m.id in A.img)) {
+      A.img[m.id] = 'loading';
+      getDoc(doc(db, 'messages', m.id, 'media', 'image')).then(d => { A.img[m.id] = d.exists() ? d.data().data : null; if (S.screen === 'admin-read') render() }).catch(() => { A.img[m.id] = null });
+    }
+    const im = A.img[m.id];
+    v.innerHTML = `<div class="letter">
+      <div class="from"><span class="who"><span class="mini">${avatar(m.from, c.fromNick)}</span><b>${esc(c.fromNick || S.users[m.from] || '')} → ${esc(S.users[m.to] || '')}</b></span><span>${fmt(m.createdAt)}</span></div>
+      <span class="chip ${m.secret ? '' : 'pub'}">${m.secret ? 'SECRET' : 'PUBLIC'}</span>
+      ${m.hasImage ? `<div class="photo">${im && im !== 'loading' ? `<img src="${im}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
+      <div class="text"><b>${esc(c.title)}</b>\n${esc(c.body)}</div>
+      ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}</small>${esc(c.reply)}</div>` : ''}
+    </div>`;
     return;
   }
 
@@ -612,6 +651,22 @@ function render() {
       toast(swapped ? '막힌 영상이라 같은 노래의 다른 영상으로 넣었어요' : idle ? '바로 재생해요' : '다음 곡 목록에 넣었어요');
     };
   }
+}
+
+/* ===== 관리자 ===== */
+async function loadAdmin() {
+  S.adm = { loading: true, list: [], priv: {}, img: {} }; render();
+  try {
+    const q = await getDocs(collection(db, 'messages')), list = [];
+    q.forEach(d => list.push({ id: d.id, ...d.data() }));
+    list.sort((a, b) => ms(b.createdAt) - ms(a.createdAt));
+    S.adm.list = list;
+    await Promise.all(list.filter(m => m.secret).map(async m => {
+      try { const p = await getDoc(doc(db, 'messages', m.id, 'private', 'content')); if (p.exists()) S.adm.priv[m.id] = p.data() } catch { }
+    }));
+  } catch (e) { S.adm.err = '불러오지 못했어요 (' + (e.code || e.message) + ')' }
+  S.adm.loading = false;
+  if (S.screen === 'admin' || S.screen === 'admin-read') render();
 }
 
 /* ===== 프로필 사진 ===== */
