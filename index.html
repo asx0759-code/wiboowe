@@ -598,12 +598,13 @@ function render() {
       const idle = !S.room?.videoId || !S.room.playing;
       if (idle) startNow(vid, 0);
       const item = { videoId: vid, title, by: S.me.uid, pick: S.me.nick };
-      await roomTx(cur => {
+      const ok = await roomTx(cur => {
         if (!cur.videoId || !cur.playing) return { ...cur, ...item, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
         const qq = [...(cur.queue || [])];
         if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
       });
+      if (!ok) return; // 저장이 안 됐으면 "넣었어요"라고 하지 않음
       toast(swapped ? '막힌 영상이라 같은 노래의 다른 영상으로 넣었어요' : idle ? '바로 재생해요' : '다음 곡 목록에 넣었어요');
     };
   }
@@ -725,6 +726,7 @@ async function doJoin() {
 
 /* ===== 같이 듣기 ===== */
 const retryN = {};
+let endAdv = null;
 let player = null, playerReady = false, beat = null, lastVid = null, checkT = null;
 const YT_ERR = { 2: '링크가 올바르지 않아요.', 5: '이 영상은 재생할 수 없어요.', 100: '삭제되었거나 비공개인 영상이에요.', 101: '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어요. 다른 링크(가사 영상, 음원만 있는 영상 등)를 써 보세요.', 150: '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어요. 다른 링크(가사 영상, 음원만 있는 영상 등)를 써 보세요.' };
 function loadYT() {
@@ -842,6 +844,9 @@ function syncPlayer() {
   const cur = player.getCurrentTime?.() || 0, st = player.getPlayerState?.(), dur = player.getDuration?.() || 0;
   // 재생 중일 때만, 5초 넘게 어긋났을 때만 위치를 맞춰요 (불러오는 중엔 건드리지 않음)
   if (r.playing && st === YT.PlayerState.PLAYING && Math.abs(cur - t) > 5 && (!dur || t < dur - 2)) player.seekTo(t, true);
+  // 서버 시간으로 이미 끝났어야 하는 곡이면 다시 틀지 않고 다음 곡으로 (끝난 곡이 처음부터 반복되던 문제)
+  if (r.playing && dur && t >= dur - 1) { if (endAdv !== r.videoId + r.startAt) { endAdv = r.videoId + r.startAt; advance(r.videoId) } return }
+  if (r.playing && st === YT.PlayerState.ENDED) return;
   if (r.playing && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) player.playVideo();
   if (!r.playing && st === YT.PlayerState.PLAYING) player.pauseVideo();
 }
@@ -851,7 +856,7 @@ function roomTx(fn) {
   const ref = doc(db, 'room', 'main');
   return runTransaction(db, async tx => {
     const snap = await tx.get(ref), cur = snap.exists() ? snap.data() : {};
-    const n = fn(cur); if (!n) return;
+    const n = fn(cur); if (!n) return false;
     const keep = n.videoId === cur.videoId || n.alt; // 곡이 바뀌면 대체 영상 찾기 기록은 초기화
     tx.set(ref, {
       videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing, ext: !!n.ext, dur: n.dur || 0,
@@ -859,7 +864,12 @@ function roomTx(fn) {
       startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
       by: S.me.uid, at: serverTimestamp()
     });
-  }).catch(() => toast('저장하지 못했어요'));
+    return true;
+  }).catch(e => {
+    console.warn('room save failed', e);
+    toast(e?.code === 'permission-denied' ? '저장이 막혔어요. Firebase 보안 규칙을 최신으로 게시해 주세요' : '저장하지 못했어요. 잠시 후 다시 해 주세요');
+    return false;
+  });
 }
 function advance(endedId) { // 곡이 끝나면(또는 NEXT) 다음 곡으로
   return roomTx(cur => {
