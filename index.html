@@ -144,7 +144,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .avbtn{cursor:pointer}
 .cam-badge{position:absolute;right:0;bottom:0;width:16px;height:16px;background:#000;color:#fff;font-size:12px;line-height:16px;text-align:center;font-family:var(--pixel)}
 .me > div{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
-.mini{flex:none;width:28px;height:28px;overflow:hidden;background:var(--tint);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--pixel);font-size:12px;color:var(--pink-deep)}
+.mini{flex:none;position:relative;width:28px;height:28px;overflow:hidden;background:var(--tint);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--pixel);font-size:12px;color:var(--pink-deep)}
 .who{display:flex;align-items:center;gap:8px;min-width:0}
 
 .crop{position:absolute;inset:3px;z-index:20;background:rgba(10,10,12,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
@@ -290,7 +290,7 @@ async function loadMe(u) {
   const snap = await getDoc(doc(db, 'users', u.uid)).catch(() => null);
   if (!snap || !snap.exists()) { await signOut(auth); return }
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
-  subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; q.forEach(d => { S.users[d.id] = d.data().nick; if (d.data().photo) S.photos[d.id] = d.data().photo }); refresh() });
+  subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; S.crops = {}; q.forEach(d => { const u = d.data(); S.users[d.id] = u.nick; if (u.photo) S.photos[d.id] = u.photo; if (u.crop) S.crops[d.id] = u.crop }); refresh() });
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); refresh() });
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
   subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -358,7 +358,7 @@ function render() {
     $('#out').onclick = () => signOut(auth);
     $('#avbtn').onclick = () => $('#phfile').click();
     $('#phfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(f) };
-    if ($('#rmph')) $('#rmph').onclick = async () => { try { await updateDoc(doc(db, 'users', S.me.uid), { photo: deleteField() }); toast('사진을 지웠어요') } catch { toast('지우지 못했어요') } };
+    if ($('#rmph')) $('#rmph').onclick = async () => { try { await updateDoc(doc(db, 'users', S.me.uid), { photo: deleteField(), crop: deleteField() }); toast('사진을 지웠어요') } catch { toast('지우지 못했어요') } };
     return;
   }
 
@@ -606,12 +606,21 @@ function render() {
 /* ===== 프로필 사진 ===== */
 function avatar(uid, nick) {
   const p = S.photos[uid];
+  const c = S.crops?.[uid];
+  if (p && c) return `<img src="${p}" alt="" style="position:absolute;left:${+c.l}%;top:${+c.t}%;width:${+c.w}%;height:${+c.h}%;object-fit:fill">`;
   if (p) return `<img src="${p}" alt="">`;
   return esc([...(S.users[uid] || nick || '?')][0]);
 }
 function loadImg(file) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file) }) }
 function jpeg(c, limit) { let q = 0.85, url = c.toDataURL('image/jpeg', q); while (url.length > limit && q > 0.3) { q -= 0.1; url = c.toDataURL('image/jpeg', q) } return url }
-async function shrink(file) { // 방명록 첨부 사진: 긴 쪽 900px 이하로 줄이기
+const GIF_AV_MAX = 270000, GIF_MSG_MAX = 480000;
+function readData(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file) }) }
+async function shrink(file) { // 방명록 첨부 사진: 긴 쪽 900px 이하로 줄이기 (움직이는 사진은 원본 그대로)
+  if (file.type === 'image/gif') {
+    const gif = await readData(file);
+    if (gif.length <= GIF_MSG_MAX) return gif;
+    toast('움직이는 사진은 350KB까지라 멈춘 사진으로 넣었어요');
+  }
   const img = await loadImg(file), max = 900, k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
   const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src);
@@ -644,17 +653,23 @@ function cropper(img) { // 끌어서 위치, 막대로 크기 맞추기
     box.querySelector('#ck').onclick = () => {
       const s = base * z, c = document.createElement('canvas'); c.width = c.height = 200;
       c.getContext('2d').drawImage(img, -x / s, -y / s, F / s, F / s, 0, 0, 200, 200);
-      close(jpeg(c, 60000));
+      const w = img.naturalWidth * s, h = img.naturalHeight * s; // 움직이는 사진용: 잘라 낼 위치를 비율로 기억
+      close({ url: jpeg(c, 60000), crop: { l: +(x / F * 100).toFixed(2), t: +(y / F * 100).toFixed(2), w: +(w / F * 100).toFixed(2), h: +(h / F * 100).toFixed(2) } });
     };
   });
 }
 async function setPhoto(file) {
   try {
     const img = await loadImg(file);
-    const url = await cropper(img);
+    const res = await cropper(img);
     URL.revokeObjectURL(img.src);
-    if (!url) return;
-    await updateDoc(doc(db, 'users', S.me.uid), { photo: url });
+    if (!res) return;
+    if (file.type === 'image/gif') { // 움직이는 사진: 원본 그대로 저장하고 자를 위치만 기억
+      const gif = await readData(file);
+      if (gif.length <= GIF_AV_MAX) { await updateDoc(doc(db, 'users', S.me.uid), { photo: gif, crop: res.crop }); toast('움직이는 프로필 사진으로 바꿨어요'); return }
+      toast('움직이는 사진은 200KB까지라 멈춘 사진으로 저장했어요');
+    }
+    await updateDoc(doc(db, 'users', S.me.uid), { photo: res.url, crop: deleteField() });
     toast('프로필 사진을 바꿨어요');
   } catch { toast('사진을 올리지 못했어요') }
 }
