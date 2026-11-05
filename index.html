@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>블랙폰 방명록</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Poor+Story&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+/* Layout: one pink phone centered on a pastel sky; every screen lives inside its LCD, nav pinned to the bottom like a 2000s handset */
+:root{
+  --sky-a:#e9e8ec; --sky-b:#cfced6;
+  --shell:#1c1b1f; --shell-hi:#4a4950; --shell-lo:#060608;
+  --pink:#2b2a2f; --pink-deep:#111013; --pink-soft:#6b6a72;
+  --lcd:#ffffff; --line:#dcdbe0; --ink:#1a191c; --muted:#85848c;
+  --bar:#ececef; --sky-text:#3a393f; --tint:#f2f1f4; --rule:#e6e5ea; --acc:#c9c8cf;
+  --pixel:"Galmuri11","DotGothic16","Courier New",monospace;
+  --hand:"Galmuri11","Poor Story","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{
+  background:radial-gradient(circle at 20% 15%,#fff 0 2px,transparent 3px) 0 0/90px 90px,
+             radial-gradient(circle at 70% 60%,#fff 0 1.5px,transparent 2.5px) 0 0/120px 120px,
+             linear-gradient(160deg,var(--sky-a),var(--sky-b));
+  color:var(--ink);font-family:var(--hand);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:24px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.note{font-family:var(--pixel);font-size:12px;color:var(--sky-text);letter-spacing:.04em;text-align:center}
+.phone{
+  width:min(100%,380px);
+  background:linear-gradient(145deg,var(--shell-hi),var(--shell) 40%,var(--shell-lo));
+  border-radius:54px;padding:26px 16px 36px;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.25),inset 0 -4px 10px rgba(0,0,0,.5),0 18px 40px rgba(20,20,30,.35);
+}
+.top{display:flex;justify-content:center;align-items:center;gap:22px;height:40px;margin-bottom:12px}
+.speaker{width:96px;height:18px;border-radius:12px;background:#000;box-shadow:inset 0 2px 3px #000,0 1px 0 rgba(255,255,255,.2)}
+.cam{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#556,#000)}
+.lcd{
+  background:var(--lcd);border:3px solid #000;border-radius:4px;
+  height:560px;display:flex;flex-direction:column;overflow:hidden;
+}
+.status{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:linear-gradient(#f6f6f7,var(--bar));border-bottom:1px solid var(--line);font-family:var(--pixel);font-size:13px}
+.status .icons{display:flex;gap:6px;align-items:center}
+.bat{width:30px;height:12px;border:2px solid #222;border-radius:2px;position:relative;padding:1px}
+.bat::after{content:"";position:absolute;right:-5px;top:2px;width:3px;height:5px;background:#222}
+.bat i{display:block;height:100%;width:80%;background:linear-gradient(90deg,#3b2a8f,#e04aa8)}
+.head{background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));color:#fff;text-align:center;font-family:var(--pixel);font-size:20px;padding:10px 40px;position:relative;text-shadow:0 1px 0 rgba(0,0,0,.6);min-height:24px}
+.head button{position:absolute;left:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-family:var(--pixel);font-size:18px;cursor:pointer;padding:4px 8px}
+.body{flex:1;overflow-y:auto;min-height:0}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(var(--pink-soft),var(--pink) 50%,var(--pink-deep))}
+.nav button{background:none;border:0;color:#fff;font-family:var(--pixel);font-size:14px;padding:12px 0;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.nav button.on{background:rgba(255,255,255,.28)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px dashed var(--pink-deep);outline-offset:2px}
+
+/* list rows */
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:2px solid var(--line);cursor:pointer;background:var(--lcd);width:100%;border-left:0;border-right:0;border-top:0;text-align:left;font:inherit;color:inherit}
+.row:hover{background:var(--tint)}
+.num{flex:none;width:28px;height:28px;background:var(--pink);color:#fff;font-family:var(--pixel);font-size:14px;display:grid;place-items:center;box-shadow:inset -2px -2px 0 var(--pink-deep)}
+.row svg{flex:none}
+.ttl{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.ttl.secret{color:var(--muted)}
+.row .meta{font-family:var(--pixel);font-size:11px;color:var(--muted);flex:none}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:15px}
+
+/* forms */
+.form{padding:16px;display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-family:var(--pixel);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.field input,.field textarea,.field select{font-family:var(--hand);font-size:16px;border:2px solid var(--line);background:#fff;padding:6px 10px;color:var(--ink);border-radius:0}
+.field textarea{resize:none;height:130px;line-height:1.6;background:repeating-linear-gradient(#fff 0 26px,var(--rule) 26px 27px);background-attachment:local}
+.count{font-family:var(--pixel);font-size:11px;color:var(--muted);text-align:right}
+.btn{font-family:var(--pixel);font-size:16px;color:#fff;background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));border:0;padding:11px;cursor:pointer;box-shadow:0 3px 0 #000}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #000}
+.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--line)}
+.tabs button{font-family:var(--pixel);font-size:14px;background:#fff;border:0;padding:10px;color:var(--muted);cursor:pointer}
+.tabs button.on{color:var(--pink-deep);box-shadow:inset 0 -3px 0 var(--pink)}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--pink)}
+.seg button{font-family:var(--hand);font-size:15px;background:#fff;border:0;padding:6px;cursor:pointer;color:var(--pink-deep)}
+.seg button.on{background:var(--pink);color:#fff}
+.hint{font-size:12px;color:var(--muted);line-height:1.6}
+.err{font-size:13px;color:var(--pink-deep);min-height:1em}
+
+/* read */
+.letter{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.from{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dashed var(--acc);padding-bottom:6px;gap:8px}
+.from b{font-size:17px}
+.from span{font-family:var(--pixel);font-size:11px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--pixel);font-size:11px;color:#fff;background:var(--pink-deep);padding:2px 6px;align-self:flex-start}
+.chip.pub{background:var(--muted)}
+.text{font-size:16px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.reply{background:var(--tint);border-left:4px solid var(--pink);padding:8px 10px;font-size:15px;line-height:1.4}
+.reply small{display:block;font-family:var(--pixel);font-size:11px;color:var(--pink-deep);margin-bottom:2px}
+.reply-form{display:flex;gap:6px}
+.reply-form input{flex:1;min-width:0;font-family:var(--hand);font-size:15px;border:2px solid var(--line);padding:4px 8px}
+.reply-form button{font-family:var(--pixel);font-size:13px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
+
+/* home */
+.me{display:flex;gap:12px;align-items:center;padding:14px;border-bottom:2px solid var(--line);background:linear-gradient(#fff,var(--tint))}
+.av{width:52px;height:52px;background:var(--pink);border:2px solid var(--pink-deep);display:grid;place-items:center;font-family:var(--pixel);font-size:22px;color:#fff;flex:none}
+.me b{font-size:19px;display:block}
+.me span{font-family:var(--pixel);font-size:11px;color:var(--muted)}
+.sect{font-family:var(--pixel);font-size:12px;color:var(--muted);padding:10px 14px 4px;letter-spacing:.06em}
+
+/* music */
+.now{padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.disc{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,#fff 0 10px,var(--pink-deep) 11px 14px,#2a2228 15px 60px,#3a3038 61px);animation:spin 6s linear infinite;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.disc{animation:none}}
+.track{font-size:18px}
+.listeners{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.listeners span{font-family:var(--pixel);font-size:12px;background:var(--tint);color:var(--pink-deep);padding:3px 8px}
+
+.homewrap{min-height:100%;display:flex;flex-direction:column}
+.foot{margin-top:auto;padding:28px 14px 12px;text-align:center}
+.out{background:none;border:0;font-family:var(--pixel);font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 10px}
+.lp{position:relative;width:170px;height:170px;border-radius:50%;background:repeating-radial-gradient(circle,#1b1a1e 0 2px,#2a292e 2px 4px);box-shadow:0 6px 16px rgba(0,0,0,.3);overflow:hidden;animation:spin 5s linear infinite;animation-play-state:paused}
+.lp.on{animation-play-state:running}
+.lp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.lp::after{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--lcd);box-shadow:0 0 0 4px rgba(0,0,0,.55)}
+.lp .ring{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 0 30%,rgba(0,0,0,.18) 31%,transparent 33%,transparent 60%,rgba(255,255,255,.08) 61%,transparent 63%)}
+.ctrl{display:flex;gap:8px;width:100%}
+.ctrl input{flex:1;min-width:0;font-family:var(--hand);font-size:13px;border:2px solid var(--line);padding:6px 8px}
+.ctrl button,.play{font-family:var(--pixel);font-size:13px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
+.play{padding:8px 22px;font-size:15px;box-shadow:0 3px 0 #000}
+@media (prefers-reduced-motion:reduce){.lp{animation:none}}
+.toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:rgba(34,32,36,.88);color:#fff;font-family:var(--pixel);font-size:13px;padding:8px 14px;white-space:nowrap}
+.lcdwrap{position:relative}
+.home-btn{width:54px;height:54px;border-radius:50%;margin:16px auto 0;background:linear-gradient(145deg,var(--shell-hi),var(--shell-lo));box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.2);border:0;display:block;cursor:pointer}
+
+#yt-box{position:absolute;left:0;top:0;width:1px;height:1px;opacity:.01;overflow:hidden;pointer-events:none}
+#yt-box.show{left:22px;right:22px;top:auto;bottom:62px;width:auto;height:180px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
+.btn:disabled{opacity:.6}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="top"><div class="speaker"></div><div class="cam"></div></div>
+  <div class="lcdwrap">
+    <div class="lcd">
+      <div class="status">
+        <div class="icons">
+          <svg width="22" height="14" viewBox="0 0 22 14"><path d="M1 1h8L5 6z" fill="#2a6fd8"/><rect x="4.5" y="6" width="1.5" height="8" fill="#2a6fd8"/><rect x="9" y="9" width="2" height="5" fill="#2a6fd8"/><rect x="12" y="7" width="2" height="7" fill="#2a6fd8"/><rect x="15" y="4" width="2" height="10" fill="#9ab8e8"/><rect x="18" y="1" width="2" height="13" fill="#9ab8e8"/></svg>
+          <svg width="16" height="14" viewBox="0 0 16 14"><rect x="0.5" y="0.5" width="15" height="13" rx="2" fill="#2a6fd8"/><path d="M5 4l5 5-2.5 2.5V2.5L10 5l-5 5" stroke="#fff" stroke-width="1.3" fill="none"/></svg>
+        </div>
+        <div class="icons"><span id="clock">20:00</span><span class="bat"><i></i></span></div>
+      </div>
+      <div class="head" id="head"></div>
+      <div class="body" id="view"></div>
+      <nav class="nav" id="nav" hidden>
+        <button data-go="home">HOME</button>
+        <button data-go="inbox">INBOX</button>
+        <button data-go="send">SEND</button>
+        <button data-go="music">MUSIC</button>
+      </nav>
+    </div>
+    <div id="yt-box"><div id="yt"></div></div>
+    <div class="toast" id="toast" hidden></div>
+  </div>
+  <button class="home-btn" id="homebtn" aria-label="홈으로"></button>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ===== Firebase 설정 (weboowe) ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBaqKOeVLaI8P0JUioD2O4hua80LHzueK4",
+  authDomain: "weboowe-84b14.firebaseapp.com",
+  projectId: "weboowe-84b14",
+  storageBucket: "weboowe-84b14.firebasestorage.app",
+  messagingSenderId: "1054759729550",
+  appId: "1:1054759729550:web:2b48fc8ccc0037bc590cdf"
+};
+/* ============================================================ */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const ENV_C = '<svg width="24" height="18" viewBox="0 0 24 18"><rect x="1" y="1" width="22" height="16" fill="#e8f6fb" stroke="#5b8ea3" stroke-width="1.5"/><path d="M1 1l11 9 11-9M1 17l8-7M23 17l-8-7" fill="none" stroke="#5b8ea3" stroke-width="1.5"/></svg>';
+const ENV_O = '<svg width="24" height="18" viewBox="0 0 24 18"><path d="M1 7l11-6 11 6v10H1z" fill="#fff" stroke="#b9a9b4" stroke-width="1.5"/><path d="M1 7l11 7 11-7" fill="none" stroke="#b9a9b4" stroke-width="1.5"/></svg>';
+const LOCK = '<svg width="18" height="20" viewBox="0 0 18 20"><rect x="2" y="9" width="14" height="10" fill="#2b2a2f" stroke="#111013" stroke-width="1.5"/><path d="M5 9V6a4 4 0 018 0v3" fill="none" stroke="#111013" stroke-width="2"/><rect x="8" y="12" width="2" height="4" fill="#fff"/></svg>';
+
+const S = {
+  me: null, screen: 'login', authTab: 'login', owner: null, open: null, vis: 'pub', to: null,
+  users: {},          // uid -> nick
+  mine: [],           // messages to me
+  other: [],          // messages to the guestbook being viewed
+  priv: {},           // message id -> private content (secret ones I can read)
+  room: null, listeners: [], joined: false, showVideo: false, confirmDel: false, busy: false
+};
+const subs = {};
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nickOk = n => n.length >= 1 && n.length <= 12 && !/[\/\s]/.test(n);
+function nickEmail(n) { // 한글 닉네임도 로그인 주소로 쓸 수 있게 바꿔 줌
+  return 'u' + Array.from(new TextEncoder().encode(n.normalize('NFC')), b => b.toString(16).padStart(2, '0')).join('') + '@pinkphone.app';
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800) }
+function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
+const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
+function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false }, extra); if (screen === 'inbox') watchOwner(); render() }
+function unsub(k) { if (subs[k]) { subs[k](); delete subs[k] } }
+
+/* ===== 로그인 상태 ===== */
+let signingUp = false;
+onAuthStateChanged(auth, async u => {
+  if (!u) { cleanup(); S.me = null; go('login'); return }
+  if (signingUp) return;
+  await loadMe(u);
+});
+async function loadMe(u) {
+  const snap = await getDoc(doc(db, 'users', u.uid)).catch(() => null);
+  if (!snap || !snap.exists()) { await signOut(auth); return }
+  S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
+  subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; q.forEach(d => S.users[d.id] = d.data().nick); render() });
+  subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); render() });
+  subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; syncPlayer(); if (S.screen === 'music') render() });
+  subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
+  go('inbox', { owner: u.uid });
+}
+function cleanup() { Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {} }
+function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
+function loadPriv(arr) {
+  arr.filter(m => m.secret && !S.priv[m.id] && (m.to === S.me?.uid || m.from === S.me?.uid)).forEach(m => {
+    S.priv[m.id] = 'loading';
+    subs['p' + m.id] = onSnapshot(doc(db, 'messages', m.id, 'private', 'content'), d => { if (d.exists()) { S.priv[m.id] = d.data(); render() } }, () => { });
+  });
+}
+function watchOwner() {
+  unsub('other');
+  if (!S.owner || S.owner === S.me?.uid) return;
+  subs.other = onSnapshot(query(collection(db, 'messages'), where('to', '==', S.owner)), q => { S.other = list(q); loadPriv(S.other); render() });
+}
+const msgsOf = owner => owner === S.me?.uid ? S.mine : S.other;
+function content(m) { // 화면에 보여 줄 제목·내용·답장
+  if (!m.secret) return m;
+  const p = S.priv[m.id];
+  return p && p !== 'loading' ? p : null;
+}
+
+/* ===== 화면 ===== */
+function render() {
+  const v = $('#view'), h = $('#head');
+  $('#nav').hidden = S.screen === 'login';
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
+  const back = html => h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html;
+
+  if (S.screen === 'login') {
+    const join = S.authTab === 'join';
+    h.textContent = join ? 'Join' : 'Log in';
+    v.innerHTML = `
+      <div class="tabs"><button id="t-login" class="${join ? '' : 'on'}">로그인</button><button id="t-join" class="${join ? 'on' : ''}">가입하기</button></div>
+      <form class="form" id="auth">
+        ${join ? `<div class="field"><label for="code">INVITE CODE</label><input id="code" autocomplete="off" placeholder="초대 코드"></div>` : ''}
+        <div class="field"><label for="uid">NICKNAME</label><input id="uid" maxlength="12" autocomplete="username" placeholder="닉네임 (띄어쓰기 없이 12자까지)"></div>
+        <div class="field"><label for="pw">PASSWORD</label><input id="pw" type="password" autocomplete="${join ? 'new-password' : 'current-password'}" placeholder="비밀번호 (6자 이상)"></div>
+        <div class="err" id="err">${esc(S.loginErr || '')}</div>
+        <button class="btn" type="submit" ${S.busy ? 'disabled' : ''}>${join ? 'JOIN' : 'LOG IN'}</button>
+        ${join ? '<p class="hint">닉네임과 비밀번호만 있으면 돼요. 비밀번호는 찾을 수 없으니 꼭 기억해 주세요.</p>' : ''}
+      </form>`;
+    $('#t-login').onclick = () => go('login', { authTab: 'login', loginErr: '' });
+    $('#t-join').onclick = () => go('login', { authTab: 'join', loginErr: '' });
+    $('#auth').onsubmit = e => { e.preventDefault(); join ? doJoin() : doLogin() };
+    return;
+  }
+
+  if (S.screen === 'home') {
+    h.textContent = 'Home';
+    const others = Object.entries(S.users).filter(([u]) => u !== S.me.uid).sort((a, b) => a[1].localeCompare(b[1]));
+    v.innerHTML = `<div class="homewrap">
+      <div class="me"><div class="av">${esc([...S.me.nick][0])}</div><div><b>${esc(S.me.nick)}</b><span>MY INBOX · ${S.mine.length} MSG · ${S.mine.filter(m => !m.read).length} NEW</span></div></div>
+      <div class="sect">FRIENDS' INBOX</div>
+      ${others.length ? others.map(([u, n], i) => `<button class="row" data-u="${u}"><span class="num">${i + 1}</span>${ENV_C}<span class="ttl">${esc(n)}의 방명록</span></button>`).join('') : '<div class="empty">아직 다른 친구가 없어요.<br>초대 코드를 알려 주세요!</div>'}
+      <div class="foot"><button class="out" id="out">log out</button></div></div>`;
+    v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('inbox', { owner: b.dataset.u }));
+    $('#out').onclick = () => signOut(auth);
+    return;
+  }
+
+  if (S.screen === 'inbox') {
+    const owner = S.owner || S.me.uid, mine = owner === S.me.uid, arr = msgsOf(owner);
+    if (mine) h.textContent = `Inbox {${arr.length}}`; else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
+    v.innerHTML = (arr.length ? arr.map((m, i) => {
+      const c = content(m);
+      const icon = m.secret ? LOCK : (m.read || !mine ? ENV_O : ENV_C);
+      const title = c ? esc(c.title) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요');
+      return `<button class="row" data-id="${m.id}" ${c ? '' : 'data-locked="1"'}><span class="num">${i + 1}</span>${icon}<span class="ttl ${c ? '' : 'secret'}">${title}</span>${mine && !m.read ? '<span class="meta">NEW</span>' : ''}</button>`;
+    }).join('') : `<div class="empty">아직 받은 메시지가 없어요</div>`)
+      + (mine ? '' : `<div class="form"><button class="btn" id="write">${esc(S.users[owner] || '')}에게 남기기</button></div>`);
+    v.querySelectorAll('[data-id]').forEach(b => b.onclick = () => {
+      if (b.dataset.locked) { toast('주인과 보낸 사람만 볼 수 있어요'); return }
+      go('read', { open: b.dataset.id });
+    });
+    if ($('#back')) $('#back').onclick = () => go('home');
+    if ($('#write')) $('#write').onclick = () => go('send', { to: owner });
+    return;
+  }
+
+  if (S.screen === 'read') {
+    const m = msgsOf(S.owner).find(x => x.id === S.open), c = m && content(m);
+    back('Message');
+    $('#back').onclick = () => go('inbox');
+    if (!m || !c) { v.innerHTML = '<div class="empty">메시지를 찾을 수 없어요</div>'; return }
+    const isOwner = m.to === S.me.uid, canDel = isOwner || m.from === S.me.uid;
+    if (isOwner && !m.read) updateDoc(doc(db, 'messages', m.id), { read: true }).catch(() => { });
+    v.innerHTML = `<div class="letter">
+      <div class="from"><b>From. ${esc(c.fromNick)}</b><span>${fmt(m.createdAt)}</span></div>
+      <span class="chip ${m.secret ? '' : 'pub'}">${m.secret ? 'SECRET' : 'PUBLIC'}</span>
+      <div class="text"><b>${esc(c.title)}</b>\n${esc(c.body)}</div>
+      ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}</small>${esc(c.reply)}</div>` : ''}
+      ${isOwner && !c.reply ? `<form class="reply-form" id="rf"><input id="rt" maxlength="100" placeholder="답장 쓰기 (100자)"><button>RE</button></form>` : ''}
+      ${canDel ? `<div class="foot" style="padding-top:8px"><button class="out" id="del">${S.confirmDel ? '한 번 더 누르면 삭제돼요' : 'delete'}</button></div>` : ''}
+    </div>`;
+    if ($('#rf')) $('#rf').onsubmit = async e => {
+      e.preventDefault(); const t = $('#rt').value.trim(); if (!t) return;
+      const ref = m.secret ? doc(db, 'messages', m.id, 'private', 'content') : doc(db, 'messages', m.id);
+      try { await updateDoc(ref, { reply: t, replyAt: serverTimestamp() }); toast('답장을 남겼어요') } catch { toast('답장을 저장하지 못했어요') }
+    };
+    if ($('#del')) $('#del').onclick = async () => {
+      if (!S.confirmDel) { S.confirmDel = true; render(); return }
+      const b = writeBatch(db);
+      if (m.secret) b.delete(doc(db, 'messages', m.id, 'private', 'content'));
+      b.delete(doc(db, 'messages', m.id));
+      try { await b.commit(); unsub('p' + m.id); delete S.priv[m.id]; toast('삭제했어요'); go('inbox') } catch { toast('삭제하지 못했어요') }
+    };
+    return;
+  }
+
+  if (S.screen === 'send') {
+    h.textContent = 'New Message';
+    const others = Object.entries(S.users).filter(([u]) => u !== S.me.uid);
+    if (!others.length) { v.innerHTML = '<div class="empty">메시지를 보낼 친구가 아직 없어요</div>'; return }
+    const to = S.to && S.users[S.to] ? S.to : others[0][0];
+    v.innerHTML = `<form class="form" id="sf">
+      <div class="field"><label for="to">TO</label><select id="to">${others.map(([u, n]) => `<option value="${u}" ${u === to ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
+      <div class="field"><label for="st">TITLE</label><input id="st" maxlength="20" placeholder="제목 (20자)"></div>
+      <div class="field"><label for="sb">MESSAGE</label><textarea id="sb" maxlength="300" placeholder="메시지를 적어 주세요"></textarea><div class="count" id="cnt">0/300</div></div>
+      <div class="seg" role="group" aria-label="공개 범위"><button type="button" data-v="pub" class="${S.vis === 'pub' ? 'on' : ''}">공개</button><button type="button" data-v="sec" class="${S.vis === 'sec' ? 'on' : ''}">비밀</button></div>
+      <p class="hint" id="vh"></p>
+      <div class="err" id="err"></div>
+      <button class="btn" type="submit">SEND ✉</button>
+    </form>`;
+    const hint = () => $('#vh').textContent = S.vis === 'sec' ? '비밀 메시지는 받는 사람과 나만 볼 수 있어요.' : '공개 메시지는 방명록에 들른 친구 누구나 볼 수 있어요.';
+    hint();
+    $('#sb').oninput = e => $('#cnt').textContent = e.target.value.length + '/300';
+    $('#to').onchange = e => S.to = e.target.value;
+    v.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { S.vis = b.dataset.v; v.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); hint() });
+    $('#sf').onsubmit = async e => {
+      e.preventDefault();
+      const title = $('#st').value.trim(), body = $('#sb').value.trim(), dest = $('#to').value, secret = S.vis === 'sec';
+      if (!title || !body) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
+      const ref = doc(collection(db, 'messages')), b = writeBatch(db);
+      const base = { to: dest, from: S.me.uid, secret, read: false, createdAt: serverTimestamp() };
+      const text = { fromNick: S.me.nick, title, body, reply: '' };
+      if (secret) { b.set(ref, base); b.set(doc(ref, 'private', 'content'), { to: dest, from: S.me.uid, ...text }) }
+      else b.set(ref, { ...base, ...text });
+      try { await b.commit(); toast(S.users[dest] + '에게 보냈어요'); go('inbox', { owner: dest, to: null, vis: 'pub' }) }
+      catch { $('#err').textContent = '보내지 못했어요. 잠시 후 다시 해 주세요.' }
+    };
+    return;
+  }
+
+  if (S.screen === 'music') {
+    h.textContent = 'Listen Together';
+    const r = S.room, t = r?.videoId, now = Date.now();
+    const live = S.listeners.filter(l => now - ms(l.at) < 75000);
+    v.innerHTML = `<div class="now">
+      <div class="lp ${r?.playing ? 'on' : ''}" aria-hidden="true">${t ? `<img src="https://i.ytimg.com/vi/${t}/hqdefault.jpg" alt="">` : ''}<div class="ring"></div></div>
+      <div class="track">${!t ? '아직 곡이 없어요' : r.playing ? '같이 듣는 중' : '일시정지'}</div>
+      ${t && r.byNick ? `<div class="hint">${esc(r.byNick)}님이 고른 곡</div>` : ''}
+      ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
+        : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button>` : ''}
+      ${S.joined ? `<button class="out" id="leave">그만 듣기</button>` : ''}
+      <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크 붙여넣기"><button>OK</button></form>
+      <div class="err" id="err"></div>
+      ${S.joined ? `<button class="out" id="vid">${S.showVideo ? '영상 숨기기' : '소리가 안 나면 영상 보기'}</button>` : ''}
+      <div class="sect" style="padding:0">LISTENING NOW · ${live.length}</div>
+      <div class="listeners">${live.map(l => `<span>${esc(l.nick)}${l.uid === S.me.uid ? ' (나)' : ''}</span>`).join('') || '<span>아무도 없어요</span>'}</div>
+    </div>`;
+    v.querySelectorAll('.lp img').forEach(i => i.onerror = () => i.remove());
+    if ($('#join')) $('#join').onclick = joinRoom;
+    if ($('#leave')) $('#leave').onclick = () => { leaveRoom(); render() };
+    if ($('#vid')) $('#vid').onclick = () => { S.showVideo = !S.showVideo; $('#yt-box').classList.toggle('show', S.showVideo); render() };
+    if ($('#play')) $('#play').onclick = togglePlay;
+    $('#yt').onsubmit = async e => {
+      e.preventDefault();
+      const u = $('#yturl').value.trim();
+      const m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/) || u.match(/^([\w-]{11})$/);
+      if (!m) { $('#err').textContent = '유튜브 링크를 확인해 주세요.'; return }
+      await setRoom({ videoId: m[1], playing: true, startAt: Date.now(), pos: 0 });
+      if (!S.joined) joinRoom();
+    };
+  }
+}
+
+/* ===== 가입 / 로그인 ===== */
+const ERR = {
+  'auth/email-already-in-use': '이미 있는 닉네임이에요.',
+  'auth/invalid-credential': '닉네임이나 비밀번호가 맞지 않아요.',
+  'auth/wrong-password': '닉네임이나 비밀번호가 맞지 않아요.',
+  'auth/user-not-found': '닉네임이나 비밀번호가 맞지 않아요.',
+  'auth/weak-password': '비밀번호는 6자 이상이에요.',
+  'auth/too-many-requests': '시도가 너무 많아요. 잠시 후 다시 해 주세요.',
+  'auth/network-request-failed': '인터넷 연결을 확인해 주세요.'
+};
+const showErr = t => { S.loginErr = t; const e = $('#err'); if (e) e.textContent = t };
+async function doLogin() {
+  const nick = $('#uid').value.trim(), pw = $('#pw').value;
+  if (!nick || !pw) { showErr('닉네임과 비밀번호를 적어 주세요.'); return }
+  S.busy = true;
+  try { await signInWithEmailAndPassword(auth, nickEmail(nick), pw) }
+  catch (e) { showErr(ERR[e.code] || '로그인하지 못했어요.') }
+  S.busy = false;
+}
+async function doJoin() {
+  const code = $('#code').value.trim(), nick = $('#uid').value.trim().normalize('NFC'), pw = $('#pw').value;
+  if (!code) { showErr('초대 코드를 적어 주세요.'); return }
+  if (!nickOk(nick)) { showErr('닉네임은 띄어쓰기와 / 없이 12자까지예요.'); return }
+  if (pw.length < 6) { showErr('비밀번호는 6자 이상이에요.'); return }
+  signingUp = true; S.busy = true;
+  let cred;
+  try { cred = await createUserWithEmailAndPassword(auth, nickEmail(nick), pw) }
+  catch (e) { signingUp = false; S.busy = false; showErr(ERR[e.code] || '가입하지 못했어요.'); return }
+  try {
+    const b = writeBatch(db), uid = cred.user.uid;
+    b.set(doc(db, 'joins', uid), { code });
+    b.set(doc(db, 'nicks', nick), { uid });
+    b.set(doc(db, 'users', uid), { nick, createdAt: serverTimestamp() });
+    await b.commit();
+    signingUp = false; S.busy = false;
+    toast('가입했어요'); await loadMe(cred.user);
+  } catch (e) {
+    await deleteUser(cred.user).catch(() => signOut(auth));
+    signingUp = false; S.busy = false;
+    showErr('초대 코드가 맞지 않아요.');
+  }
+}
+
+/* ===== 같이 듣기 ===== */
+let player = null, playerReady = false, beat = null, lastVid = null;
+function loadYT() {
+  return new Promise(res => {
+    if (window.YT?.Player) return res();
+    window.onYouTubeIframeAPIReady = res;
+    const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+  });
+}
+async function joinRoom() {
+  S.joined = true; render();
+  await loadYT();
+  if (!player) {
+    player = new YT.Player('yt', {
+      width: '100%', height: '100%', playerVars: { playsinline: 1, controls: 0, rel: 0 },
+      events: {
+        onReady: () => { playerReady = true; lastVid = null; syncPlayer() },
+        onStateChange: e => { if (e.data === YT.PlayerState.ENDED && S.room?.playing) setRoom({ ...S.room, playing: false, pos: 0 }) }
+      }
+    });
+  } else syncPlayer();
+  heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000);
+}
+function heartbeat() { if (S.me && S.joined) setDoc(doc(db, 'room', 'main', 'listeners', S.me.uid), { nick: S.me.nick, at: serverTimestamp() }).catch(() => { }) }
+function leaveRoom() {
+  clearInterval(beat); beat = null;
+  if (S.joined && S.me) deleteDoc(doc(db, 'room', 'main', 'listeners', S.me.uid)).catch(() => { });
+  S.joined = false; S.showVideo = false; $('#yt-box')?.classList.remove('show');
+  try { player?.pauseVideo() } catch { }
+}
+addEventListener('pagehide', leaveRoom);
+function target(r) { return r.playing ? Math.max(0, (Date.now() - r.startAt) / 1000) : (r.pos || 0) }
+function syncPlayer() {
+  const r = S.room;
+  if (!S.joined || !player || !playerReady || !r?.videoId) return;
+  const t = target(r);
+  if (r.videoId !== lastVid) {
+    lastVid = r.videoId;
+    if (r.playing) player.loadVideoById({ videoId: r.videoId, startSeconds: t });
+    else player.cueVideoById({ videoId: r.videoId, startSeconds: t });
+    return;
+  }
+  const cur = player.getCurrentTime?.() || 0;
+  if (Math.abs(cur - t) > 2) player.seekTo(t, true);
+  r.playing ? player.playVideo() : player.pauseVideo();
+}
+setInterval(() => { if (S.room?.playing) syncPlayer() }, 10000);
+function setRoom(d) {
+  return setDoc(doc(db, 'room', 'main'), { videoId: d.videoId, playing: d.playing, startAt: d.startAt ?? Date.now(), pos: d.pos ?? 0, by: S.me.uid, byNick: S.me.nick, at: serverTimestamp() }).catch(() => toast('저장하지 못했어요'));
+}
+function togglePlay() {
+  const r = S.room; if (!r) return;
+  if (r.playing) setRoom({ ...r, playing: false, pos: target(r) });
+  else setRoom({ ...r, playing: true, startAt: Date.now() - (r.pos || 0) * 1000 });
+}
+
+/* ===== 공통 ===== */
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.go, { owner: S.me?.uid }));
+$('#homebtn').onclick = () => { if (S.me) go('home') };
+function tick() { const d = new Date(); $('#clock').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') }
+tick(); setInterval(tick, 30000);
+render();
+</script>
+</body>
+</html>
