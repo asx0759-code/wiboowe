@@ -484,7 +484,7 @@ function render() {
       <div class="track">${!t ? '아직 곡이 없어요' : esc(r.title || (r.playing ? '같이 듣는 중' : '일시정지'))}</div>
       ${t ? `<div class="hint">${r.playing ? '▶ 재생 중' : '❚❚ 일시정지'}${r.pick ? ' · ' + esc(r.pick) + '님이 고른 곡' : ''}</div>` : ''}
       ${r?.ext ? `<a class="play ytopen" id="ytopen" href="https://www.youtube.com/watch?v=${t}" target="_blank" rel="noopener">▶ 유튜브에서 열기</a>
-        <p class="hint"><span id="extt">${fmtT(target(r))} / ${fmtT(r.dur)}</span><br>사이트 안에서는 재생이 막힌 곡이라 유튜브에서 들어요.<br>버튼을 누르면 지금 위치부터 열려요. PC에서는 작은 창으로 떠요.</p>` : ''}
+        <p class="hint"><span id="extt">${fmtT(target(r))}${r.dur ? ' / ' + fmtT(r.dur) : ''}</span><br>사이트 안에서는 재생이 막힌 곡이라 유튜브에서 들어요.${r.dur ? '' : '<br>다 들으면 NEXT를 눌러 주세요.'}<br>버튼을 누르면 지금 위치부터 열려요. PC에서는 작은 창으로 떠요.</p>` : ''}
       <div class="ctrl-row">
         ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
           : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button><button class="play ghost" id="skip">NEXT ▶▶</button>` : ''}
@@ -706,8 +706,15 @@ async function preparePlayer() {
       },
       onError: e => {
         S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.';
-        // 재생할 수 없는 곡이면 멈춰 있지 않고 다음 곡으로 넘김
-        if (S.joined && S.room?.playing && !S.room.ext && [100, 101, 150, 5].includes(e.data)) { S.ytErr += ' 다음 곡으로 넘길게요.'; advance(S.room.videoId) }
+        const r = S.room, vid = lastVid;
+        if (r && !r.ext && r.videoId === vid && [101, 150].includes(e.data)) {
+          // 다른 사이트 재생이 막힌 곡: 유튜브에서 같이 듣기로 바꿈
+          S.ytErr = '';
+          roomTx(cur => cur.videoId === vid && !cur.ext ? { ...cur, ext: true, dur: cur.dur || 0 } : null);
+        } else if (S.joined && r?.playing && !r.ext && [100, 5].includes(e.data)) {
+          // 삭제됐거나 재생할 수 없는 곡이면 다음 곡으로 넘김
+          S.ytErr += ' 다음 곡으로 넘길게요.'; advance(r.videoId);
+        }
         if (S.screen === 'music') render();
       }
     }
@@ -724,7 +731,7 @@ function startNow(videoId, t) { // 클릭한 순간에 바로 호출
   clearTimeout(checkT);
   checkT = setTimeout(() => { // 몇 초 지나도 재생이 안 되면 플레이어를 직접 누르게 보여 줌
     const st = player?.getPlayerState?.();
-    if (S.joined && S.room?.playing && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) {
+    if (S.joined && S.room?.playing && !S.room.ext && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) {
       S.showVideo = true; $('#yt-box').classList.add('show'); S.needTap = true; if (S.screen === 'music') render();
     }
   }, 3500);
@@ -854,7 +861,7 @@ setInterval(() => {
   const r = S.room;
   if (!r?.ext || !r.playing) return;
   const t = target(r), el = $('#extt');
-  if (el) el.textContent = fmtT(t) + ' / ' + fmtT(r.dur);
+  if (el) el.textContent = fmtT(t) + (r.dur ? ' / ' + fmtT(r.dur) : '');
   if (S.me && r.dur && t >= r.dur + 1 && extAdv !== r.videoId + r.startAt) { extAdv = r.videoId + r.startAt; advance(r.videoId) }
 }, 1000);
 
