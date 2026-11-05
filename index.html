@@ -586,7 +586,7 @@ function render() {
           }
         }
         $('#err').textContent = '';
-        if (!alt) { S.extPending = { id, title: title || '' }; render(); return }
+        if (!alt) { S.ytErr = '이 노래는 재생할 수 있는 영상을 찾지 못해서 넣지 않았어요.'; render(); return }
         vid = alt.id; title = title || alt.title; swapped = true;
       }
       const idle = !S.room?.videoId || !S.room.playing;
@@ -931,9 +931,12 @@ async function fixBlocked(vid) {
   await roomTx(cur => {
     if (cur.videoId !== vid) return null;
     if (alt) return { ...cur, alt: true, videoId: alt.id, title: cur.title || alt.title, fix: '', tried: [...(cur.tried || []), vid], startAt: srvNow(), pos: 0 };
-    return { ...cur, fix: '', ext: true, dur: cur.dur || 0 };
+    // 끝까지 못 찾으면 멈춰 있지 않고 다음 곡으로
+    const qq = [...(cur.queue || [])], next = qq.shift();
+    if (!next) return { ...cur, fix: '', playing: false, pos: 0, queue: [] };
+    return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, ext: !!next.ext, dur: next.dur || 0, playing: true, startAt: srvNow(), pos: 0, queue: qq };
   });
-  if (alt) toast('막힌 영상이라 같은 노래의 다른 영상으로 바꿨어요');
+  toast(alt ? '막힌 영상이라 같은 노래의 다른 영상으로 바꿨어요' : '재생할 수 있는 영상을 못 찾아서 다음 곡으로 넘겼어요');
 }
 // 숨겨 둔 두 번째 플레이어(소리 끔)로 영상을 잠깐 틀어 봐서, 이 사이트에서 재생되는지 미리 확인
 let probe = null, probeReady = null, probeCb = null, probeQ = Promise.resolve();
