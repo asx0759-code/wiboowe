@@ -179,6 +179,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.vol{display:flex;align-items:center;gap:8px;width:100%;max-width:260px;font-family:var(--pixel);font-size:12px;color:var(--muted)}
+.vol input{flex:1;min-width:0;accent-color:var(--pink-deep);height:20px}
+.vol #volv{width:26px;text-align:right;font-variant-numeric:tabular-nums}
 .ytopen{display:inline-block;text-decoration:none;background:#c00;box-shadow:0 3px 0 #600;color:#fff}
 .extform{width:100%;display:flex;flex-direction:column;gap:8px;text-align:left;border:2px dashed var(--acc);padding:10px}
 .extform input{font-family:var(--hand);border:2px solid var(--line);padding:6px 8px}
@@ -263,6 +266,7 @@ const S = {
   priv: {},           // message id -> private content (secret ones I can read)
   imgs: {},           // message id -> 첨부 사진
   attach: null,       // 보낼 사진
+  vol: (() => { try { const v = parseInt(localStorage.getItem('wb_vol'), 10); return Number.isFinite(v) ? v : 80 } catch { return 80 } })(),
   room: null, listeners: [], joined: false, showVideo: false, confirmDel: false, busy: false
 };
 const subs = {};
@@ -491,6 +495,7 @@ function render() {
         ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
           : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button><button class="play ghost" id="skip">NEXT ▶▶</button>` : ''}
       </div>
+      ${S.joined ? `<div class="vol"><span aria-hidden="true">VOL</span><input type="range" id="vol" min="0" max="100" step="1" value="${S.vol}" aria-label="음량"><span id="volv">${S.vol}</span></div>` : ''}
       <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크로 곡 추가"><button>ADD</button></form>
       <div class="err" id="err">${esc(S.ytErr || '')}</div>
       ${S.extPending ? `<form class="extform" id="xf">
@@ -520,6 +525,7 @@ function render() {
     if ($('#leave')) $('#leave').onclick = () => { leaveRoom(); render() };
     if ($('#vid')) $('#vid').onclick = () => { S.showVideo = !S.showVideo; $('#yt-box').classList.toggle('show', S.showVideo); render() };
     if ($('#wake')) $('#wake').onclick = toggleWake;
+    if ($('#vol')) $('#vol').oninput = e => setVol(+e.target.value);
     if ($('#play')) $('#play').onclick = togglePlay;
     if ($('#skip')) $('#skip').onclick = () => advance(null);
     if ($('#ytopen')) $('#ytopen').onclick = e => {
@@ -737,7 +743,7 @@ async function preparePlayer() {
   player = new YT.Player('yt', {
     width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, origin: location.origin, widget_referrer: location.href },
     events: {
-      onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
+      onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; try { player.setVolume(S.vol) } catch { } if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
       onStateChange: e => {
         if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (ytPop && !S.room?.ext) { try { ytPop.close() } catch { } ytPop = null; popVid = null } if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
         if (e.data === YT.PlayerState.ENDED) {
@@ -771,7 +777,7 @@ function startNow(videoId, t) { // 클릭한 순간에 바로 호출
   if (!playerReady) return;
   if (S.room?.ext && S.room.videoId === videoId) return; // 유튜브에서 듣는 곡은 사이트에서 재생 안 함
   try {
-    player.unMute(); player.setVolume(100);
+    player.unMute(); player.setVolume(S.vol);
     if (videoId !== lastVid) { lastVid = videoId; player.loadVideoById({ videoId, startSeconds: t }) }
     else { player.seekTo(t, true); player.playVideo() }
   } catch { }
@@ -982,6 +988,13 @@ function testPlayable(id) {
   };
   probeQ = probeQ.then(run, run);
   return probeQ;
+}
+// 음량: 내 기기에서만 바뀌고, 다음에 들어와도 기억해요
+function setVol(v) {
+  S.vol = Math.max(0, Math.min(100, v | 0));
+  try { localStorage.setItem('wb_vol', S.vol) } catch { }
+  const el = $('#volv'); if (el) el.textContent = S.vol;
+  try { if (playerReady) { S.vol ? player.unMute() : player.mute(); player.setVolume(S.vol) } } catch { }
 }
 function fmtT(sec) { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') }
 function parseDur(v) {
