@@ -291,7 +291,7 @@ async function loadMe(u) {
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
   subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; q.forEach(d => { S.users[d.id] = d.data().nick; if (d.data().photo) S.photos[d.id] = d.data().photo }); refresh() });
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); refresh() });
-  subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; syncPlayer(); if (S.screen === 'music') render() });
+  subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
   subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
   preparePlayer();
@@ -484,7 +484,7 @@ function render() {
       <div class="track">${!t ? '아직 곡이 없어요' : esc(r.title || (r.playing ? '같이 듣는 중' : '일시정지'))}</div>
       ${t ? `<div class="hint">${r.playing ? '▶ 재생 중' : '❚❚ 일시정지'}${r.pick ? ' · ' + esc(r.pick) + '님이 고른 곡' : ''}</div>` : ''}
       ${r?.ext ? `<a class="play ytopen" id="ytopen" href="https://www.youtube.com/watch?v=${t}" target="_blank" rel="noopener">▶ 유튜브에서 열기</a>
-        <p class="hint"><span id="extt">${fmtT(target(r))}${r.dur ? ' / ' + fmtT(r.dur) : ''}</span><br>사이트 안에서는 재생이 막힌 곡이라 유튜브에서 들어요.${r.dur ? '' : '<br>다 들으면 NEXT를 눌러 주세요.'}<br>버튼을 누르면 지금 위치부터 열려요. PC에서는 작은 창으로 떠요.</p>` : ''}
+        <p class="hint"><span id="extt">${fmtT(target(r))}${r.dur ? ' / ' + fmtT(r.dur) : ''}</span><br>사이트 안에서는 재생이 막힌 곡이라 유튜브에서 들어요.${r.dur ? '' : '<br>다 들으면 NEXT를 눌러 주세요.'}<br>버튼을 누르면 지금 위치부터 열려요. PC에서는 LP판 위에 작은 창으로 떠요.</p>` : ''}
       <div class="ctrl-row">
         ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
           : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button><button class="play ghost" id="skip">NEXT ▶▶</button>` : ''}
@@ -527,9 +527,14 @@ function render() {
       // PC: 사이트 옆에 작은 창으로 띄움 / 휴대폰: 새 탭이나 유튜브 앱 (브라우저가 작은 창을 지원하지 않음)
       const pc = matchMedia('(pointer:fine)').matches && screen.width > 800;
       if (!pc) return;
-      const w = 520, h = 340, left = Math.max(0, (window.screenX || 0) + window.outerWidth - w - 20), top = Math.max(0, (window.screenY || 0) + 60);
+      // LP판이 화면 어디에 있는지 계산해서, 작은 창의 가운데가 LP판 가운데에 오게 함
+      const w = 420, h = 320, lp = document.querySelector('.lp')?.getBoundingClientRect();
+      const chromeX = Math.max(0, (window.outerWidth - window.innerWidth) / 2), chromeY = Math.max(0, window.outerHeight - window.innerHeight - chromeX);
+      const cx = lp ? (window.screenX || 0) + chromeX + lp.left + lp.width / 2 : (window.screenX || 0) + window.outerWidth / 2;
+      const cy = lp ? (window.screenY || 0) + chromeY + lp.top + lp.height / 2 : (window.screenY || 0) + window.outerHeight / 2;
+      const left = Math.max(0, Math.round(cx - w / 2)), top = Math.max(0, Math.round(cy - h / 2));
       const pop = window.open(url, 'wiboowe_yt', `popup=yes,width=${w},height=${h},left=${left},top=${top}`);
-      if (pop) { e.preventDefault(); try { pop.focus() } catch { } }
+      if (pop) { e.preventDefault(); ytPop = pop; popVid = rr.videoId; try { pop.focus() } catch { } }
     };
     if ($('#xc')) $('#xc').onclick = () => { S.extPending = null; render() };
     if ($('#xf')) $('#xf').onsubmit = async e => {
@@ -701,7 +706,7 @@ async function preparePlayer() {
     events: {
       onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
       onStateChange: e => {
-        if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
+        if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (ytPop && !S.room?.ext) { try { ytPop.close() } catch { } ytPop = null; popVid = null } if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
         if (e.data === YT.PlayerState.ENDED && S.joined && S.room?.playing) advance(S.room.videoId);
       },
       onError: e => {
@@ -848,6 +853,18 @@ document.addEventListener('visibilitychange', async () => {
   syncPlayer(); // 돌아오면 다시 맞춤
 });
 
+// PC 작은 창: 곡이 바뀌면 창도 따라서 다음 곡으로 바꾸고, 사이트에서 재생되는 곡이 오면 창을 닫음
+let ytPop = null, popVid = null;
+function followPopup() {
+  if (!ytPop) return;
+  if (ytPop.closed) { ytPop = null; popVid = null; return }
+  const r = S.room;
+  if (!r?.videoId) return;
+  if (!r.ext) return; // 사이트에서 재생되는 곡이면, 실제로 소리가 나기 시작할 때 창을 닫음
+  if (r.playing && r.videoId !== popVid) {
+    try { ytPop.location.href = `https://www.youtube.com/watch?v=${r.videoId}&t=${Math.floor(target(r))}s`; popVid = r.videoId } catch { }
+  }
+}
 function fmtT(sec) { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') }
 function parseDur(v) {
   v = String(v).trim(); let m;
