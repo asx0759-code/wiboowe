@@ -179,6 +179,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
 
+/* 수정 */
+.edited{font-family:var(--pixel);font-size:10px;color:var(--muted);align-self:flex-end}
+.out.inline{padding:0;font-size:11px;color:var(--pink-deep)}
+.ghostbtn{background:none!important;color:var(--muted)!important;font-size:16px!important}
 /* 모바일: 페이지 전체는 고정하고, 폰 화면 안쪽만 스크롤 */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-bottom,0px));justify-content:center;touch-action:manipulation}
@@ -267,8 +271,8 @@ function nickEmail(n) { // 한글 닉네임도 로그인 주소로 쓸 수 있�
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
-function refresh() { if (S.screen !== 'send') render() }
-function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false }, extra); if (screen === 'inbox') watchOwner(); render() }
+function refresh() { if (S.screen !== 'send' && !S.editMsg && !S.editReply) render() }
+function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false, editMsg: false, editReply: false }, extra); if (screen === 'inbox') watchOwner(); render() }
 function unsub(k) { if (subs[k]) { subs[k](); delete subs[k] } }
 
 /* ===== 로그인 상태 ===== */
@@ -386,15 +390,34 @@ function render() {
       <div class="from"><span class="who"><span class="mini">${avatar(m.from, c.fromNick)}</span><b>From. ${esc(c.fromNick)}</b></span><span>${fmt(m.createdAt)}</span></div>
       <span class="chip ${m.secret ? '' : 'pub'}">${m.secret ? 'SECRET' : 'PUBLIC'}</span>
       ${m.hasImage ? `<div class="photo">${S.imgs[m.id] && S.imgs[m.id] !== 'loading' ? `<img src="${S.imgs[m.id]}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
-      <div class="text"><b>${esc(c.title)}</b>\n${esc(c.body)}</div>
-      ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}</small>${esc(c.reply)}</div>` : ''}
-      ${isOwner && !c.reply ? `<form class="reply-form" id="rf"><input id="rt" maxlength="100" placeholder="답장 쓰기 (100자)"><button>RE</button></form>` : ''}
+      ${S.editMsg ? `<form class="form" id="ef" style="padding:0">
+          <div class="field"><label for="et">TITLE</label><input id="et" maxlength="20" value="${esc(c.title)}"></div>
+          <div class="field"><label for="eb">MESSAGE</label><textarea id="eb" maxlength="300">${esc(c.body)}</textarea></div>
+          <div class="err" id="err"></div>
+          <div class="ctrl-row"><button type="button" class="play ghost" id="ecancel">CANCEL</button><button class="play">SAVE</button></div>
+        </form>`
+        : `<div class="text"><b>${esc(c.title)}</b>\n${esc(c.body)}</div>`}
+      ${c.reply && !S.editReply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}${isOwner ? ' · <button class="out inline" id="redit">edit</button>' : ''}</small>${esc(c.reply)}</div>` : ''}
+      ${isOwner && (!c.reply || S.editReply) && !S.editMsg ? `<form class="reply-form" id="rf"><input id="rt" maxlength="100" placeholder="답장 쓰기 (100자)" value="${S.editReply ? esc(c.reply) : ''}"><button>${S.editReply ? 'OK' : 'RE'}</button>${S.editReply ? '<button type="button" id="rcancel" class="ghostbtn">×</button>' : ''}</form>${S.editReply ? '<p class="hint">비우고 OK를 누르면 답장이 지워져요.</p>' : ''}` : ''}
+      ${m.from === S.me.uid && !S.editMsg ? `<div class="foot" style="padding:8px 0 0;margin:0"><button class="out" id="medit">edit message</button></div>` : ''}
       ${canDel ? `<div class="foot" style="padding-top:8px"><button class="out" id="del">${S.confirmDel ? '한 번 더 누르면 삭제돼요' : 'delete'}</button></div>` : ''}
     </div>`;
     if ($('#rf')) $('#rf').onsubmit = async e => {
-      e.preventDefault(); const t = $('#rt').value.trim(); if (!t) return;
+      e.preventDefault(); const t = $('#rt').value.trim(); if (!t && !S.editReply) return;
       const ref = m.secret ? doc(db, 'messages', m.id, 'private', 'content') : doc(db, 'messages', m.id);
-      try { await updateDoc(ref, { reply: t, replyAt: serverTimestamp() }); toast('답장을 남겼어요') } catch { toast('답장을 저장하지 못했어요') }
+      try { await updateDoc(ref, { reply: t, replyAt: serverTimestamp() }); toast(S.editReply ? '답장을 고쳤어요' : '답장을 남겼어요'); S.editReply = false; render() } catch { toast('답장을 저장하지 못했어요') }
+    };
+    if ($('#redit')) $('#redit').onclick = () => { S.editReply = true; render(); $('#rt')?.focus() };
+    if ($('#rcancel')) $('#rcancel').onclick = () => { S.editReply = false; render() };
+    if ($('#medit')) $('#medit').onclick = () => { S.editMsg = true; render() };
+    if ($('#ecancel')) $('#ecancel').onclick = () => { S.editMsg = false; render() };
+    if ($('#ef')) $('#ef').onsubmit = async e => {
+      e.preventDefault();
+      const title = $('#et').value.trim(), body = $('#eb').value.trim();
+      if (!title || !body) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
+      const ref = m.secret ? doc(db, 'messages', m.id, 'private', 'content') : doc(db, 'messages', m.id);
+      try { await updateDoc(ref, { title, body, editedAt: serverTimestamp() }); S.editMsg = false; toast('메시지를 고쳤어요'); render() }
+      catch { $('#err').textContent = '저장하지 못했어요. 잠시 후 다시 해 주세요.' }
     };
     if ($('#del')) $('#del').onclick = async () => {
       if (!S.confirmDel) { S.confirmDel = true; render(); return }
