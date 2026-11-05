@@ -178,6 +178,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.ytopen{display:inline-block;text-decoration:none;background:#c00;box-shadow:0 3px 0 #600;color:#fff}
+.extform{width:100%;display:flex;flex-direction:column;gap:8px;text-align:left;border:2px dashed var(--acc);padding:10px}
+.extform input{font-family:var(--hand);border:2px solid var(--line);padding:6px 8px}
 
 /* 수정 */
 .edited{font-family:var(--pixel);font-size:12px;color:var(--muted);align-self:flex-end}
@@ -480,12 +483,21 @@ function render() {
       <div class="lp ${r?.playing ? 'on' : ''}" aria-hidden="true">${t ? `<img src="https://i.ytimg.com/vi/${t}/hqdefault.jpg" alt="">` : ''}<div class="ring"></div></div>
       <div class="track">${!t ? '아직 곡이 없어요' : esc(r.title || (r.playing ? '같이 듣는 중' : '일시정지'))}</div>
       ${t ? `<div class="hint">${r.playing ? '▶ 재생 중' : '❚❚ 일시정지'}${r.pick ? ' · ' + esc(r.pick) + '님이 고른 곡' : ''}</div>` : ''}
+      ${r?.ext ? `<a class="play ytopen" id="ytopen" href="https://www.youtube.com/watch?v=${t}" target="_blank" rel="noopener">▶ 유튜브에서 열기</a>
+        <p class="hint"><span id="extt">${fmtT(target(r))} / ${fmtT(r.dur)}</span><br>사이트 안에서는 재생이 막힌 곡이라 유튜브에서 들어요.<br>버튼을 누르면 지금 위치부터 열려요. PC에서는 작은 창으로 떠요.</p>` : ''}
       <div class="ctrl-row">
         ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
           : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button><button class="play ghost" id="skip">NEXT ▶▶</button>` : ''}
       </div>
       <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크로 곡 추가"><button>ADD</button></form>
       <div class="err" id="err">${esc(S.ytErr || '')}</div>
+      ${S.extPending ? `<form class="extform" id="xf">
+          <p class="hint">이 영상은 사이트 안에서 재생이 막혀 있어요.<br>대신 "유튜브에서 같이 듣기"로 넣을 수 있어요. 차례가 오면 유튜브에서 열고, 곡 길이만큼 지나면 다음 곡으로 넘어가요.</p>
+          <input id="xt" maxlength="60" placeholder="곡 제목 (예: 아이유 - 밤편지)" value="${esc(S.extPending.title)}">
+          <input id="xd" inputmode="numeric" placeholder="곡 길이 (예: 3:45)">
+          <div class="err" id="xerr"></div>
+          <div class="ctrl-row"><button type="button" class="play ghost" id="xc">취소</button><button class="play">넣기</button></div>
+        </form>` : ''}
       ${S.loadingYT && S.joined ? '<p class="hint">플레이어를 준비하는 중이에요…</p>' : ''}
       ${S.needTap ? '<p class="hint">브라우저가 소리를 막았어요. 아래 영상의 재생 버튼을 한 번 직접 눌러 주세요.</p>' : ''}
       <div class="qlist">
@@ -508,6 +520,33 @@ function render() {
     if ($('#wake')) $('#wake').onclick = toggleWake;
     if ($('#play')) $('#play').onclick = togglePlay;
     if ($('#skip')) $('#skip').onclick = () => advance(null);
+    if ($('#ytopen')) $('#ytopen').onclick = e => {
+      const rr = S.room; if (!rr?.ext) return;
+      const url = `https://www.youtube.com/watch?v=${rr.videoId}&t=${Math.floor(target(rr))}s`;
+      e.currentTarget.href = url;
+      // PC: 사이트 옆에 작은 창으로 띄움 / 휴대폰: 새 탭이나 유튜브 앱 (브라우저가 작은 창을 지원하지 않음)
+      const pc = matchMedia('(pointer:fine)').matches && screen.width > 800;
+      if (!pc) return;
+      const w = 520, h = 340, left = Math.max(0, (window.screenX || 0) + window.outerWidth - w - 20), top = Math.max(0, (window.screenY || 0) + 60);
+      const pop = window.open(url, 'wiboowe_yt', `popup=yes,width=${w},height=${h},left=${left},top=${top}`);
+      if (pop) { e.preventDefault(); try { pop.focus() } catch { } }
+    };
+    if ($('#xc')) $('#xc').onclick = () => { S.extPending = null; render() };
+    if ($('#xf')) $('#xf').onsubmit = async e => {
+      e.preventDefault();
+      const id = S.extPending.id, title = $('#xt').value.trim(), dur = parseDur($('#xd').value);
+      if (!title) { $('#xerr').textContent = '곡 제목을 적어 주세요.'; return }
+      if (!dur) { $('#xerr').textContent = '곡 길이를 3:45처럼 적어 주세요.'; return }
+      const item = { videoId: id, title, by: S.me.uid, pick: S.me.nick, ext: true, dur };
+      let now = false;
+      await roomTx(cur => {
+        if (!cur.videoId || !cur.playing) { now = true; return { ...cur, ...item, playing: true, startAt: srvNow(), pos: 0 } }
+        const qq = [...(cur.queue || [])];
+        if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
+        qq.push(item); return { ...cur, queue: qq };
+      });
+      S.extPending = null; toast(now ? '지금 곡이에요. 유튜브에서 열어 주세요' : '다음 곡 목록에 넣었어요'); render();
+    };
     v.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => roomTx(cur => {
       const qq = [...(cur.queue || [])], k = +b.dataset.rm;
       if (qq[k]?.by !== S.me.uid) return null;
@@ -526,12 +565,13 @@ function render() {
       const info = await ytInfo(id), title = info.title;
       if (info.blocked || info.missing) {
         if (idle && lastVid === id) { try { player.stopVideo() } catch { } lastVid = null }
-        S.ytErr = info.blocked ? '이 영상은 다른 사이트에서 재생할 수 없게 막혀 있어서 넣지 않았어요. 같은 노래의 다른 영상 링크를 써 보세요.' : '없거나 비공개인 영상이에요.';
+        if (info.blocked) S.extPending = { id, title: '' };
+        else S.ytErr = '없거나 비공개인 영상이에요.';
         render(); return;
       }
       const item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
       await roomTx(cur => {
-        if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, playing: true, startAt: srvNow(), pos: 0 };
+        if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
         const qq = [...(cur.queue || [])];
         if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
@@ -667,7 +707,7 @@ async function preparePlayer() {
       onError: e => {
         S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.';
         // 재생할 수 없는 곡이면 멈춰 있지 않고 다음 곡으로 넘김
-        if (S.joined && S.room?.playing && [100, 101, 150, 5].includes(e.data)) { S.ytErr += ' 다음 곡으로 넘길게요.'; advance(S.room.videoId) }
+        if (S.joined && S.room?.playing && !S.room.ext && [100, 101, 150, 5].includes(e.data)) { S.ytErr += ' 다음 곡으로 넘길게요.'; advance(S.room.videoId) }
         if (S.screen === 'music') render();
       }
     }
@@ -675,6 +715,7 @@ async function preparePlayer() {
 }
 function startNow(videoId, t) { // 클릭한 순간에 바로 호출
   if (!playerReady) return;
+  if (S.room?.ext && S.room.videoId === videoId) return; // 유튜브에서 듣는 곡은 사이트에서 재생 안 함
   try {
     player.unMute(); player.setVolume(100);
     if (videoId !== lastVid) { lastVid = videoId; player.loadVideoById({ videoId, startSeconds: t }) }
@@ -726,6 +767,7 @@ function target(r) { return r.playing ? Math.max(0, (srvNow() - r.startAt) / 100
 function syncPlayer() {
   const r = S.room;
   if (!player || !playerReady || !r?.videoId) return;
+  if (r.ext) { try { if (player.getPlayerState?.() === YT.PlayerState.PLAYING) player.pauseVideo() } catch { } return }
   const t = target(r);
   if (!S.joined) { // 듣기 전에는 곡만 준비
     if (r.videoId !== lastVid) { lastVid = r.videoId; player.cueVideoById({ videoId: r.videoId, startSeconds: t }) }
@@ -751,7 +793,7 @@ function roomTx(fn) {
     const snap = await tx.get(ref), cur = snap.exists() ? snap.data() : {};
     const n = fn(cur); if (!n) return;
     tx.set(ref, {
-      videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing,
+      videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing, ext: !!n.ext, dur: n.dur || 0,
       startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
       by: S.me.uid, at: serverTimestamp()
     });
@@ -763,7 +805,7 @@ function advance(endedId) { // 곡이 끝나면(또는 NEXT) 다음 곡으로
     if (endedId && (cur.videoId !== endedId || !cur.playing)) return null; // 이미 다른 사람이 넘김
     const qq = [...(cur.queue || [])], next = qq.shift();
     if (!next) return { ...cur, playing: false, pos: 0, queue: [] };
-    return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, playing: true, startAt: srvNow(), pos: 0, queue: qq };
+    return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, ext: !!next.ext, dur: next.dur || 0, playing: true, startAt: srvNow(), pos: 0, queue: qq };
   });
 }
 // 제목을 가져오면서, 다른 사이트 재생이 막힌 영상인지도 미리 확인 (막힌 영상은 유튜브가 401/403으로 답함)
@@ -798,6 +840,23 @@ document.addEventListener('visibilitychange', async () => {
   if (S.wake) { try { wakeLock = await navigator.wakeLock.request('screen') } catch { } }
   syncPlayer(); // 돌아오면 다시 맞춤
 });
+
+function fmtT(sec) { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') }
+function parseDur(v) {
+  v = String(v).trim(); let m;
+  if ((m = v.match(/^(\d{1,2})\s*[:：분.]\s*(\d{1,2})\s*초?$/))) { const s = +m[1] * 60 + +m[2]; return s >= 10 && s <= 1800 ? s : 0 }
+  if ((m = v.match(/^(\d{2,4})$/))) { const s = +m[1]; return s >= 10 && s <= 1800 ? s : 0 }
+  return 0;
+}
+// 유튜브에서 듣는 곡: 시간 표시하고, 곡 길이가 지나면 다음 곡으로
+let extAdv = null;
+setInterval(() => {
+  const r = S.room;
+  if (!r?.ext || !r.playing) return;
+  const t = target(r), el = $('#extt');
+  if (el) el.textContent = fmtT(t) + ' / ' + fmtT(r.dur);
+  if (S.me && r.dur && t >= r.dur + 1 && extAdv !== r.videoId + r.startAt) { extAdv = r.videoId + r.startAt; advance(r.videoId) }
+}, 1000);
 
 /* ===== 공통 ===== */
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.go, { owner: S.me?.uid }));
