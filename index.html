@@ -123,7 +123,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .homewrap{min-height:100%;display:flex;flex-direction:column}
 .foot{margin-top:auto;padding:28px 14px 12px;text-align:center}
 .out{background:none;border:0;font-family:var(--pixel);font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 10px}
-.lp{position:relative;width:170px;height:170px;border-radius:50%;background:repeating-radial-gradient(circle,#1b1a1e 0 2px,#2a292e 2px 4px);box-shadow:0 6px 16px rgba(0,0,0,.3);overflow:hidden;animation:spin 5s linear infinite;animation-play-state:paused}
+.lp{position:relative;width:150px;height:150px;flex:none;border-radius:50%;background:repeating-radial-gradient(circle,#1b1a1e 0 2px,#2a292e 2px 4px);box-shadow:0 6px 16px rgba(0,0,0,.3);overflow:hidden;animation:spin 5s linear infinite;animation-play-state:paused}
 .lp.on{animation-play-state:running}
 .lp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;transform:scale(1.35)}
 .lp::after{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--lcd);box-shadow:0 0 0 4px rgba(0,0,0,.55)}
@@ -163,6 +163,18 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .photo{border:1px solid var(--line);background:var(--tint);min-height:60px;display:grid;place-items:center}
 .photo img{width:100%;display:block}
 .photo span{font-family:var(--pixel);font-size:12px;color:var(--muted);padding:20px}
+
+.ctrl-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.play.ghost{background:#fff;color:var(--pink-deep);box-shadow:0 3px 0 #000;border:2px solid var(--pink-deep)}
+.qlist{width:100%;text-align:left;border-top:2px solid var(--line);padding-top:8px}
+.qrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.qrow .num{width:22px;height:22px;font-size:11px}
+.qt{flex:1;min-width:0;font-size:13px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.qt small{display:block;font-family:var(--pixel);font-size:10px;color:var(--muted)}
+.qrow .out{font-size:16px;text-decoration:none;padding:2px 8px}
+.links{display:flex;gap:4px 14px;flex-wrap:wrap;justify-content:center}
+.links .out{padding:4px 0}
+.now .track{font-size:15px;line-height:1.4;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
@@ -197,7 +209,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, writeBatch, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ===== Firebase 설정 (weboowe) ===== */
 const firebaseConfig = {
@@ -422,19 +434,29 @@ function render() {
 
   if (S.screen === 'music') {
     h.textContent = 'Listen Together';
-    const r = S.room, t = r?.videoId, now = Date.now();
+    const r = S.room, t = r?.videoId, now = Date.now(), q = r?.queue || [];
     const live = S.listeners.filter(l => now - ms(l.at) < 75000);
     v.innerHTML = `<div class="now">
       <div class="lp ${r?.playing ? 'on' : ''}" aria-hidden="true">${t ? `<img src="https://i.ytimg.com/vi/${t}/hqdefault.jpg" alt="">` : ''}<div class="ring"></div></div>
-      <div class="track">${!t ? '아직 곡이 없어요' : r.playing ? '같이 듣는 중' : '일시정지'}</div>
-      ${t && r.byNick ? `<div class="hint">${esc(r.byNick)}님이 고른 곡</div>` : ''}
-      ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
-        : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button>` : ''}
-      ${S.joined ? `<button class="out" id="leave">그만 듣기</button>` : ''}
-      <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크 붙여넣기"><button>OK</button></form>
+      <div class="track">${!t ? '아직 곡이 없어요' : esc(r.title || (r.playing ? '같이 듣는 중' : '일시정지'))}</div>
+      ${t ? `<div class="hint">${r.playing ? '▶ 재생 중' : '❚❚ 일시정지'}${r.pick ? ' · ' + esc(r.pick) + '님이 고른 곡' : ''}</div>` : ''}
+      <div class="ctrl-row">
+        ${!S.joined ? `<button class="play" id="join">♪ 같이 듣기</button>`
+          : t ? `<button class="play" id="play">${r.playing ? '❚❚ PAUSE' : '▶ PLAY'}</button><button class="play ghost" id="skip">NEXT ▶▶</button>` : ''}
+      </div>
+      <form class="ctrl" id="yt"><input id="yturl" placeholder="유튜브 링크로 곡 추가"><button>ADD</button></form>
       <div class="err" id="err">${esc(S.ytErr || '')}</div>
       ${S.needTap ? '<p class="hint">브라우저가 소리를 막았어요. 아래 영상의 재생 버튼을 한 번 직접 눌러 주세요.</p>' : ''}
-      ${S.joined ? `<button class="out" id="vid">${S.showVideo ? '영상 숨기기' : '소리가 안 나면 영상 보기'}</button>` : ''}
+      <div class="qlist">
+        <div class="sect" style="padding:0 0 4px">NEXT UP · ${q.length}</div>
+        ${q.length ? q.map((it, i) => `<div class="qrow"><span class="num">${i + 1}</span><span class="qt">${esc(it.title || '제목을 불러오지 못한 곡')}<small>${esc(it.pick || '')}</small></span>${it.by === S.me.uid ? `<button class="out" data-rm="${i}" aria-label="빼기">×</button>` : ''}</div>`).join('')
+          : '<p class="hint">다음 곡이 없어요. 링크를 추가하면 지금 곡이 끝난 뒤에 이어서 나와요.</p>'}
+      </div>
+      <div class="links">
+        ${S.joined ? `<button class="out" id="vid">${S.showVideo ? '영상 숨기기' : '영상 보기'}</button>
+        <button class="out" id="wake">${S.wake ? '화면 켜두기 끄기' : '화면 켜두기'}</button>
+        <button class="out" id="leave">그만 듣기</button>` : ''}
+      </div>
       <div class="sect" style="padding:0">LISTENING NOW · ${live.length}</div>
       <div class="listeners">${live.map(l => `<span>${esc(l.nick)}${l.uid === S.me.uid ? ' (나)' : ''}</span>`).join('') || '<span>아무도 없어요</span>'}</div>
     </div>`;
@@ -442,17 +464,32 @@ function render() {
     if ($('#join')) $('#join').onclick = joinRoom;
     if ($('#leave')) $('#leave').onclick = () => { leaveRoom(); render() };
     if ($('#vid')) $('#vid').onclick = () => { S.showVideo = !S.showVideo; $('#yt-box').classList.toggle('show', S.showVideo); render() };
+    if ($('#wake')) $('#wake').onclick = toggleWake;
     if ($('#play')) $('#play').onclick = togglePlay;
+    if ($('#skip')) $('#skip').onclick = () => advance(null);
+    v.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => roomTx(cur => {
+      const qq = [...(cur.queue || [])], k = +b.dataset.rm;
+      if (qq[k]?.by !== S.me.uid) return null;
+      qq.splice(k, 1); return { ...cur, queue: qq };
+    }));
     $('#yt').onsubmit = async e => {
       e.preventDefault();
       const u = $('#yturl').value.trim();
       const m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/) || u.match(/^([\w-]{11})$/);
       if (!m) { $('#err').textContent = '유튜브 링크를 확인해 주세요.'; return }
-      const startAt = Date.now();
-      S.ytErr = '';
+      const id = m[1]; S.ytErr = '';
       if (!S.joined) { S.joined = true; heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000) }
-      startNow(m[1], 0);
-      await setRoom({ videoId: m[1], playing: true, startAt, pos: 0 });
+      const idle = !S.room?.videoId || !S.room.playing;
+      if (idle) startNow(id, 0);          // 아무것도 안 나오고 있으면 바로 재생
+      $('#yturl').value = '';
+      const title = await ytTitle(id), item = { videoId: id, title, by: S.me.uid, pick: S.me.nick };
+      await roomTx(cur => {
+        if (!cur.videoId || !cur.playing) return { ...cur, videoId: id, title, pick: S.me.nick, playing: true, startAt: Date.now(), pos: 0 };
+        const qq = [...(cur.queue || [])];
+        if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
+        qq.push(item); return { ...cur, queue: qq };
+      });
+      toast(idle ? '바로 재생해요' : '다음 곡 목록에 넣었어요');
     };
   }
 }
@@ -578,7 +615,7 @@ async function preparePlayer() {
       onReady: () => { playerReady = true; lastVid = null; syncPlayer() },
       onStateChange: e => {
         if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
-        if (e.data === YT.PlayerState.ENDED && S.room?.playing) setRoom({ ...S.room, playing: false, pos: 0 });
+        if (e.data === YT.PlayerState.ENDED && S.joined && S.room?.playing) advance(S.room.videoId);
       },
       onError: e => { S.ytErr = YT_ERR[e.data] || '재생할 수 없는 영상이에요.'; if (S.screen === 'music') render() }
     }
@@ -610,6 +647,7 @@ function joinRoom() {
 function heartbeat() { if (S.me && S.joined) setDoc(doc(db, 'room', 'main', 'listeners', S.me.uid), { nick: S.me.nick, at: serverTimestamp() }).catch(() => { }) }
 function leaveRoom() {
   clearInterval(beat); beat = null; clearTimeout(checkT);
+  if (S.wake) { S.wake = false; try { wakeLock?.release() } catch { } wakeLock = null }
   if (S.joined && S.me) deleteDoc(doc(db, 'room', 'main', 'listeners', S.me.uid)).catch(() => { });
   S.joined = false; S.showVideo = false; S.needTap = false; $('#yt-box')?.classList.remove('show');
   try { player?.pauseVideo() } catch { }
@@ -637,14 +675,52 @@ function syncPlayer() {
   if (!r.playing && st === YT.PlayerState.PLAYING) player.pauseVideo();
 }
 setInterval(() => { if (S.room?.playing && S.joined) syncPlayer() }, 10000);
-function setRoom(d) {
-  return setDoc(doc(db, 'room', 'main'), { videoId: d.videoId, playing: d.playing, startAt: d.startAt ?? Date.now(), pos: d.pos ?? 0, by: S.me.uid, byNick: S.me.nick, at: serverTimestamp() }).catch(() => toast('저장하지 못했어요'));
+// 방 정보는 항상 트랜잭션으로 바꿔서, 여러 사람이 동시에 눌러도 곡이 겹치거나 건너뛰지 않게 함
+function roomTx(fn) {
+  const ref = doc(db, 'room', 'main');
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(ref), cur = snap.exists() ? snap.data() : {};
+    const n = fn(cur); if (!n) return;
+    tx.set(ref, {
+      videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing,
+      startAt: n.startAt ?? Date.now(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
+      by: S.me.uid, at: serverTimestamp()
+    });
+  }).catch(() => toast('저장하지 못했어요'));
+}
+function advance(endedId) { // 곡이 끝나면(또는 NEXT) 다음 곡으로
+  return roomTx(cur => {
+    if (!cur.videoId) return null;
+    if (endedId && (cur.videoId !== endedId || !cur.playing)) return null; // 이미 다른 사람이 넘김
+    const qq = [...(cur.queue || [])], next = qq.shift();
+    if (!next) return { ...cur, playing: false, pos: 0, queue: [] };
+    return { ...cur, videoId: next.videoId, title: next.title, pick: next.pick, playing: true, startAt: Date.now(), pos: 0, queue: qq };
+  });
+}
+async function ytTitle(id) {
+  for (const u of [`https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`, `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${id}`]) {
+    try { const r = await fetch(u); if (r.ok) { const j = await r.json(); if (j.title) return String(j.title).slice(0, 100) } } catch { }
+  }
+  return '';
 }
 function togglePlay() {
   const r = S.room; if (!r) return;
-  if (r.playing) { try { player?.pauseVideo() } catch { } setRoom({ ...r, playing: false, pos: target(r) }) }
-  else { const startAt = Date.now() - (r.pos || 0) * 1000; startNow(r.videoId, r.pos || 0); setRoom({ ...r, playing: true, startAt }) }
+  if (r.playing) { try { player?.pauseVideo() } catch { } roomTx(cur => cur.playing ? { ...cur, playing: false, pos: target(cur) } : null) }
+  else { startNow(r.videoId, r.pos || 0); roomTx(cur => cur.playing ? null : { ...cur, playing: true, startAt: Date.now() - (cur.pos || 0) * 1000 }) }
 }
+// 화면 켜두기: 휴대폰 화면이 꺼지면 재생이 멈추는 걸 막아 줌
+let wakeLock = null;
+async function toggleWake() {
+  if (S.wake) { S.wake = false; try { await wakeLock?.release() } catch { } wakeLock = null; render(); return }
+  try { wakeLock = await navigator.wakeLock.request('screen'); S.wake = true; toast('화면이 꺼지지 않게 해 둘게요') }
+  catch { toast('이 브라우저는 화면 켜두기를 지원하지 않아요') }
+  render();
+}
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible') return;
+  if (S.wake) { try { wakeLock = await navigator.wakeLock.request('screen') } catch { } }
+  syncPlayer(); // 돌아오면 다시 맞춤
+});
 
 /* ===== 공통 ===== */
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.go, { owner: S.me?.uid }));
