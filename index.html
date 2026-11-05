@@ -276,11 +276,16 @@ const nickOk = n => n.length >= 1 && n.length <= 12 && !/[\/\s]/.test(n);
 function nickEmail(n) { // 한글 닉네임도 로그인 주소로 쓸 수 있게 바꿔 줌
   return 'u' + Array.from(new TextEncoder().encode(n.normalize('NFC')), b => b.toString(16).padStart(2, '0')).join('') + '@pinkphone.app';
 }
-function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800) }
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, t.length > 25 ? 4000 : 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && !S.editMsg && !S.editReply) render() }
-function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false, editMsg: false, editReply: false }, extra); if (screen === 'inbox') watchOwner(); render() }
+function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false, editMsg: false, editReply: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); render() }
+// '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
+function watchListeners() {
+  if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
+  if (S.screen !== 'music' && subs.lis) { subs.lis(); delete subs.lis }
+}
 function unsub(k) { if (subs[k]) { subs[k](); delete subs[k] } }
 
 /* ===== 로그인 상태 ===== */
@@ -297,7 +302,6 @@ async function loadMe(u) {
   subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; S.crops = {}; q.forEach(d => { const u = d.data(); S.users[d.id] = u.nick; if (u.photo) S.photos[d.id] = u.photo; if (u.crop) S.crops[d.id] = u.crop }); refresh() });
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); refresh() });
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
-  subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
   preparePlayer();
   getProbe().catch(() => { });
@@ -484,7 +488,7 @@ function render() {
   if (S.screen === 'music') {
     h.textContent = 'Listen Together';
     const r = S.room, t = r?.videoId, now = srvNow(), q = r?.queue || [];
-    const live = S.listeners.filter(l => now - ms(l.at) < 75000);
+    const live = S.listeners.filter(l => now - ms(l.at) < 200000);
     v.innerHTML = `<div class="now">
       <div class="lp ${r?.playing ? 'on' : ''}" aria-hidden="true">${t ? `<img src="https://i.ytimg.com/vi/${t}/hqdefault.jpg" alt="">` : ''}<div class="ring"></div></div>
       <div class="track">${!t ? '아직 곡이 없어요' : esc(r.title || (r.playing ? '같이 듣는 중' : '일시정지'))}</div>
@@ -571,7 +575,7 @@ function render() {
       const m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/) || u.match(/^([\w-]{11})$/);
       if (!m) { $('#err').textContent = '유튜브 링크를 확인해 주세요.'; return }
       const id = m[1]; S.ytErr = '';
-      if (!S.joined) { S.joined = true; heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000) }
+      if (!S.joined) { S.joined = true; heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 90000) }
       $('#yturl').value = '';
       $('#err').textContent = '재생되는 영상인지 확인하는 중이에요…';
       // 넣기 전에 미리 확인: 막힌 영상이면 처음부터 대신 틀 영상으로 넣음
@@ -797,7 +801,7 @@ function joinRoom() {
   if (!playerReady) { S.loadingYT = true; preparePlayer() }   // 준비되는 대로 바로 재생 (onReady → syncPlayer)
   else if (r?.videoId && r.playing) startNow(r.videoId, target(r));
   render();
-  heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 25000);
+  heartbeat(); clearInterval(beat); beat = setInterval(heartbeat, 90000);
 }
 // 기기마다 시계가 조금씩 달라서, 서버 시계에 맞춰 위치를 계산해요
 let clockOff = 0, clockN = 0;
@@ -816,7 +820,12 @@ async function measureClock(keep) {
     if (!keep && !S.joined) await deleteDoc(ref);
   } catch { }
 }
-function heartbeat() { if (S.me && S.joined) measureClock(true) }
+let beatN = 0;
+function heartbeat() { // 90초마다 '듣는 중' 표시. 시계 맞추기(읽기 1번 더)는 6번에 1번만
+  if (!S.me || !S.joined) return;
+  if (beatN++ % 6 === 0) measureClock(true);
+  else setDoc(doc(db, 'room', 'main', 'listeners', S.me.uid), { nick: S.me.nick, at: serverTimestamp() }).catch(() => { });
+}
 function leaveRoom() {
   clearInterval(beat); beat = null; clearTimeout(checkT);
   if (S.wake) { S.wake = false; try { wakeLock?.release() } catch { } wakeLock = null }
@@ -852,6 +861,12 @@ function syncPlayer() {
 }
 setInterval(() => { if (S.room?.playing && S.joined) syncPlayer() }, 10000);
 // 방 정보는 항상 트랜잭션으로 바꿔서, 여러 사람이 동시에 눌러도 곡이 겹치거나 건너뛰지 않게 함
+// 목록에 들어가는 곡 정보를 깔끔하게 정리 (빈 값이 섞이면 Firebase가 저장을 거부함)
+function cleanItem(i) {
+  const o = { videoId: String(i?.videoId || ''), title: String(i?.title || ''), by: String(i?.by || ''), pick: String(i?.pick || '') };
+  if (i?.ext) { o.ext = true; o.dur = +i.dur || 0 }
+  return o;
+}
 function roomTx(fn) {
   const ref = doc(db, 'room', 'main');
   return runTransaction(db, async tx => {
@@ -859,15 +874,15 @@ function roomTx(fn) {
     const n = fn(cur); if (!n) return false;
     const keep = n.videoId === cur.videoId || n.alt; // 곡이 바뀌면 대체 영상 찾기 기록은 초기화
     tx.set(ref, {
-      videoId: n.videoId, title: n.title || '', pick: n.pick || '', playing: !!n.playing, ext: !!n.ext, dur: n.dur || 0,
+      videoId: String(n.videoId || ''), title: String(n.title || ''), pick: String(n.pick || ''), playing: !!n.playing, ext: !!n.ext, dur: n.dur || 0,
       fix: keep ? (n.fix || '') : '', tried: keep ? (n.tried || []).slice(-6) : [],
-      startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30),
+      startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30).map(cleanItem),
       by: S.me.uid, at: serverTimestamp()
     });
     return true;
   }).catch(e => {
     console.warn('room save failed', e);
-    toast(e?.code === 'permission-denied' ? '저장이 막혔어요. Firebase 보안 규칙을 최신으로 게시해 주세요' : '저장하지 못했어요. 잠시 후 다시 해 주세요');
+    toast(e?.code === 'permission-denied' ? '저장이 막혔어요. Firebase 보안 규칙을 최신으로 게시해 주세요' : (e?.code === 'resource-exhausted' ? '오늘 Firebase 무료 사용량을 다 썼어요. 오후 4~5시쯤 다시 채워져요' : '저장하지 못했어요 (' + (e?.code || e?.message || '알 수 없음') + ')'));
     return false;
   });
 }
