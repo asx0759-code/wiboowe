@@ -320,8 +320,20 @@ async function loadMe(u) {
 }
 function cleanup() { S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
+// 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
+const anonChk = {};
+function checkAnon(arr) {
+  arr.filter(m => m.anon && m.to !== S.me?.uid && !(m.id in anonChk)).forEach(m => {
+    anonChk[m.id] = 'pending';
+    getDoc(doc(db, 'messages', m.id, 'meta', 'sender')).then(d => {
+      anonChk[m.id] = d.exists() && d.data().uid === S.me?.uid;
+      if (anonChk[m.id]) { loadPriv([m]); refresh() }
+    }).catch(() => { anonChk[m.id] = false });
+  });
+}
+const sentByMe = m => m.from === S.me?.uid || anonChk[m.id] === true;
 function loadPriv(arr) {
-  arr.filter(m => m.secret && !S.priv[m.id] && (m.to === S.me?.uid || m.from === S.me?.uid)).forEach(m => {
+  arr.filter(m => m.secret && !S.priv[m.id] && (m.to === S.me?.uid || sentByMe(m))).forEach(m => {
     S.priv[m.id] = 'loading';
     subs['p' + m.id] = onSnapshot(doc(db, 'messages', m.id, 'private', 'content'), d => { if (d.exists()) { S.priv[m.id] = d.data(); refresh() } }, () => { });
   });
@@ -329,7 +341,7 @@ function loadPriv(arr) {
 function watchOwner() {
   unsub('other');
   if (!S.owner || S.owner === S.me?.uid) return;
-  subs.other = onSnapshot(query(collection(db, 'messages'), where('to', '==', S.owner)), q => { S.other = list(q); loadPriv(S.other); refresh() });
+  subs.other = onSnapshot(query(collection(db, 'messages'), where('to', '==', S.owner)), q => { S.other = list(q); checkAnon(S.other); loadPriv(S.other); refresh() });
 }
 const msgsOf = owner => owner === S.me?.uid ? S.mine : S.other;
 function content(m) { // 화면에 보여 줄 제목·내용·답장
@@ -413,9 +425,9 @@ function render() {
     }
     if (isOwner && !m.read) updateDoc(doc(db, 'messages', m.id), { read: true }).catch(() => { });
     v.innerHTML = `<div class="letter">
-      <div class="from"><span class="who"><span class="mini">${m.anon ? '?' : avatar(m.from, c.fromNick)}</span><b>From. ${esc(c.fromNick)}</b></span><span>${fmt(m.createdAt)}</span></div>
+      <div class="from"><span class="who"><span class="mini">${m.anon ? '?' : avatar(m.from, c.fromNick)}</span><b>From. ${esc(c.fromNick)}${m.anon && anonChk[m.id] === true ? ' (내가 보냄)' : ''}</b></span><span>${fmt(m.createdAt)}</span></div>
       <span class="chip ${m.secret ? '' : 'pub'}">${m.secret ? 'SECRET' : 'PUBLIC'}</span>
-      ${c.item ? `<div class="itembox">${pix(c.item, 108)}<b>${esc((ITEMS[c.item] || {}).name || c.title)}</b><span>${m.anon ? '누군가' : esc(c.fromNick) + '님'}이 보낸 선물이에요</span></div>` : ''}
+      ${c.item ? `<div class="itembox">${pix(c.item, 108)}<b>${esc((ITEMS[c.item] || {}).name || c.title)}</b><span>${m.anon ? '누군가가' : esc(c.fromNick) + '님이'} 보낸 선물이에요</span></div>` : ''}
       ${m.hasImage ? `<div class="photo">${S.imgs[m.id] && S.imgs[m.id] !== 'loading' ? `<img src="${S.imgs[m.id]}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
       ${S.editMsg ? `<form class="form" id="ef" style="padding:0">
           <div class="field"><label for="et">TITLE</label><input id="et" maxlength="20" value="${esc(c.title)}"></div>
