@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261106-1158">
+<meta name="build" content="20261106-1201">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -416,8 +416,10 @@ function render() {
     if (mine) h.textContent = `Inbox {${arr.length}}`; else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
     v.innerHTML = (arr.length ? arr.map((m, i) => {
       const c = content(m);
-      const icon = c?.item ? pix(c.item, 24) : m.secret ? LOCK : (m.read || !mine ? ENV_O : ENV_C);
-      const title = c ? (c.item ? '아이템이 도착했어요' : esc(c.title)) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요');
+      // 아이템은 목록에서 무엇인지 보이지 않게: 공개면 선물상자, 비밀이면 자물쇠. 눌러서 열어야 확인 가능
+      const isItem = m.kind === 'item' || !!c?.item;
+      const icon = m.secret ? LOCK : isItem ? pix('gift', 24) : (m.read || !mine ? ENV_O : ENV_C);
+      const title = isItem ? '아이템이 도착했어요' : c ? esc(c.title) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요');
       return `<button class="row" data-id="${m.id}" ${c ? '' : 'data-locked="1"'}><span class="num">${i + 1}</span>${icon}<span class="ttl ${c ? '' : 'secret'}">${title}</span>${m.hasImage && c ? '<span class="meta">IMG</span>' : ''}${mine && !m.read ? '<span class="meta">NEW</span>' : ''}</button>`;
     }).join('') : `<div class="empty">아직 받은 메시지가 없어요</div>`)
       + (mine ? '' : `<div class="form"><button class="btn" id="write">${esc(S.users[owner] || '')}에게 남기기</button></div>`);
