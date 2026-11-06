@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261106-1518">
+<meta name="build" content="20261106-2057">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -181,6 +181,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.rtime{margin-left:8px;color:var(--muted);font-variant-numeric:tabular-nums}
 .text a{color:var(--pink-deep);word-break:break-all}
 .ytwrap{display:flex;flex-direction:column;gap:4px}
 .ytc{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;background:#000;border:2px solid #000;overflow:hidden;cursor:pointer}
@@ -474,7 +475,7 @@ function render() {
           <div class="ctrl-row"><button type="button" class="play ghost" id="ecancel">CANCEL</button><button class="play">SAVE</button></div>
         </form>`
         : c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="text"><b>${esc(c.title)}</b>\n${linkify(c.body)}</div>${ytCards(c.body)}`}
-      ${c.reply && !S.editReply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}${isOwner ? ' · <button class="out inline" id="redit">edit</button>' : ''}</small>${esc(c.reply)}</div>` : ''}
+      ${c.reply && !S.editReply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}<span class="rtime">${c.replyAt ? fmt(c.replyAt) : ''}</span>${isOwner ? ' · <button class="out inline" id="redit">edit</button>' : ''}</small>${esc(c.reply)}</div>` : ''}
       ${isOwner && (!c.reply || S.editReply) && !S.editMsg ? `<form class="reply-form" id="rf"><input id="rt" maxlength="100" placeholder="답장 쓰기 (100자)" value="${S.editReply ? esc(c.reply) : ''}"><button>${S.editReply ? 'OK' : 'RE'}</button>${S.editReply ? '<button type="button" id="rcancel" class="ghostbtn">×</button>' : ''}</form>${S.editReply ? '<p class="hint">비우고 OK를 누르면 답장이 지워져요.</p>' : ''}` : ''}
       ${sentByMe(m) && m.anon && !S.editMsg ? (S.confirmReveal
           ? `<div class="reveal"><p class="hint">익명을 풀면 받는 사람과 친구들에게 내 닉네임이 보여요. 다시 익명으로는 돌릴 수 없어요.</p><div class="ctrl-row"><button type="button" class="play ghost" id="rvno">취소</button><button type="button" class="play" id="rvok">닉네임 공개하기</button></div></div>`
@@ -627,7 +628,7 @@ function render() {
       <span class="chip ${m.secret ? '' : 'pub'}">${m.secret ? 'SECRET' : 'PUBLIC'}</span>
       ${m.hasImage ? `<div class="photo">${im && im !== 'loading' ? `<img src="${im}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
       ${c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="text"><b>${esc(c.title)}</b>\n${linkify(c.body)}</div>${ytCards(c.body)}`}
-      ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}</small>${esc(c.reply)}</div>` : ''}
+      ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}<span class="rtime">${c.replyAt ? fmt(c.replyAt) : ''}</span></small>${esc(c.reply)}</div>` : ''}
     </div>`;
     return;
   }
