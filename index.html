@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261106-1502">
+<meta name="build" content="20261106-1518">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -709,7 +709,7 @@ function render() {
       await roomTx(cur => {
         if (!cur.videoId || !cur.playing) { now = true; return { ...cur, ...item, playing: true, startAt: srvNow(), pos: 0 } }
         const qq = [...(cur.queue || [])];
-        if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
+        if (qq.length >= QMAX) { toast('다음 곡은 ' + QMAX + '곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
       });
       S.extPending = null; toast(now ? '지금 곡이에요. 유튜브에서 열어 주세요' : '다음 곡 목록에 넣었어요'); render();
@@ -755,7 +755,7 @@ function render() {
       const ok = await roomTx(cur => {
         if (!cur.videoId || !cur.playing) return { ...cur, ...item, ext: false, dur: 0, playing: true, startAt: srvNow(), pos: 0 };
         const qq = [...(cur.queue || [])];
-        if (qq.length >= 30) { toast('다음 곡은 30곡까지예요'); return null }
+        if (qq.length >= QMAX) { toast('다음 곡은 ' + QMAX + '곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
       });
       if (!ok) return; // 저장이 안 됐으면 "넣었어요"라고 하지 않음
@@ -1111,6 +1111,7 @@ function syncPlayer() {
 setInterval(() => { if (S.room?.playing && S.joined) syncPlayer() }, 10000);
 // 방 정보는 항상 트랜잭션으로 바꿔서, 여러 사람이 동시에 눌러도 곡이 겹치거나 건너뛰지 않게 함
 // 목록에 들어가는 곡 정보를 깔끔하게 정리 (빈 값이 섞이면 Firebase가 저장을 거부함)
+const QMAX = 200; // 다음 곡 목록 최대 곡 수
 function cleanItem(i) {
   const o = { videoId: String(i?.videoId || ''), title: String(i?.title || ''), by: String(i?.by || ''), pick: String(i?.pick || '') };
   if (i?.ext) { o.ext = true; o.dur = +i.dur || 0 }
@@ -1125,7 +1126,7 @@ function roomTx(fn) {
     tx.set(ref, {
       videoId: String(n.videoId || ''), title: String(n.title || ''), pick: String(n.pick || ''), playing: !!n.playing, ext: !!n.ext, dur: n.dur || 0,
       fix: keep ? (n.fix || '') : '', tried: keep ? (n.tried || []).slice(-6) : [],
-      startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, 30).map(cleanItem),
+      startAt: n.startAt ?? srvNow(), pos: n.pos ?? 0, queue: (n.queue || []).slice(0, QMAX).map(cleanItem),
       by: S.me.uid, at: serverTimestamp()
     });
     return true;
