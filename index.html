@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261106-1204">
+<meta name="build" content="20261106-1211">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -438,7 +438,7 @@ function render() {
     back('Message');
     $('#back').onclick = () => go('inbox');
     if (!m || !c) { v.innerHTML = '<div class="empty">메시지를 찾을 수 없어요</div>'; return }
-    const isOwner = m.to === S.me.uid, canDel = isOwner || m.from === S.me.uid;
+    const isOwner = m.to === S.me.uid, canDel = isOwner || sentByMe(m);
     if (m.hasImage && !S.imgs[m.id]) {
       S.imgs[m.id] = 'loading';
       getDoc(doc(db, 'messages', m.id, 'media', 'image')).then(d => { S.imgs[m.id] = d.exists() ? d.data().data : null; if (S.screen === 'read') render() }).catch(() => { S.imgs[m.id] = null });
@@ -450,15 +450,16 @@ function render() {
       ${c.item ? `<div class="itembox">${pix(c.item, 108)}<b>${esc((ITEMS[c.item] || {}).name || c.title)}</b><span>${m.anon ? '누군가가' : esc(c.fromNick) + '님이'} 보낸 선물이에요</span></div>` : ''}
       ${m.hasImage ? `<div class="photo">${S.imgs[m.id] && S.imgs[m.id] !== 'loading' ? `<img src="${S.imgs[m.id]}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
       ${S.editMsg ? `<form class="form" id="ef" style="padding:0">
-          <div class="field"><label for="et">TITLE</label><input id="et" maxlength="20" value="${esc(c.title)}"></div>
-          <div class="field"><label for="eb">MESSAGE</label><textarea id="eb" maxlength="300">${esc(c.body)}</textarea></div>
+          ${c.item ? `<div class="field"><label for="eb">NOTE</label><input id="eb" maxlength="100" placeholder="같이 보낼 한마디 (없어도 돼요)" value="${esc(c.body)}"></div>`
+            : `<div class="field"><label for="et">TITLE</label><input id="et" maxlength="20" value="${esc(c.title)}"></div>
+          <div class="field"><label for="eb">MESSAGE</label><textarea id="eb" maxlength="300">${esc(c.body)}</textarea></div>`}
           <div class="err" id="err"></div>
           <div class="ctrl-row"><button type="button" class="play ghost" id="ecancel">CANCEL</button><button class="play">SAVE</button></div>
         </form>`
         : c.item ? (c.body ? `<div class="text">${esc(c.body)}</div>` : '') : `<div class="text"><b>${esc(c.title)}</b>\n${esc(c.body)}</div>`}
       ${c.reply && !S.editReply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}${isOwner ? ' · <button class="out inline" id="redit">edit</button>' : ''}</small>${esc(c.reply)}</div>` : ''}
       ${isOwner && (!c.reply || S.editReply) && !S.editMsg ? `<form class="reply-form" id="rf"><input id="rt" maxlength="100" placeholder="답장 쓰기 (100자)" value="${S.editReply ? esc(c.reply) : ''}"><button>${S.editReply ? 'OK' : 'RE'}</button>${S.editReply ? '<button type="button" id="rcancel" class="ghostbtn">×</button>' : ''}</form>${S.editReply ? '<p class="hint">비우고 OK를 누르면 답장이 지워져요.</p>' : ''}` : ''}
-      ${m.from === S.me.uid && !c.item && !S.editMsg ? `<div class="foot" style="padding:8px 0 0;margin:0"><button class="out" id="medit">edit message</button></div>` : ''}
+      ${sentByMe(m) && !S.editMsg ? `<div class="foot" style="padding:8px 0 0;margin:0"><button class="out" id="medit">${c.item ? 'edit note' : 'edit message'}</button></div>` : ''}
       ${canDel ? `<div class="foot" style="padding-top:8px"><button class="out" id="del">${S.confirmDel ? '한 번 더 누르면 삭제돼요' : 'delete'}</button></div>` : ''}
     </div>`;
     if ($('#rf')) $('#rf').onsubmit = async e => {
@@ -472,10 +473,15 @@ function render() {
     if ($('#ecancel')) $('#ecancel').onclick = () => { S.editMsg = false; render() };
     if ($('#ef')) $('#ef').onsubmit = async e => {
       e.preventDefault();
-      const title = $('#et').value.trim(), body = $('#eb').value.trim();
-      if (!title || !body) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
+      const title = $('#et') ? $('#et').value.trim() : c.title, body = $('#eb').value.trim();
+      if (!title || (!body && !c.item)) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
       const ref = m.secret ? doc(db, 'messages', m.id, 'private', 'content') : doc(db, 'messages', m.id);
-      try { await updateDoc(ref, { title, body, editedAt: serverTimestamp() }); S.editMsg = false; toast('메시지를 고쳤어요'); render() }
+      try {
+        await updateDoc(ref, { title, body, editedAt: serverTimestamp() });
+        if (localAnon[m.id]) saveLocalAnon(m.id, { ...localAnon[m.id], title, body });
+        if (m.secret && S.priv[m.id] && S.priv[m.id] !== 'loading') S.priv[m.id] = { ...S.priv[m.id], title, body };
+        S.editMsg = false; toast(c.item ? '한마디를 고쳤어요' : '메시지를 고쳤어요'); render();
+      }
       catch { $('#err').textContent = '저장하지 못했어요. 잠시 후 다시 해 주세요.' }
     };
     if ($('#del')) $('#del').onclick = async () => {
@@ -484,7 +490,7 @@ function render() {
       if (m.secret) b.delete(doc(db, 'messages', m.id, 'private', 'content'));
       if (m.hasImage) b.delete(doc(db, 'messages', m.id, 'media', 'image'));
       b.delete(doc(db, 'messages', m.id));
-      try { await b.commit(); unsub('p' + m.id); delete S.priv[m.id]; delete privSub[m.id]; toast('삭제했어요'); go('inbox') } catch { toast('삭제하지 못했어요') }
+      try { await b.commit(); unsub('p' + m.id); delete S.priv[m.id]; delete privSub[m.id]; if (localAnon[m.id]) { delete localAnon[m.id]; try { localStorage.setItem('wb_anon', JSON.stringify(localAnon)) } catch { } } toast('삭제했어요'); go('inbox') } catch { toast('삭제하지 못했어요') }
     };
     return;
   }
@@ -512,7 +518,7 @@ function render() {
       <button class="btn" type="submit">SEND ${kind === 'item' ? 'ITEM' : '✉'}</button>
     </form>`;
     const hint = () => $('#vh').textContent = (S.vis === 'sec' ? '비밀로 보내면 받는 사람과 나만 볼 수 있어요.' : '공개로 보내면 방명록에 들른 친구 누구나 볼 수 있어요.')
-      + (S.anon ? ' 받는 사람에게 보낸 사람이 "익명"으로 보이고, 보낸 뒤에는 고칠 수 없어요.' : '');
+      + (S.anon ? ' 받는 사람에게 보낸 사람이 "익명"으로 보여요.' : '');
     hint();
     const saveDraft = () => { S.draft = { title: $('#st')?.value ?? D.title, body: $('#sb')?.value ?? D.body, note: $('#sn')?.value ?? D.note } };
     v.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { saveDraft(); S.to = $('#to').value; S.kind = b.dataset.k; render() });
