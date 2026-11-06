@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="build" content="20261106-1158">
+<meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -311,19 +313,30 @@ async function loadMe(u) {
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
   S.isAdmin = false; getDoc(doc(db, 'admins', u.uid)).then(d => { S.isAdmin = d.exists(); refresh() }).catch(() => { });
   subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; S.crops = {}; q.forEach(d => { const u = d.data(); S.users[d.id] = u.nick; if (u.photo) S.photos[d.id] = u.photo; if (u.crop) S.crops[d.id] = u.crop }); refresh() });
-  subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => { S.mine = list(q); loadPriv(S.mine); refresh() });
+  subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => {
+    S.mine = list(q); loadPriv(S.mine);
+    // 새로 온 아이템이 있으면 알려 줌 (처음 불러올 때는 제외)
+    const ids = new Set(S.mine.map(m => m.id));
+    if (mineSeen && S.mine.some(m => !mineSeen.has(m.id) && m.kind === 'item' && !m.read)) toast('아이템이 도착했어요!');
+    mineSeen = ids; refresh();
+  });
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
   go('inbox', { owner: u.uid });
   preparePlayer();
   getProbe().catch(() => { });
   measureClock(false);
 }
-function cleanup() { S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; S.users = {}; S.photos = {} }
+let mineSeen = null;
+function cleanup() { mineSeen = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 // 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
-const anonChk = {};
+const anonChk = {}, privSub = {};
+// 익명으로 보낸 내용은 보낸 기기에도 따로 기억해 둠 (서버 확인이 늦거나 막혀도 바로 보이게)
+const localAnon = (() => { try { return JSON.parse(localStorage.getItem('wb_anon') || '{}') } catch { return {} } })();
+function saveLocalAnon(id, data) { localAnon[id] = data; try { localStorage.setItem('wb_anon', JSON.stringify(localAnon)) } catch { } }
 function checkAnon(arr) {
   arr.filter(m => m.anon && m.to !== S.me?.uid && !(m.id in anonChk)).forEach(m => {
+    if (localAnon[m.id]) { anonChk[m.id] = true; loadPriv([m]); return }
     anonChk[m.id] = 'pending';
     getDoc(doc(db, 'messages', m.id, 'meta', 'sender')).then(d => {
       anonChk[m.id] = d.exists() && d.data().uid === S.me?.uid;
@@ -332,10 +345,14 @@ function checkAnon(arr) {
   });
 }
 const sentByMe = m => m.from === S.me?.uid || anonChk[m.id] === true;
+let rulesWarned = false;
 function loadPriv(arr) {
-  arr.filter(m => m.secret && !S.priv[m.id] && (m.to === S.me?.uid || sentByMe(m))).forEach(m => {
-    S.priv[m.id] = 'loading';
-    subs['p' + m.id] = onSnapshot(doc(db, 'messages', m.id, 'private', 'content'), d => { if (d.exists()) { S.priv[m.id] = d.data(); refresh() } }, () => { });
+  arr.filter(m => m.secret && !privSub[m.id] && (m.to === S.me?.uid || sentByMe(m))).forEach(m => {
+    privSub[m.id] = true;
+    if (!S.priv[m.id] || S.priv[m.id] === 'loading') S.priv[m.id] = localAnon[m.id] || 'loading';
+    subs['p' + m.id] = onSnapshot(doc(db, 'messages', m.id, 'private', 'content'), d => { if (d.exists()) { S.priv[m.id] = d.data(); refresh() } }, err => {
+      if (err?.code === 'permission-denied' && m.anon && !rulesWarned) { rulesWarned = true; console.warn('anon private read denied', m.id); if (!localAnon[m.id]) toast('익명 비밀 메시지를 보려면 Firebase 보안 규칙을 최신으로 게시해 주세요') }
+    });
   });
 }
 function watchOwner() {
@@ -400,7 +417,7 @@ function render() {
     v.innerHTML = (arr.length ? arr.map((m, i) => {
       const c = content(m);
       const icon = c?.item ? pix(c.item, 24) : m.secret ? LOCK : (m.read || !mine ? ENV_O : ENV_C);
-      const title = c ? esc(c.title) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요');
+      const title = c ? (c.item ? '아이템이 도착했어요' : esc(c.title)) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요');
       return `<button class="row" data-id="${m.id}" ${c ? '' : 'data-locked="1"'}><span class="num">${i + 1}</span>${icon}<span class="ttl ${c ? '' : 'secret'}">${title}</span>${m.hasImage && c ? '<span class="meta">IMG</span>' : ''}${mine && !m.read ? '<span class="meta">NEW</span>' : ''}</button>`;
     }).join('') : `<div class="empty">아직 받은 메시지가 없어요</div>`)
       + (mine ? '' : `<div class="form"><button class="btn" id="write">${esc(S.users[owner] || '')}에게 남기기</button></div>`);
@@ -464,7 +481,7 @@ function render() {
       if (m.secret) b.delete(doc(db, 'messages', m.id, 'private', 'content'));
       if (m.hasImage) b.delete(doc(db, 'messages', m.id, 'media', 'image'));
       b.delete(doc(db, 'messages', m.id));
-      try { await b.commit(); unsub('p' + m.id); delete S.priv[m.id]; toast('삭제했어요'); go('inbox') } catch { toast('삭제하지 못했어요') }
+      try { await b.commit(); unsub('p' + m.id); delete S.priv[m.id]; delete privSub[m.id]; toast('삭제했어요'); go('inbox') } catch { toast('삭제하지 못했어요') }
     };
     return;
   }
@@ -526,6 +543,7 @@ function render() {
       if (withImg) b.set(doc(ref, 'media', 'image'), { to: dest, from, secret, data: S.attach });
       try {
         await b.commit();
+        if (anon) { saveLocalAnon(ref.id, { to: dest, from: '', ...text }); anonChk[ref.id] = true; if (secret) S.priv[ref.id] = localAnon[ref.id] }
         toast(S.users[dest] + '에게 ' + (item ? ITEMS[item].name + '을(를) ' : '') + '보냈어요');
         go('inbox', { owner: dest, to: null, vis: 'pub', attach: null, draft: null, item: null, anon: false });
       } catch (err) { console.warn(err); $('#err').textContent = '보내지 못했어요 (' + (err?.code || '') + '). 잠시 후 다시 해 주세요.' }
@@ -716,6 +734,7 @@ const ITEMS = {
   tteok: { name: '떡볶이', art: ['............', '............', '...RRRRRR...', '..RccRRccR..', '.RRRccRGccR.', '.RccRRccRRR.', '.RRGccRRccR.', '..RRRRRRRR..', 'ssssssssssss', '.ssssssssss.', '............', '............'] },
   bungeo: { name: '붕어빵', art: ['............', '............', '..DDDDD...D.', '.DBBBBBD.DD.', 'DBkBBBBBDBD.', 'DBBBDBDBBBD.', 'DBBBBBBBDBD.', '.DBBBBBD.DD.', '..DDDDD...D.', '............', '............', '............'] },
   ramen: { name: '라면', art: ['...s...s....', '....s...s...', '............', '.yyywwwyyyy.', 'rryywoowyyrr', 'rrrrrrrrrrrr', '.rrrrrrrrrr.', '.rrwrrrrwrr.', '..rrrrrrrr..', '...ssssss...', '............', '............'] },
+  hammer: { name: '뿅망치', art: ['............', 'rrryoyoyorrr', 'rwryoyoyorrr', 'rrryoyoyorrr', 'rrryoyoyorrr', '.....yy.....', '.....yy.....', '.....rr.....', '.....yy.....', '.....yy.....', '.....rr.....', '............'] },
   // 예전에 보낸 아이템이 계속 보이도록 남겨 둠 (고르는 목록에는 안 나옴)
   flower: { hidden: true, name: '꽃', art: ['...ppp...', '..ppppp..', '.ppyyypp.', '.ppyyypp.', '..ppppp..', '...ppp...', '....g....', '..ggg....', '....g....'] },
   cake: { hidden: true, name: '케이크', art: ['....r....', '....u....', '.ccccccc.', '.ccccccc.', '.bbbbbbb.', '.ccccccc.', '.bbbbbbb.', 'sssssssss', '.........'] },
@@ -1175,6 +1194,25 @@ setInterval(() => {
   if (el) el.textContent = fmtT(t) + (r.dur ? ' / ' + fmtT(r.dur) : '');
   if (S.me && r.dur && t >= r.dur + 1 && extAdv !== r.videoId + r.startAt) { extAdv = r.videoId + r.startAt; advance(r.videoId) }
 }, 1000);
+
+/* ===== 새 버전 자동 적용 ===== */
+// 사이트를 새로 올렸는데 휴대폰이 예전 화면을 기억하고 있으면, 알아서 새 버전으로 다시 불러옴
+const BUILD = document.querySelector('meta[name="build"]')?.content || '';
+async function checkUpdate(force) {
+  try {
+    const r = await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' });
+    const m = (await r.text()).match(/<meta name="build" content="([^"]+)"/);
+    if (!m || !BUILD || m[1] === BUILD) return;
+    let done = ''; try { done = sessionStorage.getItem('wb_reload') || '' } catch { }
+    if (done === m[1]) return; // 같은 버전으로 두 번 다시 불러오지 않음
+    const busy = S.screen === 'send' || S.editMsg || S.editReply || S.joined;
+    if (busy && !force) { toast('새 버전이 있어요. 새로고침해 주세요'); return }
+    try { sessionStorage.setItem('wb_reload', m[1]) } catch { }
+    location.reload();
+  } catch { }
+}
+checkUpdate(true);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(false) });
 
 /* ===== 공통 ===== */
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.go, { owner: S.me?.uid }));
