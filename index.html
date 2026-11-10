@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1655">
+<meta name="build" content="20261110-1806">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -286,6 +286,110 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .c-friends{--l:#ffffff;--b:#dcdbe3;color:#8b93a7}
 .c-friends .vi{filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
 .c-admin{--l:#5a6b8f;--b:#263252}
+.c-now{--l:#ffe14a;--b:#ff7a1a;color:#fff}
+.c-now .vi{width:70%;height:70%;object-fit:contain;--d:var(--b);filter:drop-shadow(0 2px 2px rgba(150,50,0,.45))}
+/* NOW (잭디 스타일) */
+.body.nowbg{background:#0b0b0d;color:#e8e8ea}
+.nw-top{display:flex;align-items:center;gap:8px;padding:10px 8px 8px}
+.nw-me{display:flex;align-items:center;gap:8px;min-width:0;flex:1;background:#1b1b20;border:0;border-radius:999px;padding:4px 12px 4px 4px;color:#ddd;font:inherit;font-size:12px;cursor:pointer;text-align:left}
+.nw-me .mini{width:26px;height:26px;border-radius:50%;border:0}
+.nw-me .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nw-me i,.nw-msg i{color:#777;font-style:normal}
+.nw-seg{display:flex;background:#1b1b20;border-radius:999px;padding:3px;flex:none}
+.nw-seg button{border:0;background:none;color:#8a8a92;font:inherit;font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.nw-seg button.on{background:#ffb020;color:#111;font-weight:700}
+.nw-lab{font-size:11px;color:#8a8a92;padding:2px 10px 6px}
+.nw-taps{display:flex;gap:10px;overflow-x:auto;padding:0 10px 10px;scrollbar-width:none}
+.nw-tp{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#bbb;font:inherit;flex:none}
+.nw-tp .mini{width:40px;height:40px;border-radius:50%;border:2px solid #ffb020}
+.nw-tp small{font-size:10px;max-width:48px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.nw-cell{position:relative;aspect-ratio:1;border:0;padding:0;background:#16161a;overflow:hidden;cursor:pointer;display:block;font:inherit}
+.nw-cell:active{filter:brightness(.8)}
+.nw-ph{position:absolute;inset:0;overflow:hidden;display:grid;place-items:center;font-size:30px;color:#5a5a62;background:linear-gradient(160deg,#2a2a31,#141417)}
+.nw-ph img{width:100%;height:100%;object-fit:cover;max-width:none;display:block}
+.nw-cell.off .nw-ph{filter:grayscale(.55) brightness(.62)}
+.nw-cap{position:absolute;left:0;right:0;bottom:0;padding:18px 6px 5px;background:linear-gradient(transparent,rgba(0,0,0,.88));text-align:left;display:flex;flex-direction:column;gap:1px}
+.nw-cap b{color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden}
+.nw-cap small{color:#a9a9b0;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:7px;height:7px;border-radius:50%;flex:none;background:#55555c;font-style:normal}
+.dot.on{background:#3bff7a;box-shadow:0 0 6px #3bff7a}
+.dot.music{background:#ff4f8b;box-shadow:0 0 6px #ff4f8b}
+.dot.game{background:#b48cff;box-shadow:0 0 6px #b48cff}
+.nw-cell.me::after{content:"ME";position:absolute;top:5px;left:5px;font-size:9px;font-weight:700;background:#ffb020;color:#111;padding:1px 5px;border-radius:4px}
+.nw-pk{position:absolute;top:4px;right:5px;font-size:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.nw-sheet{position:absolute;inset:3px;z-index:20;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;animation:nwf .15s}
+.nw-card{width:100%;background:#121215;color:#eee;border-radius:18px 18px 0 0;overflow:hidden auto;max-height:94%;animation:nwu .22s ease-out}
+.nw-big{position:relative;aspect-ratio:1;background:#1a1a1f}
+.nw-big .nw-ph{font-size:72px}
+.nw-x{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.5);color:#fff;font-size:14px;cursor:pointer;z-index:2}
+.nw-info{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.92))}
+.nw-info b{font-size:18px;color:#fff;display:block}
+.nw-info span{font-size:12px;color:#bbb;display:flex;align-items:center;gap:6px;margin-top:3px}
+.nw-msg{padding:14px 14px 2px;font-size:13px;color:#ddd;line-height:1.5;word-break:break-all}
+.nw-acts{display:flex;gap:8px;padding:12px 14px 16px}
+.nw-acts button,.nw-edit button{flex:1;border:0;border-radius:12px;padding:11px 0;font:inherit;font-size:12px;cursor:pointer;background:#24242a;color:#eee}
+.nw-acts .pk,.nw-edit button{background:#ffb020;color:#111;font-weight:700}
+.nw-acts button:disabled{opacity:.6}
+.nw-edit{display:flex;gap:8px;padding:14px}
+.nw-edit input{flex:1;min-width:0;background:#1d1d22;border:1px solid #2e2e35;border-radius:12px;color:#fff;font:inherit;font-size:16px;padding:9px 12px}
+.nw-edit button{flex:none;padding:0 18px}
+.head .hd-r{left:auto;right:6px;font-size:12px;display:flex;align-items:center;gap:4px}
+.hd-n{min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#ff3b30;color:#fff;font-size:10px;line-height:16px;text-align:center}
+.nw-cnt{position:absolute;top:5px;right:5px;font-size:9px;color:#fff;background:rgba(0,0,0,.55);border-radius:4px;padding:1px 4px}
+.nw-cnt~.nw-pk{top:18px}
+.nw-bars{position:absolute;top:8px;left:10px;right:48px;display:flex;gap:4px;z-index:2}
+.nw-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35)}
+.nw-bars i.on{background:#fff}
+.nw-big{cursor:pointer}
+.nw-pics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 14px 0}
+.nw-slot{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#1d1d22;border:1px dashed #3a3a42;padding:0}
+.nw-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.nw-slot.add{color:#ffb020;font-size:26px;cursor:pointer;font-family:inherit}
+.nw-slot.add:disabled{opacity:.3;cursor:default}
+.nw-slot [data-rm]{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:11px;cursor:pointer}
+.nw-slot .fst{position:absolute;left:4px;bottom:4px;border:0;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;font:inherit;font-size:10px;padding:2px 6px;cursor:pointer}
+.nw-slot .fst.on{background:#ffb020;color:#111;font-weight:700}
+.nd-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-bottom:1px solid #1e1e23;background:none;color:#eee;font:inherit;text-align:left;cursor:pointer}
+.nd-row .mini{width:44px;height:44px;border-radius:50%;border:0}
+.nd-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.nd-t b{font-size:13px}
+.nd-t small{color:#999;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nd-m{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.nd-m small{color:#777;font-size:10px}
+.nd-m i{font-style:normal;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#ff7a1a;color:#fff;font-size:10px;line-height:18px;text-align:center}
+.nc{min-height:100%;display:flex;flex-direction:column}
+.nc-list{flex:1;display:flex;flex-direction:column;gap:8px;padding:12px 10px}
+.nc-b{max-width:78%;display:flex;flex-direction:column;gap:2px}
+.nc-b p{margin:0;padding:8px 12px;border-radius:16px;font-size:13px;line-height:1.45;white-space:pre-wrap;word-break:break-all}
+.nc-b small{font-size:10px;color:#777}
+.nc-b.l{align-self:flex-start}.nc-b.l p{background:#24242a;color:#eee;border-bottom-left-radius:4px}
+.nc-b.r{align-self:flex-end;align-items:flex-end}.nc-b.r p{background:linear-gradient(160deg,#ffd23f,#ff8a1f);color:#1a1000;border-bottom-right-radius:4px}
+.nc-bar{position:sticky;bottom:0;display:flex;gap:8px;padding:8px 10px;background:#0b0b0d;border-top:1px solid #1e1e23}
+.nc-bar input{flex:1;min-width:0;background:#1d1d22;border:1px solid #2e2e35;border-radius:18px;color:#fff;font:inherit;font-size:16px;padding:8px 14px}
+.nc-bar button{border:0;border-radius:18px;background:#ff8a1f;color:#fff;font:inherit;font-size:12px;font-weight:700;padding:0 16px;cursor:pointer}
+.adm-nc{background:#0b0b0d;border-radius:8px;margin:0 10px 12px}
+.adm-pair{padding:8px 12px;font-size:12px}
+.adm-pair small{color:var(--muted)}
+
+.an-ban{margin:10px 10px 0;padding:10px 12px;border-radius:14px;background:#17171b;border:1px solid #2a2a31;display:flex;flex-direction:column;gap:6px;font-size:12px;color:#ccc;line-height:1.5}
+.an-ban b{color:#ffb020}
+.an-warn{color:#ff8a1f;font-weight:700}
+.an-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.an-acts button{border:0;border-radius:10px;background:#26262d;color:#eee;font:inherit;font-size:11px;padding:7px 10px;cursor:pointer}
+.an-acts button.hot{background:#ff8a1f;color:#fff;font-weight:700}
+.an-acts button:disabled{opacity:.5}
+.an-acts input{flex:1;min-width:0;background:#1d1d22;border:1px solid #2e2e35;border-radius:10px;color:#fff;font:inherit;font-size:16px;padding:5px 10px}
+.nc-anon{flex:none;border:1px solid #3a3a42;border-radius:18px;background:none;color:#aaa;font:inherit;font-size:11px;padding:0 10px;cursor:pointer;white-space:nowrap}
+.nc-anon.on{background:#2a1f10;border-color:#ff8a1f;color:#ffb020}
+.nc-anon:disabled{opacity:.4}
+.nc-bar input:disabled{opacity:.5}
+.nc-bar button:disabled{opacity:.4}
+.an-q{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;color:#fff;background:linear-gradient(160deg,hsl(var(--h) 80% 62%),hsl(calc(var(--h) + 40) 70% 42%))}
+.nd-tag{font-size:10px;font-weight:400;color:#ffb020;background:#2a1f10;border-radius:5px;padding:1px 5px;margin-left:2px}
+@keyframes nwf{from{opacity:0}}
+@keyframes nwu{from{transform:translateY(40%)}}
+
 .c-inbox{--l:#6fd0ff;--b:#1f7ef0}
 .c-board{--l:#ffffff;--b:#dcdbe3}
 .c-board .vi{width:74%;height:74%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
@@ -460,7 +564,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'game' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (S.screen === 'game' && screen !== 'game') MOLE.stop(); Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); render() }
+function go(screen, extra = {}) { if (S.screen === 'game' && screen !== 'game') MOLE.stop(); Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -490,6 +594,17 @@ async function loadMe(u) {
     if (mineSeen && S.mine.some(m => !mineSeen.has(m.id) && m.bc && !m.read)) toast('전체 쪽지가 도착했어요!');
     mineSeen = ids; refresh();
   });
+  subs.taps = onSnapshot(query(collection(db, 'taps'), where('to', '==', u.uid)), q => {
+    const first = !P.tapsLoaded; P.taps = []; q.forEach(d => P.taps.push(d.data()));
+    if (!first) q.docChanges().forEach(c => { if (c.type !== 'removed') { const t = c.doc.data(); toast(`${S.users[t.from] || '누군가'}님이 콕 찔렀어요! 👉`) } });
+    P.tapsLoaded = true; if (S.screen === 'home' || S.screen === 'now') refresh();
+  }, () => { });
+  anSubs(u.uid);
+  subs.dmIn = onSnapshot(query(collection(db, 'dms'), where('to', '==', u.uid)), q => {
+    const first = !P.dmLoaded; P.dmIn = []; q.forEach(d => P.dmIn.push({ id: d.id, ...d.data() }));
+    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (!(S.screen === 'now-chat' && S.chatWith === m.from)) toast(`${S.users[m.from] || '누군가'}님에게 쪽지가 왔어요 💬`) } });
+    P.dmLoaded = true; if (S.screen.startsWith('now')) render(); else if (S.screen === 'home') refresh();
+  }, () => { });
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
   go('home', { owner: u.uid });
   preparePlayer();
@@ -497,7 +612,7 @@ async function loadMe(u) {
   measureClock(false);
 }
 let mineSeen = null;
-function cleanup() { mineSeen = null; G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
+function cleanup() { mineSeen = null; AN.toMe = {}; AN.mine = {}; AN.mineIdx = {}; AN.msgs = []; AN.msgTid = null; AN.loaded = false; P.list = {}; P.pics = {}; P.dmIn = []; P.dmOut = []; P.dmLoaded = false; S.admDm = null; P.taps = []; P.tapsLoaded = false; P.lastAct = ''; P.lastW = 0; $('#nw-sheet')?.remove(); G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 // 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
 const anonChk = {}, privSub = {};
@@ -541,7 +656,7 @@ function content(m) { // 화면에 보여 줄 제목·내용·답장
 function render() {
   const v = $('#view'), h = $('#head');
   $('#nav').hidden = true;
-  h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); applyWall(); $('.lcd').classList.toggle('dark', S.screen === 'home');
+  h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); $('#view').classList.toggle('nowbg', S.screen.startsWith('now')); applyWall(); $('.lcd').classList.toggle('dark', S.screen === 'home');
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (b.dataset.go === 'board' && (S.screen === 'post' || S.screen === 'board-write')) || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
   const back = html => { h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html; $('#back').onclick = () => go('home') };
 
@@ -573,6 +688,7 @@ function render() {
         ${tile('me', 'photo p3f', `<span class="appav">${avatar(S.me.uid)}</span>`, '프로필')}
         ${tile('game', 'p3 c-game', ico('pad'), '게임')}
         ${tile('friends', 'p3 c-friends', ico('friends'), '친구들')}
+        ${tile('now', 'p3 c-now', `<img class="vi jic" src="${JICON}" alt="">`, 'NOW', newTaps() + unreadDm())}
         ${S.isAdmin ? tile('admin', 'p3 c-admin', ico('gear'), '관리자') : ''}
       </div>
       <div class="hs-dock">
@@ -808,7 +924,7 @@ function render() {
   if (S.screen === 'admin') {
     const A = S.adm || {}, tab = S.admTab || 'all', U = S.admUser;
     back(U ? esc(S.users[U] || '(탈퇴)') : 'Admin');
-    $('#back').onclick = () => U ? go('admin', { admUser: null }) : go('home');
+    $('#back').onclick = () => U ? go('admin', { admUser: null }) : (S.admPair || S.admAn) ? go('admin', { admPair: null, admAn: null, admDel: null }) : go('home');
     const nm = u => esc(S.users[u] || '(탈퇴)');
     const who = m => m.anon ? (A.sender?.[m.id] ? nm(A.sender[m.id]) + '(익명)' : '익명') : nm(m.from);
     const listAll = A.list || [];
@@ -833,13 +949,49 @@ function render() {
       body = AB.loading ? '<div class="empty">불러오는 중…</div>' : AB.err ? `<div class="empty">${esc(AB.err)}</div>`
         : (AB.posts || []).length ? AB.posts.map((x, i) => `<div class="row arow"><button class="abtn" data-ap="${x.id}"><span class="num">${i + 1}</span><span class="ttl wrap">${esc(x.title)}${x.cc ? `<span class="ccnt">[${x.cc}]</span>` : ''}<small class="adm-who">${AB.author[x.id] ? nm(AB.author[x.id]) : '익명'} · ${fmt(x.at)}</small></span></button><button class="out" data-apdel="${x.id}">${S.admDel === x.id ? '정말 삭제' : '삭제'}</button></div>`).join('')
         : '<div class="empty">게시판에 글이 없어요</div>';
+    } else if (tab === 'now') { // NOW 쪽지 전체 (익명 쪽지는 진짜 보낸 사람까지)
+      const AD = S.admDm || {};
+      if (AD.loading) body = '<div class="empty">불러오는 중…</div>';
+      else if (AD.err) body = `<div class="empty">${esc(AD.err)}</div>`;
+      else if (S.admAn) {
+        const t = (AD.an || []).find(x => x.id === S.admAn), msgs = AD.anMsgs?.[S.admAn];
+        body = !t ? '<div class="empty">대화가 없어요</div>' : `<div class="adm-pair">🤫 ${t.owner ? nm(t.owner) : '?'}(익명) → ${nm(t.to)} <small>(오른쪽이 익명으로 보낸 사람)</small><br><small>${t.rev ? '정체 공개함 · ' : ''}${t.hint ? '힌트: ' + esc(t.hint) + ' · ' : ''}${t.blocked ? '받은 사람이 차단함' : ''}</small></div>`
+          + (msgs ? `<div class="nc-list adm-nc">${anBubbles(msgs, 'a', t)}</div>` : '<div class="empty">불러오는 중…</div>')
+          + `<div class="form"><button class="btn" id="adm-andel">${S.admDel === 'an' ? '정말 이 대화를 지울까요?' : '이 익명 대화 지우기'}</button></div>`;
+      } else if (S.admPair) {
+        const [a, b] = S.admPair.split('|'), ms2 = (AD.list || []).filter(m => (m.from === a && m.to === b) || (m.from === b && m.to === a)).sort((x, y) => ms(x.at) - ms(y.at));
+        body = `<div class="adm-pair">${nm(a)} ↔ ${nm(b)} · ${ms2.length}개 <small>(오른쪽이 ${nm(a)})</small></div><div class="nc-list adm-nc">${bubbles(ms2, a)}</div>`
+          + `<div class="form"><button class="btn" id="adm-pdel">${S.admDel === 'pair' ? '정말 이 대화를 지울까요?' : '이 대화 지우기'}</button></div>`;
+      } else {
+        const an = [...(AD.an || [])].sort((x, y) => ms(y.at) - ms(x.at));
+        const pairs = {}; (AD.list || []).forEach(m => { const k = [m.from, m.to].sort().join('|'); const x = pairs[k] ||= { k, n: 0, last: m }; x.n++; if (ms(m.at) > ms(x.last.at)) x.last = m });
+        const P2 = Object.values(pairs).sort((x, y) => ms(y.last.at) - ms(x.last.at));
+        body = `<div class="sect">익명 쪽지 · ${an.length}</div>` + (an.length ? an.map((x, i) => `<button class="row" data-adan="${x.id}"><span class="num">${i + 1}</span><span class="ttl">🤫 ${x.owner ? nm(x.owner) : '?'} → ${nm(x.to)}${x.rev ? ' <span class="bc">공개</span>' : ''}${x.blocked ? ' <span class="bc">차단</span>' : ''}<small class="adm-who">${esc((x.last || '').slice(0, 40))} · ${fmt(x.at)}</small></span></button>`).join('') : '<div class="empty">익명 쪽지가 없어요</div>')
+          + `<div class="sect">이름 쪽지 · ${P2.length}</div>` + (P2.length ? P2.map((x, i) => { const [a, b] = x.k.split('|'); return `<button class="row" data-pair="${x.k}"><span class="num">${i + 1}</span><span class="ttl">${nm(a)} ↔ ${nm(b)}<small class="adm-who">${nm(x.last.from)}: ${esc(x.last.text.slice(0, 40))} · ${fmt(x.last.at)}</small></span><span class="meta">${x.n}</span></button>` }).join('') : '<div class="empty">이름 쪽지가 없어요</div>');
+      }
     } else body = rows(listAll);
-    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button><button id="at-board" class="${tab === 'board' ? 'on' : ''}">게시판</button></div>`)
-      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : tab === 'board' ? 'BOARD POSTS' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : tab === 'board' ? (S.admB?.posts || []).length : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
+    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button><button id="at-board" class="${tab === 'board' ? 'on' : ''}">게시판</button><button id="at-now" class="${tab === 'now' ? 'on' : ''}">NOW</button></div>`)
+      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : tab === 'board' ? 'BOARD POSTS' : tab === 'now' ? 'NOW 쪽지' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : tab === 'board' ? (S.admB?.posts || []).length : tab === 'now' ? (S.admDm?.list || []).length + (S.admDm?.an || []).length : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
       + body;
     if ($('#at-all')) $('#at-all').onclick = () => go('admin', { admTab: 'all' });
     if ($('#at-users')) $('#at-users').onclick = () => go('admin', { admTab: 'users' });
     if ($('#at-board')) $('#at-board').onclick = () => { go('admin', { admTab: 'board', admDel: null }); if (!S.admB) loadAdminBoard() };
+    if ($('#at-now')) $('#at-now').onclick = () => { go('admin', { admTab: 'now', admPair: null }); if (!S.admDm) loadAdminDm() };
+    v.querySelectorAll('[data-pair]').forEach(b => b.onclick = () => go('admin', { admPair: b.dataset.pair, admDel: null }));
+    v.querySelectorAll('[data-adan]').forEach(b => b.onclick = async () => {
+      const id = b.dataset.adan; go('admin', { admAn: id, admDel: null });
+      if (!S.admDm.anMsgs?.[id]) { try { const q = await getDocs(query(collection(db, 'athreads', id, 'msgs'), orderBy('at'))), a = []; q.forEach(d => a.push(d.data())); (S.admDm.anMsgs ||= {})[id] = a } catch (e) { (S.admDm.anMsgs ||= {})[id] = []; toast('불러오지 못했어요 (' + (e.code || '') + ')') } if (S.screen === 'admin') render() }
+    });
+    if ($('#adm-andel')) $('#adm-andel').onclick = async () => {
+      if (S.admDel !== 'an') { S.admDel = 'an'; render(); return }
+      const t = S.admDm.an.find(x => x.id === S.admAn);
+      try { await adminDelAn(t.id, t.owner); toast('익명 대화를 지웠어요'); go('admin', { admAn: null, admDel: null }); loadAdminDm() } catch (e) { toast('지우지 못했어요 (' + (e.code || '') + ')') }
+    };
+    if ($('#adm-pdel')) $('#adm-pdel').onclick = async () => {
+      if (S.admDel !== 'pair') { S.admDel = 'pair'; render(); return }
+      const [a, c] = S.admPair.split('|'), ids = S.admDm.list.filter(m => (m.from === a && m.to === c) || (m.from === c && m.to === a)).map(m => m.id);
+      try { for (let i = 0; i < ids.length; i += 400) { const b = writeBatch(db); ids.slice(i, i + 400).forEach(id => b.delete(doc(db, 'dms', id))); await b.commit() } toast('대화를 지웠어요'); go('admin', { admPair: null, admDel: null }); loadAdminDm() } catch (e) { toast('지우지 못했어요 (' + (e.code || '') + ')') }
+    };
     v.querySelectorAll('[data-ap]').forEach(b => b.onclick = () => go('post', { post: b.dataset.ap, postFrom: 'admin' }));
     v.querySelectorAll('[data-apdel]').forEach(b => b.onclick = async () => {
       const id = b.dataset.apdel;
@@ -847,7 +999,7 @@ function render() {
       S.admDel = null; b.textContent = '지우는 중…';
       try { await deletePost(id); toast('글과 댓글을 지웠어요'); loadAdminBoard() } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')'); render() }
     });
-    if ($('#areload')) $('#areload').onclick = () => tab === 'board' && !U ? loadAdminBoard() : loadAdmin();
+    if ($('#areload')) $('#areload').onclick = () => tab === 'board' && !U ? loadAdminBoard() : tab === 'now' && !U ? loadAdminDm() : loadAdmin();
     v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('admin', { admUser: b.dataset.u }));
     v.querySelectorAll('[data-aid]').forEach(b => b.onclick = () => go('admin-read', { admOpen: b.dataset.aid }));
     return;
@@ -911,6 +1063,116 @@ function render() {
       ${c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="mtitle">${esc(c.title)}</div><div class="text">${linkify(c.body)}</div>${ytCards(c.body)}`}
       ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}<span class="rtime">${c.replyAt ? fmt(c.replyAt) : ''}</span></small>${esc(c.reply)}</div>` : ''}
     </div>`;
+    return;
+  }
+
+  if (S.screen === 'now') { // 잭디 스타일: 지금 접속 중인 친구 격자
+    back('Now');
+    const nd = unreadDm(); h.insertAdjacentHTML('beforeend', `<button class="hd-r" id="nw-box">쪽지함${nd ? `<span class="hd-n">${nd}</span>` : ''}</button>`);
+    $('#nw-box').onclick = () => go('now-dm');
+    try { localStorage.setItem('wb_tapseen_' + S.me.uid, Date.now()) } catch { }
+    const me = S.me.uid, all = nowPeople(), on = all.filter(x => x.on);
+    const shown = P.filter === 'on' ? all.filter(x => x.on || x.u === me) : all;
+    const recent = P.taps.filter(t => Date.now() - tms(t.at) < 86400000 && S.users[t.from]).sort((a, b) => tms(b.at) - tms(a.at));
+    const pokedMe = new Set(recent.map(t => t.from));
+    const myMsg = P.list[me]?.msg || '';
+    v.innerHTML = `<div class="nw">
+      <div class="nw-top">
+        <button class="nw-me" id="nw-me"><span class="mini">${nowPic(me)}</span><span class="t">${myMsg ? esc(myMsg) : '<i>한마디를 남겨 보세요</i>'}</span></button>
+        <div class="nw-seg"><button data-f="all" class="${P.filter !== 'on' ? 'on' : ''}">전체</button><button data-f="on" class="${P.filter === 'on' ? 'on' : ''}">접속 ${on.length}</button></div>
+      </div>
+      ${recent.length ? `<div class="nw-lab">나를 콕 찌른 친구</div><div class="nw-taps">${recent.map(t => `<button class="nw-tp" data-u="${t.from}"><span class="mini">${avatar(t.from)}</span><small>${esc(S.users[t.from])}</small></button>`).join('')}</div>` : ''}
+      <div class="nw-grid">${shown.map(x => `<button class="nw-cell ${x.on ? '' : 'off'} ${x.u === me ? 'me' : ''}" data-u="${x.u}">
+        <span class="nw-ph">${nowPic(x.u)}</span>${P.pics[x.u]?.length > 1 ? `<span class="nw-cnt">${P.pics[x.u].length}</span>` : ''}${pokedMe.has(x.u) ? '<span class="nw-pk">👉</span>' : ''}
+        <span class="nw-cap"><b><i class="dot ${x.on ? x.act : ''}"></i>${esc(S.users[x.u])}</b><small>${esc(x.msg || statusText(x))}</small></span></button>`).join('')}</div>
+      ${shown.length <= 1 ? '<div class="empty" style="color:#888">지금은 접속한 친구가 없어요</div>' : ''}
+    </div>`;
+    $('#nw-me').onclick = () => openNow(me);
+    v.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { P.filter = b.dataset.f; render() });
+    v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => openNow(b.dataset.u));
+    return;
+  }
+
+  if (S.screen === 'now-dm') { // NOW 쪽지함: 이름 쪽지 + 익명 쪽지(내가 보낸 것 / 받은 것)
+    back('쪽지함'); $('#back').onclick = () => go('now'); P.hintEdit = false; P.revConfirm = false;
+    const me = S.me.uid, items = [];
+    threads().forEach(x => items.push({ t: ms(x.last.at), html: `<button class="nd-row" data-c="${x.u}"><span class="mini">${S.users[x.u] ? nowPic(x.u) : '?'}</span><span class="nd-t"><b>${esc(S.users[x.u] || '(탈퇴)')}</b><small>${x.last.from === me ? '나: ' : ''}${esc(x.last.text)}</small></span><span class="nd-m"><small>${fmt(x.last.at)}</small>${x.unread ? `<i>${x.unread}</i>` : ''}</span></button>` }));
+    Object.entries(AN.mine).forEach(([id, t]) => items.push({ t: ms(t.at), html: `<button class="nd-row" data-am="${id}"><span class="mini an-av">${S.users[t.to] ? nowPic(t.to) : '?'}</span><span class="nd-t"><b>${esc(S.users[t.to] || '(탈퇴)')} <span class="nd-tag">${t.rev ? '정체 공개함' : '익명으로 보냄'}</span></b><small>${t.ls === 'a' ? '나: ' : ''}${esc(t.last || '')}</small></span><span class="nd-m"><small>${fmt(t.at)}</small>${anUnread(id) ? '<i>N</i>' : ''}</span></button>` }));
+    Object.entries(AN.toMe).forEach(([id, t]) => items.push({ t: ms(t.at), html: `<button class="nd-row" data-at="${id}"><span class="mini an-av">${t.rev && S.users[t.rev] ? nowPic(t.rev) : `<span class="an-q" style="--h:${anHue(id)}">?</span>`}</span><span class="nd-t"><b>${t.rev && S.users[t.rev] ? `${esc(S.users[t.rev])} <span class="nd-tag">정체 공개</span>` : '익명의 누군가 <span class="nd-tag">🤫</span>'}</b><small>${t.ls === 'b' ? '나: ' : ''}${esc(t.last || '')}</small></span><span class="nd-m"><small>${fmt(t.at)}</small>${anUnread(id) ? '<i>N</i>' : ''}</span></button>` }));
+    items.sort((a, b) => b.t - a.t);
+    v.innerHTML = items.length ? `<div class="nd">${items.map(x => x.html).join('')}</div>`
+      : '<div class="empty" style="color:#888">아직 쪽지가 없어요.<br>NOW에서 친구를 눌러 쪽지를 보내 보세요!</div>';
+    v.querySelectorAll('[data-c]').forEach(b => b.onclick = () => S.users[b.dataset.c] && go('now-chat', { chatWith: b.dataset.c, chatAnon: false, athread: null }));
+    v.querySelectorAll('[data-am]').forEach(b => b.onclick = () => { const t = AN.mine[b.dataset.am]; go('now-chat', { chatWith: t.to, chatAnon: true, athread: b.dataset.am }) });
+    v.querySelectorAll('[data-at]').forEach(b => b.onclick = () => go('now-achat', { athread: b.dataset.at }));
+    return;
+  }
+
+  if (S.screen === 'now-chat') { // 내가 쓰는 쪽지: 이름으로 / 익명으로 (토글)
+    const u = S.chatWith, me = S.me.uid, anon = !!S.chatAnon, tid = anon ? S.athread : null, t = tid ? AN.mine[tid] : null;
+    back(esc(S.users[u] || '(탈퇴)')); $('#back').onclick = () => go('now-dm');
+    const keep = $('#nc-in'), kv = keep?.value || '', kf = document.activeElement === keep;
+    let list, banner = '';
+    if (anon) {
+      list = tid && AN.msgTid === tid ? anBubbles(AN.msgs, 'a', t) : '';
+      banner = `<div class="an-ban">${t?.rev ? `<span>정체를 공개했어요. 이제 ${esc(S.users[u] || '')}님도 내가 누군지 알아요.</span>`
+        : `<span>🤫 ${esc(S.users[u] || '')}님에게는 <b>익명의 누군가</b>로 보여요</span>`}
+        ${t?.blocked ? '<span class="an-warn">상대가 이 익명 대화를 막았어요</span>' : ''}
+        ${t && t.hintOn && !t.hint ? '<span class="an-warn">상대가 힌트를 원해요! 💡</span>' : ''}
+        ${t?.hint ? `<span>💡 내가 준 힌트: ${esc(t.hint)}</span>` : ''}
+        ${t && !t.rev ? `<div class="an-acts">${P.hintEdit ? `<input id="an-hint" maxlength="40" placeholder="힌트 (예: 닉네임 첫 글자는 ㅇ)" value="${esc(t.hint || '')}"><button id="an-hsave">저장</button>` : `<button id="an-hint-b">${t.hint ? '힌트 바꾸기' : '힌트 정하기'}</button>`}<button id="an-rev" class="${P.revConfirm ? 'hot' : ''}">${P.revConfirm ? '정말 공개할까요?' : '나야! 정체 공개'}</button></div>` : ''}</div>`;
+    } else {
+      const msgs = [...P.dmIn.filter(m => m.from === u), ...P.dmOut.filter(m => m.to === u)].sort((a, b) => ms(a.at) - ms(b.at));
+      list = msgs.length ? bubbles(msgs, me) : '';
+      const unread = P.dmIn.filter(m => m.from === u && !m.read && !P.marking?.has(m.id));
+      if (unread.length) { P.marking ||= new Set(); const b = writeBatch(db); unread.forEach(m => { P.marking.add(m.id); b.update(doc(db, 'dms', m.id), { read: true }) }); b.commit().catch(() => { }).finally(() => unread.forEach(m => P.marking.delete(m.id))) }
+    }
+    v.innerHTML = `<div class="nc">${banner}<div class="nc-list" id="nc-list">${list || `<div class="empty" style="color:#888">${anon ? '익명으로 첫 쪽지를 보내 보세요 🤫' : '첫 쪽지를 보내 보세요 👋'}</div>`}</div>
+      <form class="nc-bar" id="nc-f"><button type="button" class="nc-anon ${anon ? 'on' : ''}" id="nc-anon" ${t?.rev ? 'disabled' : ''}>${anon ? '🤫 익명' : '이름'}</button><input id="nc-in" maxlength="500" autocomplete="off" placeholder="${anon ? '익명 쪽지' : '쪽지'}" ${t?.blocked ? 'disabled' : ''}><button>전송</button></form></div>`;
+    const inp = $('#nc-in'); inp.value = kv; if (kf) inp.focus();
+    v.scrollTop = v.scrollHeight;
+    if (anon && t) anMarkRead(tid, 'a');
+    $('#nc-anon').onclick = () => { P.hintEdit = false; P.revConfirm = false; go('now-chat', { chatWith: u, chatAnon: !anon, athread: !anon ? myTidFor(u) : null }) };
+    if ($('#an-hint-b')) $('#an-hint-b').onclick = () => { P.hintEdit = true; render(); $('#an-hint')?.focus() };
+    if ($('#an-hsave')) $('#an-hsave').onclick = async () => { const h = $('#an-hint').value.trim().slice(0, 40); try { await updateDoc(doc(db, 'athreads', tid), { hint: h || null }); P.hintEdit = false; toast(h ? '힌트를 정했어요' : '힌트를 지웠어요') } catch (e) { toast('저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } render() };
+    if ($('#an-rev')) $('#an-rev').onclick = async () => {
+      if (!P.revConfirm) { P.revConfirm = true; render(); return }
+      P.revConfirm = false;
+      try { await updateDoc(doc(db, 'athreads', tid), { rev: me }); toast('정체를 공개했어요!') } catch (e) { toast('공개하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    };
+    $('#nc-f').onsubmit = async e => {
+      e.preventDefault(); const text = inp.value.trim(); if (!text || !S.users[u]) return;
+      inp.value = '';
+      try {
+        if (!anon) await setDoc(doc(collection(db, 'dms')), { from: me, to: u, text, at: serverTimestamp(), read: false });
+        else if (!tid) { const id = await anStart(u, text); S.athread = id; watchAn() }
+        else await anSend(tid, 'a', text);
+      } catch (err) { inp.value = text; toast('보내지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) }
+    };
+    return;
+  }
+
+  if (S.screen === 'now-achat') { // 익명의 누군가가 나에게 보낸 대화
+    const tid = S.athread, t = AN.toMe[tid];
+    if (!t) { back('익명 쪽지'); $('#back').onclick = () => go('now-dm'); v.innerHTML = '<div class="empty" style="color:#888">대화를 찾을 수 없어요</div>'; return }
+    const who = t.rev && S.users[t.rev] ? esc(S.users[t.rev]) : '익명의 누군가';
+    back(who); $('#back').onclick = () => go('now-dm');
+    const keep = $('#nc-in'), kv = keep?.value || '', kf = document.activeElement === keep;
+    const banner = `<div class="an-ban">${t.rev ? `<span>🎉 익명의 누군가는 <b>${who}</b>님이었어요!</span>` : '<span>🤫 누가 보냈는지는 비밀이에요. 답장은 그대로 전해져요</span>'}
+      ${t.hint && !t.rev ? `<span>💡 힌트: <b>${esc(t.hint)}</b></span>` : ''}
+      <div class="an-acts">${!t.rev && !t.hint ? `<button id="an-ask" ${t.hintOn ? 'disabled' : ''}>${t.hintOn ? '힌트 요청함' : '💡 힌트 줘'}</button>` : ''}<button id="an-blk" class="${t.blocked ? 'hot' : ''}">${t.blocked ? '차단 풀기' : '차단'}</button></div></div>`;
+    v.innerHTML = `<div class="nc">${banner}<div class="nc-list">${AN.msgTid === tid ? anBubbles(AN.msgs, 'b', t) : ''}</div>
+      <form class="nc-bar" id="nc-f"><input id="nc-in" maxlength="500" autocomplete="off" placeholder="${t.blocked ? '차단한 대화예요' : '답장 보내기'}" ${t.blocked ? 'disabled' : ''}><button ${t.blocked ? 'disabled' : ''}>전송</button></form></div>`;
+    const inp = $('#nc-in'); inp.value = kv; if (kf) inp.focus();
+    v.scrollTop = v.scrollHeight;
+    anMarkRead(tid, 'b');
+    if ($('#an-ask')) $('#an-ask').onclick = async () => { try { await updateDoc(doc(db, 'athreads', tid), { hintOn: true }); toast('힌트를 요청했어요') } catch (e) { toast('요청하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } };
+    $('#an-blk').onclick = async () => { try { await updateDoc(doc(db, 'athreads', tid), { blocked: !t.blocked }); toast(t.blocked ? '차단을 풀었어요' : '이 익명 대화를 차단했어요') } catch (e) { toast('바꾸지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } };
+    $('#nc-f').onsubmit = async e => {
+      e.preventDefault(); const text = inp.value.trim(); if (!text) return;
+      inp.value = '';
+      try { await anSend(tid, 'b', text) } catch (err) { inp.value = text; toast('보내지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) }
+    };
     return;
   }
 
@@ -1203,6 +1465,8 @@ const VICON = {
   friends: '<circle cx="9" cy="9" r="3.4" fill="currentColor"/><path d="M2.6 20c.4-3.8 3.1-6.1 6.4-6.1s6 2.3 6.4 6.1z" fill="currentColor"/><circle cx="16.4" cy="10" r="2.8" fill="currentColor" opacity=".7"/><path d="M14.2 14.6c.7-.3 1.4-.4 2.2-.4 2.8 0 4.9 2 5.2 5.8h-5.6c-.2-2.2-.8-4-1.8-5.4z" fill="currentColor" opacity=".7"/><path d="M19.3 3.2c-.9 0-1.5.6-1.8 1.2-.3-.6-.9-1.2-1.8-1.2-1.1 0-1.9.9-1.9 2 0 2 3.7 4.2 3.7 4.2s3.7-2.2 3.7-4.2c0-1.1-.8-2-1.9-2z" fill="#ff4f8b"/>',
   mail: '<rect x="2.5" y="5" width="19" height="14" rx="2.2" fill="currentColor"/><path d="M4 7.2l8 5.8 8-5.8" fill="none" style="stroke:var(--d,#fff)" stroke-width="1.7" stroke-linejoin="round"/><path d="M4.2 17.2l5.6-5M19.8 17.2l-5.6-5" style="stroke:var(--d,#fff)" stroke-width="1.3"/>',
   note: '<path d="M19.5 3.2v12.4a3.1 3.1 0 1 1-2.2-3V7.6L10 9.1v8.4a3.1 3.1 0 1 1-2.2-3V5.6z" fill="currentColor"/>',
+  spark: '<g transform="rotate(-6 12 12)"><path d="M7.4 5.6L18.2 4.2M14.8 4.9L14.3 14.6Q14 19.6 9.6 19.6Q6.1 19.6 5.5 16" fill="none" stroke="#5a1d00" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.8 6v3.4" stroke="#5a1d00" stroke-width="3.6" stroke-linecap="round"/><path d="M7.4 5.6L18.2 4.2M14.8 4.9L14.3 14.6Q14 19.6 9.6 19.6Q6.1 19.6 5.5 16" fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.8 6v3.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M9 5.3l6.5-.9" stroke="#ffe7a8" stroke-width="1" stroke-linecap="round" opacity=".9"/><path d="M15.4 7.5l-.2 4" stroke="#ffe7a8" stroke-width="1" stroke-linecap="round" opacity=".9"/></g><path d="M19.8 15.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z" fill="#fff"/>',
+  radar: '<circle cx="12" cy="12" r="2.7" fill="currentColor"/><path d="M7.7 7.7a6.1 6.1 0 0 0 0 8.6M16.3 7.7a6.1 6.1 0 0 1 0 8.6" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/><path d="M4.7 4.7a10.3 10.3 0 0 0 0 14.6M19.3 4.7a10.3 10.3 0 0 1 0 14.6" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" opacity=".5"/>',
   dial: '<defs><linearGradient id="gdl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fe9d8"/><stop offset="1" stop-color="#1aa596"/></linearGradient></defs><circle cx="12" cy="12" r="10" fill="url(#gdl)"/><circle cx="12" cy="12" r="10" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".6"/><path d="M12 6.2l4.4 5.8h-8.8z" fill="#ff4f8b"/><path d="M12 17.8l-4.4-5.8h8.8z" fill="#fff"/><path d="M12 4.3l.7 1.4h-1.4zM12 19.7l.7-1.4h-1.4zM4.3 12l1.4-.7v1.4zM19.7 12l-1.4-.7v1.4z" fill="#fff" opacity=".85"/><circle cx="12" cy="12" r="1.2" fill="#fff" stroke="#1aa596" stroke-width=".5"/>',
   board: '<rect x="5" y="4.2" width="14" height="17" rx="2.4" fill="currentColor"/><path d="M8.5 10h7M8.5 13.3h7M8.5 16.6h4.5" style="stroke:var(--d,#fff)" stroke-width="1.6" stroke-linecap="round"/><path d="M9 2.6v3.2M12 2.6v3.2M15 2.6v3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 4.4v1.4M12 4.4v1.4M15 4.4v1.4" style="stroke:var(--d,#fff)" stroke-width=".9" stroke-linecap="round"/>',
   chat: '<path d="M12 3.8c-4.9 0-8.8 3.2-8.8 7.2 0 2.2 1.2 4.2 3.1 5.5l-.9 3.9 4.3-2.1c.7.2 1.5.3 2.3.3 4.9 0 8.8-3.2 8.8-7.2S16.9 3.8 12 3.8z" fill="currentColor"/>',
@@ -1348,6 +1612,215 @@ const MOLE = (() => {
   return { mount, stop: () => stop(false), playing: () => st.playing, setBest: () => { const b = $q('#mo-b'); if (b) b.textContent = bestGet() } };
 })();
 
+const JICON = 'data:image/png;base64,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';
+/* ===== NOW 익명 쪽지 ===== */
+// athreads/{tid} = { to, at, last, ls, ra, rb, rev, hint, hintOn, blocked } — 받는 사람도 읽는 공개 정보 (보낸 사람은 없음)
+// athreads/{tid}/meta/owner = { uid } — 진짜 보낸 사람 (본인과 관리자만 읽기)
+// athreads/{tid}/msgs/{id} = { side: 'a'(익명으로 보낸 사람) | 'b'(받은 사람), text, at }
+// amine/{uid}/t/{tid} = { to, at } — 내가 익명으로 시작한 대화 목록 (본인과 관리자만)
+const AN = { toMe: {}, mine: {}, mineIdx: {}, msgs: [], msgTid: null, loaded: false, marking: {} };
+const anHue = id => [...id].reduce((a, c) => a + c.charCodeAt(0), 0) * 47 % 360;
+const myTidFor = u => Object.entries(AN.mineIdx).filter(([, x]) => x.to === u).sort((a, b) => ms(b[1].at) - ms(a[1].at))[0]?.[0] || null;
+function anUnread(tid) {
+  const t = AN.mine[tid] || AN.toMe[tid]; if (!t || !t.ls) return false;
+  const side = AN.mine[tid] ? 'a' : 'b';
+  return t.ls !== side && ms(t.at) > tms(side === 'a' ? t.ra : t.rb);
+}
+function anRefresh() { if (S.screen.startsWith('now')) render(); else if (S.screen === 'home') refresh() }
+function anSubs(u) {
+  subs.anTo = onSnapshot(query(collection(db, 'athreads'), where('to', '==', u)), q => {
+    const first = !AN.loaded, old = AN.toMe; AN.toMe = {}; q.forEach(d => AN.toMe[d.id] = d.data());
+    if (!first) Object.entries(AN.toMe).forEach(([id, t]) => {
+      const o = old[id];
+      if (!o) toast('익명의 누군가에게 쪽지가 왔어요 🤫');
+      else if (t.rev && !o.rev) toast(`익명의 누군가는 ${S.users[t.rev] || '?'}님이었어요! 🎉`);
+      else if (t.hint && t.hint !== o.hint) toast('익명 대화에 힌트가 도착했어요 💡');
+      else if (t.ls === 'a' && ms(t.at) > ms(o.at) && !(S.screen === 'now-achat' && S.athread === id)) toast('익명 쪽지가 왔어요 🤫');
+    });
+    AN.loaded = true; anRefresh();
+  }, () => { });
+  subs.anIdx = onSnapshot(collection(db, 'amine', u, 't'), q => {
+    const ids = new Set();
+    q.forEach(d => {
+      ids.add(d.id); AN.mineIdx[d.id] = d.data();
+      const k = 'an_' + d.id;
+      if (!subs[k]) subs[k] = onSnapshot(doc(db, 'athreads', d.id), s => {
+        if (!s.exists()) { delete AN.mine[d.id]; anRefresh(); return }
+        const o = AN.mine[d.id], t = s.data(); AN.mine[d.id] = t;
+        const here = S.screen === 'now-chat' && S.athread === d.id;
+        if (o && t.ls === 'b' && ms(t.at) > ms(o.at) && !here) toast(`익명 대화에 ${S.users[t.to] || ''}님이 답장했어요 💬`);
+        if (o && t.hintOn && !o.hintOn) toast(`${S.users[t.to] || ''}님이 힌트를 원해요! 💡`);
+        if (o && t.blocked && !o.blocked) toast(`${S.users[t.to] || ''}님이 익명 대화를 막았어요`);
+        anRefresh();
+      }, () => { });
+    });
+    Object.keys(AN.mineIdx).forEach(k => { if (!ids.has(k)) { delete AN.mineIdx[k]; delete AN.mine[k]; unsub('an_' + k) } });
+    anRefresh();
+  }, () => { });
+}
+// 열려 있는 익명 대화의 메시지만 받아 옴
+function watchAn() {
+  const tid = S.me && ((S.screen === 'now-chat' && S.chatAnon) || S.screen === 'now-achat') ? S.athread : null;
+  if (tid === AN.msgTid) return;
+  unsub('anMsgs'); AN.msgs = []; AN.msgTid = tid;
+  if (tid) subs.anMsgs = onSnapshot(query(collection(db, 'athreads', tid, 'msgs'), orderBy('at')), q => {
+    AN.msgs = []; q.forEach(d => AN.msgs.push({ id: d.id, ...d.data() }));
+    if (AN.msgTid === tid && (S.screen === 'now-chat' || S.screen === 'now-achat')) render();
+  }, () => { });
+}
+function anBubbles(msgs, mySide, t) {
+  const otherRead = tms(mySide === 'a' ? t?.rb : t?.ra);
+  return msgs.map(m => `<div class="nc-b ${m.side === mySide ? 'r' : 'l'}"><p>${esc(m.text)}</p><small>${fmt(m.at)}${m.side === mySide && m.at && otherRead >= ms(m.at) ? ' · 읽음' : ''}</small></div>`).join('');
+}
+function anMarkRead(tid, side) {
+  if (!anUnread(tid) || AN.marking[tid]) return;
+  AN.marking[tid] = 1;
+  updateDoc(doc(db, 'athreads', tid), { [side === 'a' ? 'ra' : 'rb']: serverTimestamp() }).catch(() => { }).finally(() => delete AN.marking[tid]);
+}
+async function anStart(u, text) {
+  const me = S.me.uid, tid = doc(collection(db, 'athreads')).id, b = writeBatch(db);
+  b.set(doc(db, 'athreads', tid), { to: u, at: serverTimestamp(), last: text, ls: 'a', ra: serverTimestamp(), rb: null, rev: null, hint: null, hintOn: false, blocked: false });
+  b.set(doc(db, 'athreads', tid, 'meta', 'owner'), { uid: me });
+  b.set(doc(db, 'amine', me, 't', tid), { to: u, at: serverTimestamp() });
+  b.set(doc(collection(db, 'athreads', tid, 'msgs')), { side: 'a', text, at: serverTimestamp() });
+  await b.commit();
+  return tid;
+}
+async function anSend(tid, side, text) {
+  const b = writeBatch(db);
+  b.set(doc(collection(db, 'athreads', tid, 'msgs')), { side, text, at: serverTimestamp() });
+  b.update(doc(db, 'athreads', tid), { at: serverTimestamp(), last: text, ls: side, [side === 'a' ? 'ra' : 'rb']: serverTimestamp() });
+  await b.commit();
+}
+async function adminDelAn(tid, owner) {
+  const ms2 = await getDocs(collection(db, 'athreads', tid, 'msgs')), b = writeBatch(db);
+  ms2.forEach(d => b.delete(d.ref));
+  b.delete(doc(db, 'athreads', tid, 'meta', 'owner'));
+  if (owner) b.delete(doc(db, 'amine', owner, 't', tid));
+  b.delete(doc(db, 'athreads', tid));
+  await b.commit();
+}
+
+/* ===== NOW: 지금 접속 중 (잭디 스타일) ===== */
+// presence/{uid} = { at, act, msg } — 사이트를 보고 있으면 1분마다 '나 여기 있어요' 기록. 2분 반 안에 기록이 있으면 접속 중
+// taps/{보낸uid_받은uid} = { from, to, at } — 콕 찌르기 (같은 친구에게 1분에 한 번)
+const P = { list: {}, pics: {}, dmIn: [], dmOut: [], dmLoaded: false, taps: [], tapsLoaded: false, lastW: 0, lastAct: '', filter: 'all' };
+const ONLINE_MS = 150000;
+const tms = t => t?.toMillis ? t.toMillis() : 0;
+const actOf = sc => sc === 'music' ? 'music' : sc === 'game' ? 'game' : 'on';
+function presBeat(force) {
+  if (!S.me || document.visibilityState === 'hidden') return;
+  const act = actOf(S.screen), now = Date.now();
+  if (!force && act === P.lastAct && now - P.lastW < 60000) return;
+  P.lastAct = act; P.lastW = now;
+  setDoc(doc(db, 'presence', S.me.uid), { at: serverTimestamp(), act }, { merge: true }).catch(() => { });
+}
+setInterval(() => presBeat(), 20000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') presBeat(true) });
+function watchNow() {
+  const on = S.me && S.screen.startsWith('now');
+  if (on && !subs.pres) subs.pres = onSnapshot(collection(db, 'presence'), q => {
+    P.list = {}; q.forEach(d => P.list[d.id] = d.data());
+    if (S.screen === 'now') render();
+  }, () => { });
+  if (on && !subs.pics) subs.pics = onSnapshot(collection(db, 'nowpics'), q => {
+    P.pics = {}; q.forEach(d => { const a = d.data().p; if (Array.isArray(a) && a.length) P.pics[d.id] = a.filter(x => typeof x === 'string').slice(0, 3) });
+    if (S.screen === 'now') render();
+    const sh = $('#nw-sheet'); if (sh && sh.dataset.mine) openNow(S.me.uid);
+  }, () => { });
+  if (on && !subs.dmOut) subs.dmOut = onSnapshot(query(collection(db, 'dms'), where('from', '==', S.me.uid)), q => {
+    P.dmOut = []; q.forEach(d => P.dmOut.push({ id: d.id, ...d.data() }));
+    if (S.screen === 'now-dm' || S.screen === 'now-chat') render();
+  }, () => { });
+  if (!on) ['pres', 'pics', 'dmOut'].forEach(k => subs[k] && unsub(k));
+}
+const unreadDm = () => P.dmIn.filter(m => !m.read && S.users[m.from]).length + [...Object.keys(AN.mine), ...Object.keys(AN.toMe)].filter(anUnread).length;
+const nowPic = u => P.pics[u]?.[0] ? `<img src="${P.pics[u][0]}" alt="">` : avatar(u);
+function threads() {
+  const me = S.me.uid, t = {};
+  [...P.dmIn, ...P.dmOut].forEach(m => { const o = m.from === me ? m.to : m.from; const x = t[o] ||= { u: o, last: null, unread: 0 }; if (!x.last || ms(m.at) > ms(x.last.at)) x.last = m; if (m.to === me && !m.read) x.unread++ });
+  return Object.values(t).sort((a, b) => ms(b.last.at) - ms(a.last.at));
+}
+async function pickNowPic(file) {
+  try {
+    const img = await loadImg(file);
+    const res = await cropper(img, { title: 'NOW 사진 맞추기', fw: 240, fh: 240, ow: 420, limit: 90000 });
+    URL.revokeObjectURL(img.src);
+    if (!res) return;
+    const arr = [...(P.pics[S.me.uid] || [])].slice(0, 2); arr.push(res.url);
+    await setDoc(doc(db, 'nowpics', S.me.uid), { p: arr });
+    toast('사진을 올렸어요');
+  } catch (e) { toast('사진을 올리지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+}
+setInterval(() => { if (S.screen === 'now' && !document.querySelector('#nw-sheet')) render() }, 30000); // '3분 전' 같은 시간 갱신
+function bubbles(msgs, right) {
+  return msgs.map(m => `<div class="nc-b ${m.from === right ? 'r' : 'l'}"><p>${esc(m.text)}</p><small>${fmt(m.at)}${m.from === right && m.read ? ' · 읽음' : ''}</small></div>`).join('');
+}
+function newTaps() { let seen = 0; try { seen = +localStorage.getItem('wb_tapseen_' + S.me.uid) || 0 } catch { } return P.taps.filter(t => tms(t.at) > seen).length }
+function nowPeople() {
+  const me = S.me.uid, t = Date.now();
+  const arr = Object.keys(S.users).map(u => { const p = P.list[u] || {}, at = u === me ? t : tms(p.at); return { u, at, act: u === me ? actOf(S.screen) : (p.act || 'on'), msg: p.msg || '', on: u === me || (!!at && t - at < ONLINE_MS) } });
+  return arr.sort((a, b) => (b.u === me) - (a.u === me) || b.on - a.on || b.at - a.at || String(S.users[a.u]).localeCompare(String(S.users[b.u])));
+}
+function statusText(x) {
+  if (x.on) return x.act === 'music' ? '♪ 같이 듣는 중' : x.act === 'game' ? '게임 중' : '접속 중';
+  if (!x.at) return '아직 기록 없음';
+  const m = (Date.now() - x.at) / 60000;
+  return m < 60 ? `${Math.max(1, m | 0)}분 전` : m < 1440 ? `${m / 60 | 0}시간 전` : m < 2880 ? '어제' : `${m / 1440 | 0}일 전`;
+}
+function openNow(u) {
+  $('#nw-sheet')?.remove();
+  const me = S.me.uid, mine = u === me, x = nowPeople().find(p => p.u === u); if (!x) return;
+  const box = document.createElement('div'); box.className = 'nw-sheet'; box.id = 'nw-sheet'; if (mine) box.dataset.mine = '1';
+  const pics = P.pics[u] || [];
+  box.innerHTML = `<div class="nw-card">
+    <div class="nw-big" id="nw-big"><span class="nw-ph" id="nw-ph">${pics[0] ? `<img src="${pics[0]}" alt="">` : avatar(u)}</span>${pics.length > 1 ? `<div class="nw-bars">${pics.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}<button class="nw-x" id="nw-x" aria-label="닫기">✕</button>
+      <div class="nw-info"><b>${esc(S.users[u])}${mine ? ' (나)' : ''}</b><span><i class="dot ${x.on ? x.act : ''}"></i>${statusText(x)}</span></div></div>
+    ${mine ? `<div class="nw-lab" style="padding:14px 14px 0">NOW 사진 (최대 3장 · 첫 장이 대표 사진)</div>
+      <div class="nw-pics">${[0, 1, 2].map(i => pics[i] ? `<div class="nw-slot"><img src="${pics[i]}" alt=""><button data-rm="${i}" aria-label="사진 지우기">✕</button>${i ? `<button class="fst" data-fst="${i}">대표로</button>` : '<span class="fst on">대표</span>'}</div>` : `<button class="nw-slot add" data-add="1" ${i > pics.length ? 'disabled' : ''}>+</button>`).join('')}</div>
+      <input type="file" id="nw-file" accept="image/*" hidden>
+      <div class="nw-edit"><input id="nw-in" maxlength="40" placeholder="친구들에게 보일 한마디 (40자)" value="${esc(x.msg)}"><button id="nw-save">저장</button></div>`
+      : `<div class="nw-msg">${x.msg ? '“' + esc(x.msg) + '”' : '<i>한마디가 아직 없어요</i>'}</div>
+    <div class="nw-acts"><button class="pk" id="nw-pk">👉 콕 찌르기</button><button id="nw-dm">🤫 쪽지</button><button id="nw-gb">방명록</button></div>`}
+  </div>`;
+  $('.lcdwrap').appendChild(box);
+  const close = () => box.remove();
+  box.onclick = e => { if (e.target === box) close() };
+  box.querySelector('#nw-x').onclick = close;
+  if (pics.length > 1) { // 사진 누르면 넘기기 (왼쪽 1/3은 이전, 나머지는 다음)
+    let i = 0; const big = box.querySelector('#nw-big');
+    big.onclick = e => {
+      if (e.target.closest('.nw-x')) return;
+      const r = big.getBoundingClientRect(); i = (i + (e.clientX - r.left < r.width / 3 ? pics.length - 1 : 1)) % pics.length;
+      box.querySelector('#nw-ph').innerHTML = `<img src="${pics[i]}" alt="">`;
+      box.querySelectorAll('.nw-bars i').forEach((b, k) => b.classList.toggle('on', k === i));
+    };
+  }
+  if (mine) {
+    const savePics = async arr => { try { await setDoc(doc(db, 'nowpics', me), { p: arr }) } catch (e) { toast('바꾸지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } };
+    box.querySelectorAll('[data-add]').forEach(b => b.onclick = () => box.querySelector('#nw-file').click());
+    box.querySelector('#nw-file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) pickNowPic(f) };
+    box.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => savePics(pics.filter((_, k) => k !== +b.dataset.rm)));
+    box.querySelectorAll('[data-fst]').forEach(b => b.onclick = () => { const k = +b.dataset.fst; savePics([pics[k], ...pics.filter((_, j) => j !== k)]) });
+    const save = async () => {
+      const msg = box.querySelector('#nw-in').value.trim().slice(0, 40);
+      try { await setDoc(doc(db, 'presence', me), { at: serverTimestamp(), act: actOf(S.screen), msg }, { merge: true }); P.lastW = Date.now(); toast('한마디를 바꿨어요'); close() }
+      catch (e) { toast('저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    };
+    box.querySelector('#nw-save').onclick = save;
+    box.querySelector('#nw-in').onkeydown = e => { if (e.key === 'Enter') save() };
+    return;
+  }
+  const pk = box.querySelector('#nw-pk');
+  pk.onclick = async () => {
+    pk.disabled = true;
+    try { await setDoc(doc(db, 'taps', me + '_' + u), { from: me, to: u, at: serverTimestamp() }); pk.textContent = '콕! 찔렀어요'; toast(`${S.users[u]}님을 콕 찔렀어요`) }
+    catch (e) { pk.textContent = '👉 콕 찌르기'; pk.disabled = false; toast(e?.code === 'permission-denied' ? '같은 친구는 1분에 한 번만 찌를 수 있어요' : '찌르지 못했어요') }
+  };
+  box.querySelector('#nw-dm').onclick = () => go('now-chat', { chatWith: u, chatAnon: true, athread: myTidFor(u) });
+  box.querySelector('#nw-gb').onclick = () => go('inbox', { owner: u });
+}
+
 /* ===== 두더지 순위 ===== */
 // scores/{uid} = { best, at } — 각자 최고 점수 하나만 저장, 게임 화면에 있을 때만 불러옴
 const G = { scores: {}, loaded: false };
@@ -1429,6 +1902,17 @@ async function deletePost(pid) {
     for (let i = 0; i < ids.length; i += 400) { const b = writeBatch(db); ids.slice(i, i + 400).forEach(id => b.delete(doc(db, 'posts', pid, 'comments', id))); await b.commit() }
   }
   const b = writeBatch(db); b.delete(doc(db, 'posts', pid)); b.delete(doc(db, 'posts', pid, 'meta', 'author')); await b.commit();
+}
+async function loadAdminDm() {
+  S.admDm = { loading: true, list: [] }; render();
+  try {
+    const q = await getDocs(query(collection(db, 'dms'), orderBy('at', 'desc'), limit(2000))); q.forEach(d => S.admDm.list.push({ id: d.id, ...d.data() }));
+    const aq = await getDocs(collection(db, 'athreads')); S.admDm.an = []; S.admDm.anMsgs = {};
+    await Promise.all(aq.docs.map(async d => { let o = null; try { o = (await getDoc(doc(db, 'athreads', d.id, 'meta', 'owner'))).data()?.uid || null } catch { } S.admDm.an.push({ id: d.id, owner: o, ...d.data() }) }));
+  }
+  catch (e) { S.admDm.err = '불러오지 못했어요 (' + (e.code || e.message) + ')' }
+  S.admDm.loading = false;
+  if (S.screen === 'admin') render();
 }
 async function loadAdminBoard() {
   S.admB = { loading: true, posts: [], author: {} }; render();
