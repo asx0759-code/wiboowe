@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-2250">
+<meta name="build" content="20261110-2335">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -219,6 +219,15 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .mg-tabs{display:flex;gap:6px;padding:10px 12px 2px}
 .mg-tabs button{flex:1;border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:12px;padding:7px 0;cursor:pointer}
 .mg-tabs button.on{background:var(--ink);color:#fff;font-weight:700;border-color:transparent}
+.tt-stage{display:flex;justify-content:center}
+.tt-wrap{position:relative;display:flex;gap:8px;align-items:flex-start}
+.tt-wrap #tt-cv{border-radius:8px;touch-action:none;display:block}
+.tt-side{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:8px;background:#10121f;color:#8890b0;font-size:10px}
+.tt-wrap .mg-over{border-radius:8px}
+.tt-pad{display:flex;justify-content:center;gap:8px;padding:10px 12px 0}
+.tt-pad button{width:52px;height:46px;border:0;border-radius:12px;background:#22253a;color:#fff;font-size:18px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.35)}
+.tt-pad button:active{transform:translateY(2px);box-shadow:none}
+.tt-pad .hot{background:#ff4f8b}
 .bb-stage{display:flex;justify-content:center;border-radius:10px;overflow:hidden}
 .bb-stage canvas{display:block;touch-action:none;border-radius:10px}
 .bb-msg{position:absolute;left:0;right:0;top:42%;text-align:center;color:#fff;font-weight:700;font-size:18px;text-shadow:0 2px 6px rgba(0,0,0,.6);opacity:0;pointer-events:none}
@@ -235,6 +244,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .rk .mini{width:26px;height:26px;flex:none}
 .rk-nick{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rk b{font-variant-numeric:tabular-nums}
+.rk-del{border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:10px;padding:2px 6px;cursor:pointer}
 .rk-gap{text-align:center;color:var(--muted);padding:2px 0}
 .lg{display:inline-block;width:14px;height:14px}
 .lg.n{border-radius:50%;background:#6b6a72;border:2px solid #000}
@@ -717,7 +727,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop() } Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function go(screen, extra = {}) { if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop() } Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -1441,8 +1451,9 @@ function render() {
     back('Mini Game');
     $('#back').onclick = () => go('home');
     const ids = Object.keys(S.users), gt = S.gtab || 'mole';
-    const tabs = `<div class="mg-tabs"><button data-gt="mole" class="${gt === 'mole' ? 'on' : ''}">🔨 두더지</button><button data-gt="bubble" class="${gt === 'bubble' ? 'on' : ''}">🫧 버블 슈터</button></div>`;
-    if (gt === 'bubble') { v.innerHTML = tabs; BUBBLE.mount(v, { best: () => G.bscores[S.me.uid] || 0, onEnd: saveBScore }) }
+    const tabs = `<div class="mg-tabs"><button data-gt="mole" class="${gt === 'mole' ? 'on' : ''}">🔨 두더지</button><button data-gt="bubble" class="${gt === 'bubble' ? 'on' : ''}">🫧 버블</button><button data-gt="block" class="${gt === 'block' ? 'on' : ''}">🧱 블록 쌓기</button></div>`;
+    if (gt === 'block') { v.innerHTML = tabs; BLOCKS.mount(v, { best: () => G.tscores[S.me.uid] || 0, onEnd: saveTScore }) }
+    else if (gt === 'bubble') { v.innerHTML = tabs; BUBBLE.mount(v, { best: () => G.bscores[S.me.uid] || 0, onEnd: saveBScore }) }
     else { MOLE.mount(v, { pick: () => ids[Math.random() * ids.length | 0], face: u => u ? avatar(u) : '?', best: () => G.scores[S.me.uid] || 0, onEnd: saveScore }); v.insertAdjacentHTML('afterbegin', tabs) }
     v.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => { if (b.dataset.gt !== gt) go('game', { gtab: b.dataset.gt }) });
     drawRank();
@@ -2425,9 +2436,119 @@ const BUBBLE = (() => {
   return { mount, stop, playing: () => st.playing, setBest: () => { const b = $q('#bb-b'); if (b) b.textContent = bestGet() } };
 })();
 
+/* ===== 블록 쌓기 (떨어지는 블록 퍼즐) ===== */
+const BLOCKS = (() => {
+  const CW = 10, CH = 20;
+  const SHAPES = { I: [[0, 1], [1, 1], [2, 1], [3, 1]], O: [[1, 0], [2, 0], [1, 1], [2, 1]], T: [[1, 0], [0, 1], [1, 1], [2, 1]], S: [[1, 0], [2, 0], [0, 1], [1, 1]], Z: [[0, 0], [1, 0], [1, 1], [2, 1]], J: [[0, 0], [0, 1], [1, 1], [2, 1]], L: [[2, 0], [0, 1], [1, 1], [2, 1]] };
+  const COL = { I: ['#7ff0ff', '#13b8d8'], O: ['#ffe680', '#f2b705'], T: ['#d9a8ff', '#8b3ff0'], S: ['#9cf29c', '#20b14a'], Z: ['#ff8a8a', '#e8283c'], J: ['#8fb8ff', '#1f5ef0'], L: ['#ffc27a', '#ff7a1a'] };
+  let cv, nv, ctx, nctx, S2, board, cur, nxt, bag = [], st = { playing: false }, raf, last = 0, acc = 0, opt, keyH;
+  const $q = s => document.querySelector(s);
+  const bestGet = () => { let l = 0; try { l = +localStorage.getItem('wb_blocks') || 0 } catch { } return Math.max(l, opt?.best?.() || 0) };
+  const bestSet = v => { try { if (v > (+localStorage.getItem('wb_blocks') || 0)) localStorage.setItem('wb_blocks', v) } catch { } };
+  const draw7 = () => { if (!bag.length) bag = Object.keys(SHAPES).sort(() => Math.random() - .5); return bag.pop() };
+  const piece = k => ({ k, cells: SHAPES[k].map(c => [...c]), x: 3, y: k === 'I' ? -1 : 0 });
+  const fits = (cells, x, y) => cells.every(([a, b]) => { const X = a + x, Y = b + y; return X >= 0 && X < CW && Y < CH && (Y < 0 || !board[Y][X]) });
+  function rotate(dir = 1) {
+    if (cur.k === 'O') return;
+    const n = cur.k === 'I' ? 4 : 3, cells = cur.cells.map(([a, b]) => dir > 0 ? [n - 1 - b, a] : [b, n - 1 - a]);
+    for (const dx of [0, -1, 1, -2, 2]) for (const dy of [0, -1]) if (fits(cells, cur.x + dx, cur.y + dy)) { cur.cells = cells; cur.x += dx; cur.y += dy; return }
+  }
+  const move = dx => { if (fits(cur.cells, cur.x + dx, cur.y)) cur.x += dx };
+  const speed = () => Math.max(70, 800 - (st.level - 1) * 70);
+  function lock() {
+    cur.cells.forEach(([a, b]) => { const Y = b + cur.y; if (Y >= 0) board[Y][a + cur.x] = cur.k });
+    if (cur.cells.some(([, b]) => b + cur.y < 0)) return end();
+    let n = 0; for (let y = CH - 1; y >= 0; y--) if (board[y].every(Boolean)) { board.splice(y, 1); board.unshift(Array(CW).fill(null)); n++; y++ }
+    if (n) {
+      st.score += [0, 100, 300, 500, 800][n] * st.level; st.lines += n;
+      st.level = 1 + Math.floor(st.lines / 8);
+      flash(n === 4 ? `4줄!! +${800 * (st.level)}` : n > 1 ? `${n}줄 콤보!` : '');
+      st.flash = 8;
+    }
+    cur = nxt; nxt = piece(draw7());
+    if (!fits(cur.cells, cur.x, cur.y)) return end();
+    hud();
+  }
+  function step() { if (fits(cur.cells, cur.x, cur.y + 1)) cur.y++; else lock() }
+  function hard() { let d = 0; while (fits(cur.cells, cur.x, cur.y + 1)) { cur.y++; d++ } st.score += d * 2; lock(); hud() }
+  function soft() { if (fits(cur.cells, cur.x, cur.y + 1)) { cur.y++; st.score += 1; hud() } else lock() }
+  function hud() { $q('#tt-s') && ($q('#tt-s').textContent = st.score); $q('#tt-l') && ($q('#tt-l').textContent = st.level) }
+  function flash(t) { const el = $q('#tt-msg'); if (!el || !t) return; el.textContent = t; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on') }
+  function cell(c, x, y, k, a = 1) {
+    const [l, d] = COL[k], g = c.createLinearGradient(x, y, x + S2, y + S2); g.addColorStop(0, l); g.addColorStop(1, d);
+    c.globalAlpha = a; c.fillStyle = g; c.beginPath(); c.roundRect(x + 1, y + 1, S2 - 2, S2 - 2, S2 * .22); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.roundRect(x + S2 * .2, y + S2 * .14, S2 * .5, S2 * .18, S2 * .09); c.fill(); c.globalAlpha = 1;
+  }
+  function draw() {
+    const W = CW * S2, H = CH * S2;
+    ctx.fillStyle = '#10121f'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,.04)'; for (let i = 1; i < CW; i++) { ctx.beginPath(); ctx.moveTo(i * S2, 0); ctx.lineTo(i * S2, H); ctx.stroke() } for (let j = 1; j < CH; j++) { ctx.beginPath(); ctx.moveTo(0, j * S2); ctx.lineTo(W, j * S2); ctx.stroke() }
+    board.forEach((row, y) => row.forEach((k, x) => k && cell(ctx, x * S2, y * S2, k)));
+    if (cur && st.playing) {
+      let gy = cur.y; while (fits(cur.cells, cur.x, gy + 1)) gy++;
+      cur.cells.forEach(([a, b]) => b + gy >= 0 && cell(ctx, (a + cur.x) * S2, (b + gy) * S2, cur.k, .22));
+      cur.cells.forEach(([a, b]) => b + cur.y >= 0 && cell(ctx, (a + cur.x) * S2, (b + cur.y) * S2, cur.k));
+    }
+    if (st.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${st.flash / 40})`; ctx.fillRect(0, 0, W, H); st.flash-- }
+    nctx.clearRect(0, 0, nv.width, nv.height);
+    if (nxt) { const xs = nxt.cells.map(c => c[0]), ys = nxt.cells.map(c => c[1]), w = Math.max(...xs) - Math.min(...xs) + 1, h = Math.max(...ys) - Math.min(...ys) + 1, ox = (4 - w) / 2 - Math.min(...xs), oy = (2.4 - h) / 2 - Math.min(...ys); nxt.cells.forEach(([a, b]) => cell(nctx, (a + ox) * S2, (b + oy) * S2, nxt.k)) }
+  }
+  function loop(t) {
+    if (st.playing) { acc += t - (last || t); if (acc > speed()) { acc = 0; step() } }
+    last = t; draw(); raf = requestAnimationFrame(loop);
+  }
+  function start() {
+    board = Array.from({ length: CH }, () => Array(CW).fill(null)); bag = [];
+    st = { playing: true, score: 0, lines: 0, level: 1, flash: 0 }; cur = piece(draw7()); nxt = piece(draw7()); acc = 0;
+    $q('#tt-o').hidden = true; hud();
+  }
+  function end() {
+    st.playing = false; bestSet(st.score);
+    const o = $q('#tt-o'); if (!o) return;
+    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점 · ${st.lines}줄${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="tt-go">다시 하기</button>`; o.hidden = false;
+    $q('#tt-go').onclick = start; $q('#tt-b').textContent = bestGet();
+    opt?.onEnd?.(st.score);
+  }
+  const act = a => { if (!st.playing || !cur) return; ({ l: () => move(-1), r: () => move(1), rot: () => rotate(1), d: soft, drop: hard })[a]() };
+  function mount(v, o) {
+    opt = o; stop();
+    v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="tt-s">0</b></span><span>LV <b id="tt-l">1</b></span><span>BEST <b id="tt-b">${bestGet()}</b></span></div>
+      <div class="mg-stage tt-stage"><div class="tt-wrap"><canvas id="tt-cv"></canvas><div class="tt-side"><small>NEXT</small><canvas id="tt-nx"></canvas></div><div class="bb-msg" id="tt-msg"></div>
+        <div class="mg-over" id="tt-o"><big>블록 쌓기</big><span>한 줄을 꽉 채우면 사라져요<br>한 번에 여러 줄 지우면 점수 UP</span><button class="btn mg-btn" id="tt-go">START</button></div></div></div>
+      <div class="tt-pad"><button data-a="l" aria-label="왼쪽">◀</button><button data-a="rot" aria-label="돌리기">⟳</button><button data-a="r" aria-label="오른쪽">▶</button><button data-a="d" aria-label="한 칸 내리기">▼</button><button data-a="drop" class="hot" aria-label="바로 떨어뜨리기">⤓</button></div>
+      <div class="mg-legend"><span>1줄 100 · 2줄 300 · 3줄 500 · 4줄 800 (× 레벨)</span></div>
+      <div class="sect">RANKING</div><div class="rank" id="tt-rank"><div class="empty">불러오는 중…</div></div>`);
+    cv = $q('#tt-cv'); nv = $q('#tt-nx');
+    const avail = Math.min(300, (v.clientWidth || 320) - 110), dpr = Math.min(2, window.devicePixelRatio || 1);
+    S2 = Math.max(12, Math.floor(Math.min(avail / CW, ((window.innerHeight || 700) * .5) / CH)));
+    const W = CW * S2, H = CH * S2;
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    nv.width = 4 * S2 * dpr; nv.height = 2.4 * S2 * dpr; nv.style.width = 4 * S2 + 'px'; nv.style.height = 2.4 * S2 + 'px';
+    ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); nctx = nv.getContext('2d'); nctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    board = Array.from({ length: CH }, () => Array(CW).fill(null)); cur = null; nxt = null;
+    $q('#tt-go').onclick = start;
+    // 버튼: 누르고 있으면 반복
+    v.querySelectorAll('.tt-pad [data-a]').forEach(b => {
+      let t1, t2; const a = b.dataset.a, stopR = () => { clearTimeout(t1); clearInterval(t2) };
+      b.addEventListener('pointerdown', e => { e.preventDefault(); act(a); if (a === 'l' || a === 'r' || a === 'd') t1 = setTimeout(() => t2 = setInterval(() => act(a), 55), 170) });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stopR));
+    });
+    // 화면 밀기: 좌우 이동, 탭 = 돌리기, 아래로 빠르게 = 떨어뜨리기
+    let sx, sy, moved, t0;
+    cv.addEventListener('touchstart', e => { const p = e.touches[0]; sx = p.clientX; sy = p.clientY; moved = 0; t0 = Date.now(); e.preventDefault() }, { passive: false });
+    cv.addEventListener('touchmove', e => { const p = e.touches[0], dx = p.clientX - sx; if (Math.abs(dx) > S2) { act(dx > 0 ? 'r' : 'l'); sx = p.clientX; moved = 1 } e.preventDefault() }, { passive: false });
+    cv.addEventListener('touchend', e => { const p = e.changedTouches[0], dy = p.clientY - sy; if (dy > S2 * 3 && Date.now() - t0 < 350) act('drop'); else if (!moved && Math.abs(dy) < S2) act('rot'); e.preventDefault() }, { passive: false });
+    keyH = e => { if (S.screen !== 'game' || !st.playing) return; const m = { ArrowLeft: 'l', ArrowRight: 'r', ArrowUp: 'rot', ArrowDown: 'd', ' ': 'drop' }[e.key]; if (m) { e.preventDefault(); act(m) } };
+    document.addEventListener('keydown', keyH);
+    last = 0; raf = requestAnimationFrame(loop);
+  }
+  function stop() { cancelAnimationFrame(raf); raf = null; st.playing = false; if (keyH) document.removeEventListener('keydown', keyH), keyH = null }
+  return { mount, stop, playing: () => st.playing, setBest: () => { const b = $q('#tt-b'); if (b) b.textContent = bestGet() } };
+})();
+
 /* ===== 두더지 순위 ===== */
 // scores/{uid} = { best, at } — 각자 최고 점수 하나만 저장, 게임 화면에 있을 때만 불러옴
-const G = { scores: {}, bscores: {}, loaded: false, bloaded: false };
+const G = { scores: {}, bscores: {}, tscores: {}, loaded: false, bloaded: false, tloaded: false };
 function watchScores() {
   const on = S.me && S.screen === 'game';
   if (on && !subs.scores) subs.scores = onSnapshot(collection(db, 'scores'), q => {
@@ -2439,18 +2560,35 @@ function watchScores() {
     G.bscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.bscores[d.id] = b }); G.bloaded = true;
     if (S.screen === 'game') { drawRank(); BUBBLE.setBest() }
   }, () => { G.bloaded = true; unsub('bscores') });
-  if (!on) ['scores', 'bscores'].forEach(k => subs[k] && unsub(k));
+  if (on && !subs.tscores) subs.tscores = onSnapshot(collection(db, 'tscores'), q => {
+    G.tscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.tscores[d.id] = b }); G.tloaded = true;
+    if (S.screen === 'game') { drawRank(); BLOCKS.setBest() }
+  }, () => { G.tloaded = true; unsub('tscores') });
+  if (!on) ['scores', 'bscores', 'tscores'].forEach(k => subs[k] && unsub(k));
 }
 function drawRank() {
-  const isB = !!$('#bb-rank'), el = $('#mo-rank') || $('#bb-rank'); if (!el) return;
-  if (!(isB ? G.bloaded : G.loaded)) return;
-  const me = S.me.uid, arr = Object.entries(isB ? G.bscores : G.scores).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
+  const kind = $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank'); if (!el) return;
+  const isB = kind === 'b', map = kind === 'b' ? G.bscores : kind === 't' ? G.tscores : G.scores, col = kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : 'scores';
+  if (!(kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : G.loaded)) return;
+  const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
   if (!arr.length) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
   let rank = 0, prev = null;
   const rows = arr.map(([u, b], i) => { if (b !== prev) { rank = i + 1; prev = b } return { u, b, rank } });
-  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}점</b></div>`;
+  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}점</b>${S.isAdmin ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
   const top = rows.slice(0, 10), mine = rows.find(r => r.u === me);
   el.innerHTML = top.map(line).join('') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
+  el.querySelectorAll('[data-rkdel]').forEach(b => b.onclick = async () => { // 관리자: 기록 지우기
+    const u = b.dataset.rkdel; if (G.delAsk !== u) { G.delAsk = u; drawRank(); return }
+    G.delAsk = null;
+    try { await deleteDoc(doc(db, col, u)); toast(`${S.users[u] || ''}님 기록을 지웠어요`) } catch (e) { toast('지우지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); drawRank() }
+  });
+}
+async function saveTScore(score) {
+  const me = S.me?.uid; if (!me || score <= 0 || score <= (G.tscores[me] || 0)) return;
+  const was = G.tscores[me] || 0;
+  G.tscores[me] = score; drawRank(); BLOCKS.setBest();
+  try { await setDoc(doc(db, 'tscores', me), { best: score, at: serverTimestamp() }); toast(was ? `최고 기록 갱신! ${score}점` : `순위에 올랐어요! ${score}점`) }
+  catch (e) { if (was) G.tscores[me] = was; else delete G.tscores[me]; drawRank(); toast('기록을 저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
 }
 async function saveBScore(score) {
   const me = S.me?.uid; if (!me || score <= 0 || score <= (G.bscores[me] || 0)) return;
