@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-2240">
+<meta name="build" content="20261110-2250">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2297,8 +2297,8 @@ const BUBBLE = (() => {
   const nbrs = (r, c) => { const s = shifted(r), o = [[r, c - 1], [r, c + 1], [r - 1, s ? c : c - 1], [r - 1, s ? c + 1 : c], [r + 1, s ? c : c - 1], [r + 1, s ? c + 1 : c]]; return o.filter(([a, b]) => a >= 0 && b >= 0 && b < cols(a)) };
   const get = (r, c) => grid[r]?.[c] ?? null;
   const present = () => { const s = new Set(); grid.forEach(row => row.forEach(v => v !== null && s.add(v))); return [...s] };
-  const pickColor = () => { const p = present(), n = Math.min(COLORS.length, 3 + Math.floor(st.score / 600)); return p.length ? p[Math.random() * p.length | 0] : Math.random() * n | 0 };
-  function newRow() { return Array.from({ length: COLS }, () => Math.random() * Math.min(COLORS.length, 4 + Math.floor(st.score / 800)) | 0) }
+  const pickColor = () => { const p = present(), n = Math.min(COLORS.length, 4 + Math.floor(st.score / 400)); return p.length && Math.random() > .25 ? p[Math.random() * p.length | 0] : Math.random() * n | 0 }; // 25%는 판에 없는 색도 나옴
+  function newRow() { return Array.from({ length: COLS }, () => Math.random() * Math.min(COLORS.length, 5 + Math.floor(st.score / 500)) | 0) }
   function fill(rows) { grid = []; parity = 0; for (let r = 0; r < rows; r++) { const row = newRow(); if (shifted(r)) row[COLS - 1] = null; grid.push(row) } }
   function pushRow() { // 위에서 한 줄 내려오기
     parity ^= 1; const row = newRow(); grid.unshift(row);
@@ -2360,9 +2360,10 @@ const BUBBLE = (() => {
       st.score += same.length * 10 + dropped * 20 + (dropped >= 5 ? 50 : 0);
       st.misses = 0;
       if (dropped) flash(`+${same.length * 10 + dropped * 20} 와르르!`);
-    } else if (++st.misses >= 5) { st.misses = 0; pushRow(); flash('한 줄 내려와요!') }
+    } else if (++st.misses >= 3) { st.misses = 0; st.shots = 0; pushRow(); flash('한 줄 내려와요!') }
+    if (++st.shots >= Math.max(4, 7 - Math.floor(st.score / 500))) { st.shots = 0; pushRow(); flash('한 줄 내려와요!') } // 맞혀도 몇 번마다 내려옴 (점수 높을수록 자주)
     while (grid.length && grid.at(-1).every(v => v === null || v === undefined)) grid.pop();
-    if (!present().length) { st.score += 300; flash('+300 싹쓸이!'); fill(5) }
+    if (!present().length) { st.score += 300; flash('+300 싹쓸이!'); fill(7) }
     $q('#bb-s') && ($q('#bb-s').textContent = st.score);
     if (grid.length > MAXR) return end();
     cur = nxt; nxt = pickColor(); if (!present().includes(cur)) cur = pickColor();
@@ -2387,7 +2388,7 @@ const BUBBLE = (() => {
     let a = Math.atan2(H - R * 1.6 - y, x - W / 2); if (a < .12) a = .12; if (a > Math.PI - .12) a = Math.PI - .12; aim = a; guide();
   }
   function start() {
-    st = { playing: true, score: 0, misses: 0, fx: [] }; fill(6); cur = pickColor(); nxt = pickColor(); shot = null; aim = Math.PI / 2; guide();
+    st = { playing: true, score: 0, misses: 0, shots: 0, fx: [] }; fill(7); cur = pickColor(); nxt = pickColor(); shot = null; aim = Math.PI / 2; guide();
     $q('#bb-o').hidden = true; $q('#bb-s').textContent = 0;
   }
   function end() {
@@ -2402,7 +2403,7 @@ const BUBBLE = (() => {
     v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="bb-s">0</b></span><span>BEST <b id="bb-b">${bestGet()}</b></span></div>
       <div class="mg-stage bb-stage"><canvas id="bb-cv"></canvas><div class="bb-msg" id="bb-msg"></div>
         <div class="mg-over" id="bb-o"><big>버블 슈터</big><span>같은 색 3개 이상 맞추면 펑!<br>끌어서 조준하고 손을 떼면 발사</span><button class="btn mg-btn" id="bb-go">START</button></div></div>
-      <div class="mg-legend"><span>펑 +10</span><span>떨어뜨리기 +20</span><span>5번 못 맞히면 한 줄 내려와요</span></div>
+      <div class="mg-legend"><span>펑 +10</span><span>떨어뜨리기 +20</span><span>3번 못 맞히거나 몇 번 쏠 때마다 한 줄씩 내려와요</span></div>
       <div class="sect">RANKING</div><div class="rank" id="bb-rank"><div class="empty">불러오는 중…</div></div>`);
     cv = $q('#bb-cv'); const box = cv.parentElement, dpr = Math.min(2, window.devicePixelRatio || 1);
     W = Math.max(240, Math.min(420, box.clientWidth)); R = W / (COLS * 2); RH = R * Math.sqrt(3); H = Math.round(W * 1.32);
