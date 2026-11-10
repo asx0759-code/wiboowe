@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1010">
+<meta name="build" content="20261110-1010b">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -425,7 +425,7 @@ function render() {
       <div class="foot">${S.isAdmin ? '<button class="out" id="adm">admin</button>' : ''}<button class="out" id="out">log out</button></div></div>`;
     v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('inbox', { owner: b.dataset.u }));
     $('#out').onclick = () => signOut(auth);
-    if ($('#adm')) $('#adm').onclick = () => { go('admin'); loadAdmin() };
+    if ($('#adm')) $('#adm').onclick = () => { go('admin', { admUser: null }); loadAdmin() };
     $('#avbtn').onclick = () => $('#phfile').click();
     $('#phfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(f) };
     if ($('#rmph')) $('#rmph').onclick = async () => { try { await updateDoc(doc(db, 'users', S.me.uid), { photo: deleteField(), crop: deleteField() }); toast('사진을 지웠어요') } catch { toast('지우지 못했어요') } };
@@ -433,7 +433,7 @@ function render() {
   }
 
   if (S.screen === 'inbox') {
-    const owner = S.owner || S.me.uid, mine = owner === S.me.uid, arr = mine ? msgsOf(owner) : msgsOf(owner).filter(m => !m.bc); // 전체 쪽지는 남의 방명록에선 안 보임
+    const owner = S.owner || S.me.uid, mine = owner === S.me.uid, arr = mine ? msgsOf(owner) : msgsOf(owner).filter(m => !(m.bc && m.secret)); // 비밀 전체 쪽지는 남의 방명록에선 안 보임
     if (mine) h.textContent = `Inbox {${arr.length}}`; else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
     v.innerHTML = (arr.length ? arr.map((m, i) => {
       const c = content(m);
@@ -549,13 +549,13 @@ function render() {
       <input type="file" id="imgfile" accept="image/*" hidden>`}` : `
       <div class="field"><label>ITEM</label><div class="items">${Object.entries(ITEMS).filter(([, it]) => !it.hidden).map(([k, it]) => `<button type="button" class="itbtn ${S.item === k ? 'on' : ''}" data-it="${k}" aria-pressed="${S.item === k}">${pix(k, 36)}<span class="itname">${esc(it.name).replace(' ', '\n')}</span></button>`).join('')}</div></div>
       <div class="field"><label for="sn">NOTE</label><input id="sn" maxlength="100" placeholder="같이 보낼 한마디 (없어도 돼요)" value="${esc(D.note || '')}"></div>`}
-      ${isAll ? '' : `<div class="seg" role="group" aria-label="공개 범위"><button type="button" data-v="pub" class="${S.vis === 'pub' ? 'on' : ''}">공개</button><button type="button" data-v="sec" class="${S.vis === 'sec' ? 'on' : ''}">비밀</button></div>`}
+      <div class="seg" role="group" aria-label="공개 범위"><button type="button" data-v="pub" class="${S.vis === 'pub' ? 'on' : ''}">공개</button><button type="button" data-v="sec" class="${S.vis === 'sec' ? 'on' : ''}">비밀</button></div>
       <label class="anon"><input type="checkbox" id="anon" ${S.anon ? 'checked' : ''}> 익명으로 보내기</label>
       <p class="hint" id="vh"></p>
       <div class="err" id="err"></div>
       <button class="btn" type="submit">SEND ${kind === 'item' ? 'ITEM' : '✉'}</button>
     </form>`;
-    const hint = () => $('#vh').textContent = (isAll ? `친구 ${others.length}명 모두의 INBOX에 한 통씩 가요. 받은 사람만 볼 수 있고, 각자 답장할 수 있어요.` : S.vis === 'sec' ? '비밀로 보내면 받는 사람과 나만 볼 수 있어요.' : '공개로 보내면 방명록에 들른 친구 누구나 볼 수 있어요.')
+    const hint = () => $('#vh').textContent = (isAll ? `친구 ${others.length}명 모두의 INBOX에 한 통씩 가요. ` + (S.vis === 'sec' ? '비밀로 보내면 각자 받은 사람만 볼 수 있어요.' : '공개로 보내면 각자의 방명록에 들른 친구도 볼 수 있어요.') : S.vis === 'sec' ? '비밀로 보내면 받는 사람과 나만 볼 수 있어요.' : '공개로 보내면 방명록에 들른 친구 누구나 볼 수 있어요.')
       + (S.anon ? ' 받는 사람에게 보낸 사람이 "익명"으로 보여요.' : '');
     hint();
     const saveDraft = () => { S.draft = { title: $('#st')?.value ?? D.title, body: $('#sb')?.value ?? D.body, note: $('#sn')?.value ?? D.note } };
@@ -581,7 +581,7 @@ function render() {
         if (!title || !body) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
       }
       const all = dest === '__all__', dests = all ? others.map(([u]) => u) : [dest];
-      const sec = all ? true : secret, from = anon ? '' : S.me.uid, withImg = !all && kind === 'msg' && !!S.attach;
+      const sec = secret, from = anon ? '' : S.me.uid, withImg = !all && kind === 'msg' && !!S.attach;
       const text = { fromNick: anon ? '익명' : S.me.nick, title, body, reply: '', ...(item ? { item } : {}) };
       const sent = [];
       const put = (b, to) => { // 한 사람 몫의 메시지를 묶음에 넣기
@@ -614,18 +614,36 @@ function render() {
   }
 
   if (S.screen === 'admin') {
-    back('Admin');
-    $('#back').onclick = () => go('home');
-    const A = S.adm || {};
+    const A = S.adm || {}, tab = S.admTab || 'all', U = S.admUser;
+    back(U ? esc(S.users[U] || '(탈퇴)') : 'Admin');
+    $('#back').onclick = () => U ? go('admin', { admUser: null }) : go('home');
     const nm = u => esc(S.users[u] || '(탈퇴)');
     const who = m => m.anon ? (A.sender?.[m.id] ? nm(A.sender[m.id]) + '(익명)' : '익명') : nm(m.from);
-    v.innerHTML = `<div class="sect">ALL MESSAGES · ${(A.list || []).length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
-      + (A.loading ? '<div class="empty">불러오는 중…</div>' : A.err ? `<div class="empty">${esc(A.err)}</div>`
-      : (A.list || []).length ? A.list.map((m, i) => {
-        const c = m.secret ? A.priv[m.id] : m;
-        return `<button class="row" data-aid="${m.id}"><span class="num">${i + 1}</span>${c?.item ? pix(c.item, 24) : m.secret ? LOCK : ENV_O}<span class="ttl">${c ? esc(c.title) : '(내용 없음)'}<small class="adm-who">${who(m)} → ${nm(m.to)} · ${fmt(m.createdAt)}</small></span>${m.hasImage ? '<span class="meta">IMG</span>' : ''}</button>`;
-      }).join('') : '<div class="empty">메시지가 없어요</div>');
+    const listAll = A.list || [];
+    const rows = list => list.length ? list.map((m, i) => {
+      const c = m.secret ? A.priv[m.id] : m;
+      return `<button class="row" data-aid="${m.id}"><span class="num">${i + 1}</span><span class="ic">${c?.item ? pix(c.item, 24) : m.secret ? LOCK : ENV_O}</span><span class="ttl">${m.bc ? '<span class="bc">전체</span>' : ''}${c ? esc(c.title) : '(내용 없음)'}<small class="adm-who">${who(m)} → ${nm(m.to)} · ${fmt(m.createdAt)}</small></span>${m.hasImage ? '<span class="meta">IMG</span>' : ''}</button>`;
+    }).join('') : '<div class="empty">메시지가 없어요</div>';
+    let body;
+    if (A.loading) body = '<div class="empty">불러오는 중…</div>';
+    else if (A.err) body = `<div class="empty">${esc(A.err)}</div>`;
+    else if (U) { // 한 사람의 방명록
+      const list = listAll.filter(m => m.to === U);
+      body = `<div class="me"><div class="av">${avatar(U)}</div><div><b>${nm(U)}의 방명록</b><span>${list.length} MSG · 비밀 ${list.filter(m => m.secret).length}</span></div></div>` + rows(list);
+    } else if (tab === 'users') { // 방명록 목록
+      const users = Object.entries(S.users).sort((a, b) => a[1].localeCompare(b[1]));
+      body = users.map(([u, n], i) => {
+        const cnt = listAll.filter(m => m.to === u).length;
+        return `<button class="row" data-u="${u}"><span class="num">${i + 1}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}의 방명록</span><span class="meta">${cnt}</span></button>`;
+      }).join('') || '<div class="empty">회원이 없어요</div>';
+    } else body = rows(listAll);
+    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button></div>`)
+      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
+      + body;
+    if ($('#at-all')) $('#at-all').onclick = () => go('admin', { admTab: 'all' });
+    if ($('#at-users')) $('#at-users').onclick = () => go('admin', { admTab: 'users' });
     if ($('#areload')) $('#areload').onclick = loadAdmin;
+    v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('admin', { admUser: b.dataset.u }));
     v.querySelectorAll('[data-aid]').forEach(b => b.onclick = () => go('admin-read', { admOpen: b.dataset.aid }));
     return;
   }
