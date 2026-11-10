@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1925">
+<meta name="build" content="20261110-1932">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -505,6 +505,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .zoom img{max-width:100%;max-height:100%;object-fit:contain}
 .nb{position:absolute;left:8px;right:8px;top:6px;z-index:40;display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:18px;background:rgba(30,30,34,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);transform:translateY(-130%);opacity:0;transition:transform .28s cubic-bezier(.2,.9,.3,1.2),opacity .2s}
 .nb.in{transform:none;opacity:1}
+.rep-av{position:relative;overflow:visible!important;padding:0;cursor:pointer}
+.rep-in{position:absolute;inset:0;overflow:hidden;border-radius:inherit;display:grid;place-items:center}
+.rep-av>i{position:absolute;right:-6px;bottom:-5px;font-style:normal;font-size:9px;line-height:14px;width:15px;height:15px;border-radius:50%;background:#ff4f8b;color:#fff;text-align:center;box-shadow:0 0 0 1.5px #000}
 .nb .mini{width:34px;height:34px;border-radius:50%;border:0;flex:none}
 .nb-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .nb-t b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -925,8 +928,9 @@ function render() {
       getDoc(doc(db, 'messages', m.id, 'media', 'image')).then(d => { S.imgs[m.id] = d.exists() ? d.data().data : null; if (S.screen === 'read') render() }).catch(() => { S.imgs[m.id] = null });
     }
     if (isOwner && !m.read) updateDoc(doc(db, 'messages', m.id), { read: true }).catch(() => { });
+    setTimeout(() => { const b = $('#from-av'); if (b) b.onclick = () => go('send', { to: m.from }) });
     v.innerHTML = `<div class="letter">
-      <div class="from"><span class="who"><span class="mini">${m.anon ? '?' : avatar(m.from, c.fromNick)}</span><b>From. ${esc(c.fromNick)}${m.anon && anonChk[m.id] === true ? ' (내가 보냄)' : ''}</b></span><span>${fmt(m.createdAt)}</span></div>
+      <div class="from"><span class="who">${!m.anon && m.from && m.from !== S.me.uid && S.users[m.from] ? `<button class="mini rep-av" id="from-av" aria-label="${esc(c.fromNick)}님에게 방명록 쓰기"><span class="rep-in">${avatar(m.from, c.fromNick)}</span><i>✉</i></button>` : `<span class="mini">${m.anon ? '?' : avatar(m.from, c.fromNick)}</span>`}<b>From. ${esc(c.fromNick)}${m.anon && anonChk[m.id] === true ? ' (내가 보냄)' : ''}</b></span><span>${fmt(m.createdAt)}</span></div>
       <span class="chip ${m.secret ? '' : 'pub'}">${m.bc ? '전체 쪽지' : m.secret ? 'SECRET' : 'PUBLIC'}</span>
       ${c.item ? `<div class="itembox">${pix(c.item, 108)}<b>${esc((ITEMS[c.item] || {}).name || c.title)}</b><span>${m.anon ? '누군가가' : esc(c.fromNick) + '님이'} 보낸 선물이에요</span></div>` : ''}
       ${m.hasImage ? `<div class="photo">${S.imgs[m.id] && S.imgs[m.id] !== 'loading' ? `<img src="${S.imgs[m.id]}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
