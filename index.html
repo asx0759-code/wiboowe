@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-2335">
+<meta name="build" content="20261110-2345">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2440,7 +2440,7 @@ const BUBBLE = (() => {
 const BLOCKS = (() => {
   const CW = 10, CH = 20;
   const SHAPES = { I: [[0, 1], [1, 1], [2, 1], [3, 1]], O: [[1, 0], [2, 0], [1, 1], [2, 1]], T: [[1, 0], [0, 1], [1, 1], [2, 1]], S: [[1, 0], [2, 0], [0, 1], [1, 1]], Z: [[0, 0], [1, 0], [1, 1], [2, 1]], J: [[0, 0], [0, 1], [1, 1], [2, 1]], L: [[2, 0], [0, 1], [1, 1], [2, 1]] };
-  const COL = { I: ['#7ff0ff', '#13b8d8'], O: ['#ffe680', '#f2b705'], T: ['#d9a8ff', '#8b3ff0'], S: ['#9cf29c', '#20b14a'], Z: ['#ff8a8a', '#e8283c'], J: ['#8fb8ff', '#1f5ef0'], L: ['#ffc27a', '#ff7a1a'] };
+  const COL = { I: ['#7ff0ff', '#13b8d8'], O: ['#ffe680', '#f2b705'], T: ['#d9a8ff', '#8b3ff0'], S: ['#9cf29c', '#20b14a'], Z: ['#ff8a8a', '#e8283c'], J: ['#8fb8ff', '#1f5ef0'], L: ['#ffc27a', '#ff7a1a'], G: ['#8a8fa3', '#4a4f63'] };
   let cv, nv, ctx, nctx, S2, board, cur, nxt, bag = [], st = { playing: false }, raf, last = 0, acc = 0, opt, keyH;
   const $q = s => document.querySelector(s);
   const bestGet = () => { let l = 0; try { l = +localStorage.getItem('wb_blocks') || 0 } catch { } return Math.max(l, opt?.best?.() || 0) };
@@ -2461,9 +2461,16 @@ const BLOCKS = (() => {
     let n = 0; for (let y = CH - 1; y >= 0; y--) if (board[y].every(Boolean)) { board.splice(y, 1); board.unshift(Array(CW).fill(null)); n++; y++ }
     if (n) {
       st.score += [0, 100, 300, 500, 800][n] * st.level; st.lines += n;
-      st.level = 1 + Math.floor(st.lines / 8);
+      st.level = 1 + Math.floor(st.lines / 5);
       flash(n === 4 ? `4줄!! +${800 * (st.level)}` : n > 1 ? `${n}줄 콤보!` : '');
       st.flash = 8;
+    }
+    // 바닥에서 구멍 뚫린 줄이 올라옴 (레벨이 높을수록 자주)
+    if (++st.pieces >= Math.max(5, 13 - st.level)) {
+      st.pieces = 0;
+      if (board[0].some(Boolean)) return end();
+      const hole = Math.random() * CW | 0; board.shift(); board.push(Array.from({ length: CW }, (_, i) => i === hole ? null : 'G'));
+      flash('바닥에서 한 줄 올라와요!');
     }
     cur = nxt; nxt = piece(draw7());
     if (!fits(cur.cells, cur.x, cur.y)) return end();
@@ -2499,7 +2506,7 @@ const BLOCKS = (() => {
   }
   function start() {
     board = Array.from({ length: CH }, () => Array(CW).fill(null)); bag = [];
-    st = { playing: true, score: 0, lines: 0, level: 1, flash: 0 }; cur = piece(draw7()); nxt = piece(draw7()); acc = 0;
+    st = { playing: true, score: 0, lines: 0, level: 1, flash: 0, pieces: 0 }; cur = piece(draw7()); nxt = piece(draw7()); acc = 0;
     $q('#tt-o').hidden = true; hud();
   }
   function end() {
@@ -2516,7 +2523,7 @@ const BLOCKS = (() => {
       <div class="mg-stage tt-stage"><div class="tt-wrap"><canvas id="tt-cv"></canvas><div class="tt-side"><small>NEXT</small><canvas id="tt-nx"></canvas></div><div class="bb-msg" id="tt-msg"></div>
         <div class="mg-over" id="tt-o"><big>블록 쌓기</big><span>한 줄을 꽉 채우면 사라져요<br>한 번에 여러 줄 지우면 점수 UP</span><button class="btn mg-btn" id="tt-go">START</button></div></div></div>
       <div class="tt-pad"><button data-a="l" aria-label="왼쪽">◀</button><button data-a="rot" aria-label="돌리기">⟳</button><button data-a="r" aria-label="오른쪽">▶</button><button data-a="d" aria-label="한 칸 내리기">▼</button><button data-a="drop" class="hot" aria-label="바로 떨어뜨리기">⤓</button></div>
-      <div class="mg-legend"><span>1줄 100 · 2줄 300 · 3줄 500 · 4줄 800 (× 레벨)</span></div>
+      <div class="mg-legend"><span>1줄 100 · 2줄 300 · 3줄 500 · 4줄 800 (× 레벨)</span><span>5줄마다 레벨 UP · 가끔 바닥에서 구멍 난 줄이 올라와요</span></div>
       <div class="sect">RANKING</div><div class="rank" id="tt-rank"><div class="empty">불러오는 중…</div></div>`);
     cv = $q('#tt-cv'); nv = $q('#tt-nx');
     const avail = Math.min(300, (v.clientWidth || 320) - 110), dpr = Math.min(2, window.devicePixelRatio || 1);
