@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1010b">
+<meta name="build" content="20261110-1240">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -60,8 +60,8 @@ body{
 .head{background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));color:#fff;text-align:center;font-family:var(--pixel);font-size:20px;padding:10px 40px;position:relative;text-shadow:0 1px 0 rgba(0,0,0,.6);min-height:24px}
 .head button{position:absolute;left:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-family:var(--pixel);font-size:18px;cursor:pointer;padding:4px 8px}
 .body{flex:1;overflow-y:auto;min-height:0}
-.nav{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(var(--pink-soft),var(--pink) 50%,var(--pink-deep))}
-.nav button{background:none;border:0;color:#fff;font-family:var(--pixel);font-size:14px;padding:12px 0;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.nav{display:grid;grid-template-columns:repeat(5,1fr);background:linear-gradient(var(--pink-soft),var(--pink) 50%,var(--pink-deep))}
+.nav button{background:none;border:0;color:#fff;font-family:var(--pixel);font-size:13px;padding:12px 0;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.6)}
 .nav button.on{background:rgba(255,255,255,.28)}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px dashed var(--pink-deep);outline-offset:2px}
 
@@ -181,6 +181,17 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.ccnt{margin-left:6px;color:var(--pink-deep);font-family:var(--pixel);font-size:12px}
+.who-anon{font-size:12px;color:var(--muted)}
+.realname{color:var(--pink-deep)}
+.cmts{display:flex;flex-direction:column;gap:6px}
+.cmt{background:var(--tint);padding:6px 8px;border-left:3px solid var(--acc)}
+.cmt.op{border-left-color:var(--pink-deep)}
+.cmeta{display:flex;align-items:baseline;gap:8px;font-size:12px}
+.cmeta b{font-weight:400;color:var(--pink-deep)}
+.cmeta span{color:var(--muted);font-variant-numeric:tabular-nums}
+.cmeta .out{margin-left:auto}
+.ctext{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .bc{display:inline-block;font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;padding:0 5px;margin-right:6px;vertical-align:1px}
 .rtime{margin-left:8px;color:var(--muted);font-variant-numeric:tabular-nums}
 .text a{color:var(--pink-deep);word-break:break-all}
@@ -258,6 +269,7 @@ input,textarea,select{font-size:16px!important}
         <button data-go="inbox">INBOX</button>
         <button data-go="send">SEND</button>
         <button data-go="music">MUSIC</button>
+        <button data-go="board">BOARD</button>
       </nav>
     </div>
     <div id="yt-box"><div id="yt"></div></div>
@@ -268,7 +280,7 @@ input,textarea,select{font-size:16px!important}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, orderBy, limit, writeBatch, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, deleteField, collection, query, where, onSnapshot, orderBy, limit, writeBatch, serverTimestamp, runTransaction, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ===== Firebase 설정 (weboowe) ===== */
 const firebaseConfig = {
@@ -311,8 +323,8 @@ function nickEmail(n) { // 한글 닉네임도 로그인 주소로 쓸 수 있�
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, t.length > 25 ? 4000 : 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
-function refresh() { if (S.screen !== 'send' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); render() }
+function refresh() { if (S.screen !== 'send' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
+function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); render() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -348,7 +360,7 @@ async function loadMe(u) {
   measureClock(false);
 }
 let mineSeen = null;
-function cleanup() { mineSeen = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {} }
+function cleanup() { mineSeen = null; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {} }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 // 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
 const anonChk = {}, privSub = {};
@@ -392,7 +404,7 @@ function content(m) { // 화면에 보여 줄 제목·내용·답장
 function render() {
   const v = $('#view'), h = $('#head');
   $('#nav').hidden = S.screen === 'login';
-  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (b.dataset.go === 'board' && (S.screen === 'post' || S.screen === 'board-write')) || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
   const back = html => h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html;
 
   if (S.screen === 'login') {
@@ -709,6 +721,85 @@ function render() {
     return;
   }
 
+  if (S.screen === 'board') {
+    h.textContent = 'Board';
+    v.innerHTML = `<div class="form" style="padding-bottom:4px"><button class="btn" id="bwrite">익명으로 글쓰기</button></div>
+      <div class="sect">ANONYMOUS BOARD · ${B.posts.length}</div>`
+      + (B.posts.length ? B.posts.map((p, i) => `<button class="row" data-p="${p.id}"><span class="num">${i + 1}</span><span class="ttl">${esc(p.title)}${p.cc ? `<span class="ccnt">[${p.cc}]</span>` : ''}<small class="adm-who">익명 · ${fmt(p.at)}</small></span></button>`).join('')
+        : '<div class="empty">아직 글이 없어요.<br>첫 글을 남겨 보세요!</div>');
+    $('#bwrite').onclick = () => go('board-write', { editPost: null });
+    v.querySelectorAll('[data-p]').forEach(b => b.onclick = () => go('post', { post: b.dataset.p }));
+    return;
+  }
+
+  if (S.screen === 'board-write') {
+    const ed = S.editPost ? B.posts.find(x => x.id === S.editPost) : null;
+    back(ed ? 'Edit Post' : 'New Post');
+    $('#back').onclick = () => ed ? go('post', { post: ed.id }) : go('board');
+    v.innerHTML = `<form class="form" id="pf">
+      <div class="field"><label for="pt">TITLE</label><input id="pt" maxlength="40" placeholder="제목 (40자)" value="${esc(ed?.title || '')}"></div>
+      <div class="field"><label for="pb">CONTENT</label><textarea id="pb" maxlength="1000" placeholder="익명으로 올라가요" style="height:220px">${esc(ed?.body || '')}</textarea><div class="count" id="pcnt">${(ed?.body || '').length}/1000</div></div>
+      <p class="hint">누가 썼는지는 다른 친구들에게 보이지 않아요. 내 글은 나중에 고치거나 지울 수 있어요.</p>
+      <div class="err" id="err"></div>
+      <button class="btn" type="submit">${ed ? 'SAVE' : 'POST'}</button>
+    </form>`;
+    $('#pb').oninput = e => $('#pcnt').textContent = e.target.value.length + '/1000';
+    $('#pf').onsubmit = async e => {
+      e.preventDefault();
+      const title = $('#pt').value.trim(), body = $('#pb').value.trim();
+      if (!title || !body) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
+      try {
+        if (ed) { await updateDoc(doc(db, 'posts', ed.id), { title, body, edited: true }); toast('글을 고쳤어요'); go('post', { post: ed.id }); return }
+        const ref = doc(collection(db, 'posts')), b = writeBatch(db);
+        b.set(ref, { title, body, at: serverTimestamp(), cc: 0, seq: 0 });
+        b.set(doc(ref, 'meta', 'author'), { uid: S.me.uid });
+        await b.commit();
+        B.mine[ref.id] = true; toast('익명으로 올렸어요'); go('post', { post: ref.id });
+      } catch (err) { console.warn(err); $('#err').textContent = '올리지 못했어요 (' + (err?.code || '') + '). 보안 규칙을 최신으로 게시했는지 확인해 주세요.' }
+    };
+    return;
+  }
+
+  if (S.screen === 'post') {
+    back('Board');
+    $('#back').onclick = () => go('board');
+    const p = B.posts.find(x => x.id === S.post);
+    if (!p) { v.innerHTML = '<div class="empty">글을 찾을 수 없어요</div>'; return }
+    const keep = $('#cmt') ? { v: $('#cmt').value, f: document.activeElement === $('#cmt') } : null;
+    const cs = B.comments[p.id] || [], R = B.real[p.id] || {}, mine = B.mine[p.id] === true;
+    const real = u => S.isAdmin && u ? ` <span class="realname">(${esc(S.users[u] || '탈퇴')})</span>` : '';
+    v.innerHTML = `<div class="letter">
+      <div class="from"><b>${esc(p.title)}</b><span>${fmt(p.at)}</span></div>
+      <span class="who-anon">익명${mine ? ' (내 글)' : ''}${real(R.author)}</span>
+      <div class="text">${linkify(p.body)}</div>${ytCards(p.body)}
+      ${mine || S.isAdmin ? `<div class="links" style="justify-content:flex-end">${mine ? '<button class="out" id="pedit">edit</button>' : ''}<button class="out" id="pdel">${S.confirmDel ? '한 번 더 누르면 삭제돼요' : 'delete'}</button></div>` : ''}
+      <div class="sect" style="padding:6px 0 0">COMMENTS · ${cs.length}</div>
+      <div class="cmts">${cs.map(c => {
+        const me = (c.op && mine) || (!c.op && B.alias[p.id] === c.n);
+        return `<div class="cmt ${c.op ? 'op' : ''}"><div class="cmeta"><b>${c.op ? '글쓴이' : '익명' + c.n}${me ? ' (나)' : ''}${real(c.op ? R.author : R.names?.[c.n])}</b><span>${fmt(c.at)}</span>${me || S.isAdmin ? `<button class="out inline" data-cdel="${c.id}" aria-label="댓글 삭제">×</button>` : ''}</div><div class="ctext">${linkify(c.body)}</div></div>`;
+      }).join('') || '<p class="hint" style="margin:4px 0">첫 댓글을 남겨 보세요.</p>'}</div>
+      <form class="ctrl" id="cf"><input id="cmt" maxlength="300" autocomplete="off" placeholder="익명으로 댓글 달기"><button>RE</button></form>
+    </div>`;
+    if (keep) { const el = $('#cmt'); el.value = keep.v; if (keep.f) el.focus() }
+    if ($('#pedit')) $('#pedit').onclick = () => go('board-write', { editPost: p.id });
+    if ($('#pdel')) $('#pdel').onclick = async () => {
+      if (!S.confirmDel) { S.confirmDel = true; render(); return }
+      const b = writeBatch(db); b.delete(doc(db, 'posts', p.id)); b.delete(doc(db, 'posts', p.id, 'meta', 'author'));
+      try { await b.commit(); toast('글을 지웠어요'); go('board') } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')') }
+    };
+    v.querySelectorAll('[data-cdel]').forEach(bt => bt.onclick = async () => {
+      const b = writeBatch(db); b.delete(doc(db, 'posts', p.id, 'comments', bt.dataset.cdel)); b.update(doc(db, 'posts', p.id), { cc: increment(-1) });
+      try { await b.commit(); toast('댓글을 지웠어요') } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')') }
+    });
+    $('#cf').onsubmit = async e => {
+      e.preventDefault();
+      const el = $('#cmt'), t = el.value.trim(); if (!t) return;
+      el.value = '';
+      try { await addComment(p.id, t) } catch (err) { console.warn(err); el.value = t; toast('댓글을 남기지 못했어요 (' + (err?.code || '') + ')') }
+    };
+    return;
+  }
+
   if (S.screen === 'music') {
     h.textContent = 'Listen Together';
     // 다시 그려도 쓰던 글자와 커서가 지워지지 않게
@@ -918,6 +1009,70 @@ function playCard(c) {
 }
 document.addEventListener('click', e => { const c = e.target.closest?.('.ytc'); if (c) playCard(c) });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList?.contains('ytc')) { e.preventDefault(); playCard(e.target) } });
+
+/* ===== 익명 게시판 ===== */
+// 글쓴이와 댓글 단 사람의 진짜 정체는 관리자(와 본인)만 읽을 수 있는 곳에 따로 저장
+const B = { posts: [], comments: {}, mine: {}, alias: {}, real: {}, cmtPid: null };
+function watchBoard() {
+  const on = S.me && ['board', 'post', 'board-write'].includes(S.screen);
+  if (on && !subs.board) subs.board = onSnapshot(query(collection(db, 'posts'), orderBy('at', 'desc'), limit(60)), q => {
+    B.posts = []; q.forEach(d => B.posts.push({ id: d.id, ...d.data() })); if (S.screen === 'board' || S.screen === 'post') render();
+  }, () => { });
+  if (!on && subs.board) { subs.board(); delete subs.board }
+  const pid = S.screen === 'post' ? S.post : null;
+  if (pid !== B.cmtPid) {
+    if (subs.cmt) { subs.cmt(); delete subs.cmt }
+    B.cmtPid = pid;
+    if (pid) {
+      subs.cmt = onSnapshot(query(collection(db, 'posts', pid, 'comments'), orderBy('at', 'asc')), q => {
+        const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); B.comments[pid] = a;
+        if (S.isAdmin && a.some(c => !c.op && !B.real[pid]?.names?.[c.n])) loadRealNames(pid);
+        if (S.screen === 'post') render();
+      }, () => { });
+      checkPost(pid);
+    }
+  }
+}
+async function postMine(pid) {
+  if (B.mine[pid] === true || B.mine[pid] === false) return B.mine[pid];
+  try { const d = await getDoc(doc(db, 'posts', pid, 'meta', 'author')); B.mine[pid] = d.exists() && d.data().uid === S.me?.uid; if (S.isAdmin && d.exists()) B.real[pid] = { ...(B.real[pid] || {}), author: d.data().uid } }
+  catch { B.mine[pid] = false }
+  return B.mine[pid];
+}
+async function myAlias(pid) {
+  if (typeof B.alias[pid] === 'number' || B.alias[pid] === null) return B.alias[pid];
+  try { const d = await getDoc(doc(db, 'posts', pid, 'aliases', S.me.uid)); B.alias[pid] = d.exists() ? d.data().n : null } catch { B.alias[pid] = null }
+  return B.alias[pid];
+}
+let realT = {};
+function loadRealNames(pid) {
+  if (realT[pid]) return; realT[pid] = true; setTimeout(() => realT[pid] = false, 3000);
+  getDocs(collection(db, 'posts', pid, 'aliases')).then(q => { const names = {}; q.forEach(d => names[d.data().n] = d.id); B.real[pid] = { ...(B.real[pid] || {}), names }; if (S.screen === 'post') render() }).catch(() => { });
+}
+async function checkPost(pid) {
+  await Promise.all([postMine(pid), myAlias(pid)]);
+  if (S.isAdmin) loadRealNames(pid);
+  if (S.screen === 'post') render();
+}
+async function addComment(pid, body) {
+  const pref = doc(db, 'posts', pid), cref = doc(collection(db, 'posts', pid, 'comments'));
+  if (await postMine(pid)) { // 글쓴이가 단 댓글
+    const b = writeBatch(db); b.set(cref, { body, at: serverTimestamp(), n: 0, op: true }); b.update(pref, { cc: increment(1) }); return b.commit();
+  }
+  const n = await myAlias(pid);
+  if (n) { const b = writeBatch(db); b.set(cref, { body, at: serverTimestamp(), n, op: false }); b.update(pref, { cc: increment(1) }); return b.commit() }
+  // 이 글에 처음 댓글: 다음 번호(익명1, 익명2…)를 받음
+  let got = 0;
+  await runTransaction(db, async tx => {
+    const ps = await tx.get(pref); if (!ps.exists()) throw new Error('글이 지워졌어요');
+    const seq = (ps.data().seq || 0) + 1;
+    tx.set(doc(db, 'posts', pid, 'aliases', S.me.uid), { n: seq });
+    tx.update(pref, { seq, cc: (ps.data().cc || 0) + 1 });
+    tx.set(cref, { body, at: serverTimestamp(), n: seq, op: false });
+    got = seq;
+  });
+  B.alias[pid] = got;
+}
 
 /* ===== 관리자 ===== */
 async function loadAdmin() {
