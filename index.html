@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1243">
+<meta name="build" content="20261110-1250">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -190,7 +190,14 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .cmeta{display:flex;align-items:baseline;gap:8px;font-size:12px}
 .cmeta b{font-weight:400;color:var(--pink-deep)}
 .cmeta span{color:var(--muted);font-variant-numeric:tabular-nums}
-.cmeta .out{margin-left:auto}
+
+.cmt.sub{margin-left:18px;border-left-style:dotted}
+.arrow{margin-right:4px;color:var(--acc)}
+.cact{margin-left:auto;display:flex;gap:8px}
+.replying{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.arow{cursor:default;padding:0 10px 0 0}
+.abtn{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px 0 12px 14px;background:none;border:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.tabs{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:1fr}
 .ctext{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .bc{display:inline-block;font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;padding:0 5px;margin-right:6px;vertical-align:1px}
 .rtime{margin-left:8px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -324,7 +331,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { Object.assign(S, { screen, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); render() }
+function go(screen, extra = {}) { Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); render() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -648,13 +655,26 @@ function render() {
         const cnt = listAll.filter(m => m.to === u).length;
         return `<button class="row" data-u="${u}"><span class="num">${i + 1}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}의 방명록</span><span class="meta">${cnt}</span></button>`;
       }).join('') || '<div class="empty">회원이 없어요</div>';
+    } else if (tab === 'board') { // 게시판 관리
+      const AB = S.admB || {};
+      body = AB.loading ? '<div class="empty">불러오는 중…</div>' : AB.err ? `<div class="empty">${esc(AB.err)}</div>`
+        : (AB.posts || []).length ? AB.posts.map((x, i) => `<div class="row arow"><button class="abtn" data-ap="${x.id}"><span class="num">${i + 1}</span><span class="ttl">${esc(x.title)}${x.cc ? `<span class="ccnt">[${x.cc}]</span>` : ''}<small class="adm-who">${AB.author[x.id] ? nm(AB.author[x.id]) : '익명'} · ${fmt(x.at)}</small></span></button><button class="out" data-apdel="${x.id}">${S.admDel === x.id ? '정말 삭제' : '삭제'}</button></div>`).join('')
+        : '<div class="empty">게시판에 글이 없어요</div>';
     } else body = rows(listAll);
-    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button></div>`)
-      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
+    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button><button id="at-board" class="${tab === 'board' ? 'on' : ''}">게시판</button></div>`)
+      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : tab === 'board' ? 'BOARD POSTS' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : tab === 'board' ? (S.admB?.posts || []).length : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
       + body;
     if ($('#at-all')) $('#at-all').onclick = () => go('admin', { admTab: 'all' });
     if ($('#at-users')) $('#at-users').onclick = () => go('admin', { admTab: 'users' });
-    if ($('#areload')) $('#areload').onclick = loadAdmin;
+    if ($('#at-board')) $('#at-board').onclick = () => { go('admin', { admTab: 'board', admDel: null }); if (!S.admB) loadAdminBoard() };
+    v.querySelectorAll('[data-ap]').forEach(b => b.onclick = () => go('post', { post: b.dataset.ap, postFrom: 'admin' }));
+    v.querySelectorAll('[data-apdel]').forEach(b => b.onclick = async () => {
+      const id = b.dataset.apdel;
+      if (S.admDel !== id) { S.admDel = id; render(); return }
+      S.admDel = null; b.textContent = '지우는 중…';
+      try { await deletePost(id); toast('글과 댓글을 지웠어요'); loadAdminBoard() } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')'); render() }
+    });
+    if ($('#areload')) $('#areload').onclick = () => tab === 'board' && !U ? loadAdminBoard() : loadAdmin();
     v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('admin', { admUser: b.dataset.u }));
     v.querySelectorAll('[data-aid]').forEach(b => b.onclick = () => go('admin-read', { admOpen: b.dataset.aid }));
     return;
@@ -761,8 +781,8 @@ function render() {
   }
 
   if (S.screen === 'post') {
-    back('Board');
-    $('#back').onclick = () => go('board');
+    back(S.postFrom === 'admin' ? 'Admin' : 'Board');
+    $('#back').onclick = () => S.postFrom === 'admin' ? go('admin', { admTab: 'board', postFrom: null }) : go('board');
     const p = B.posts.find(x => x.id === S.post);
     if (!p) { v.innerHTML = '<div class="empty">글을 찾을 수 없어요</div>'; return }
     const keep = $('#cmt') ? { v: $('#cmt').value, f: document.activeElement === $('#cmt') } : null;
@@ -774,19 +794,27 @@ function render() {
       <div class="text">${linkify(p.body)}</div>${ytCards(p.body)}
       ${mine || S.isAdmin ? `<div class="links" style="justify-content:flex-end">${mine ? '<button class="out" id="pedit">edit</button>' : ''}<button class="out" id="pdel">${S.confirmDel ? '한 번 더 누르면 삭제돼요' : 'delete'}</button></div>` : ''}
       <div class="sect" style="padding:6px 0 0">COMMENTS · ${cs.length}</div>
-      <div class="cmts">${cs.map(c => {
-        const me = (c.op && mine) || (!c.op && B.alias[p.id] === c.n);
-        return `<div class="cmt ${c.op ? 'op' : ''}"><div class="cmeta"><b>${c.op ? '글쓴이' : '익명' + c.n}${me ? ' (나)' : ''}${real(c.op ? R.author : R.names?.[c.n])}</b><span>${fmt(c.at)}</span>${me || S.isAdmin ? `<button class="out inline" data-cdel="${c.id}" aria-label="댓글 삭제">×</button>` : ''}</div><div class="ctext">${linkify(c.body)}</div></div>`;
-      }).join('') || '<p class="hint" style="margin:4px 0">첫 댓글을 남겨 보세요.</p>'}</div>
-      <form class="ctrl" id="cf"><input id="cmt" maxlength="300" autocomplete="off" placeholder="익명으로 댓글 달기"><button>RE</button></form>
+      <div class="cmts">${(() => {
+        const label = c => c.op ? '글쓴이' : '익명' + c.n;
+        const one = (c, sub) => {
+          const me = (c.op && mine) || (!c.op && B.alias[p.id] === c.n);
+          return `<div class="cmt ${c.op ? 'op' : ''} ${sub ? 'sub' : ''}"><div class="cmeta"><b>${sub ? '<span class="arrow">↳</span>' : ''}${label(c)}${me ? ' (나)' : ''}${real(c.op ? R.author : R.names?.[c.n])}</b><span>${fmt(c.at)}</span><span class="cact">${sub ? '' : `<button class="out inline" data-crep="${c.id}">답글</button>`}${me || S.isAdmin ? `<button class="out inline" data-cdel="${c.id}" aria-label="댓글 삭제">×</button>` : ''}</span></div><div class="ctext">${linkify(c.body)}</div></div>`;
+        };
+        const ids = new Set(cs.map(c => c.id));
+        const tops = cs.filter(c => !c.p || !ids.has(c.p)); // 원댓글이 지워진 답글은 맨 위 줄로
+        return tops.map(c => one(c, !!c.p) + cs.filter(r => r.p === c.id).map(r => one(r, true)).join('')).join('') || '<p class="hint" style="margin:4px 0">첫 댓글을 남겨 보세요.</p>';
+      })()}</div>
+      ${S.replyTo && cs.some(c => c.id === S.replyTo) ? `<div class="replying">${(c => c.op ? '글쓴이' : '익명' + c.n)(cs.find(c => c.id === S.replyTo))}에게 답글 다는 중 <button class="out inline" id="rcan">취소</button></div>` : ''}
+      <form class="ctrl" id="cf"><input id="cmt" maxlength="300" autocomplete="off" placeholder="${S.replyTo ? '익명으로 답글 달기' : '익명으로 댓글 달기'}"><button>RE</button></form>
     </div>`;
     if (keep) { const el = $('#cmt'); el.value = keep.v; if (keep.f) el.focus() }
     if ($('#pedit')) $('#pedit').onclick = () => go('board-write', { editPost: p.id });
     if ($('#pdel')) $('#pdel').onclick = async () => {
       if (!S.confirmDel) { S.confirmDel = true; render(); return }
-      const b = writeBatch(db); b.delete(doc(db, 'posts', p.id)); b.delete(doc(db, 'posts', p.id, 'meta', 'author'));
-      try { await b.commit(); toast('글을 지웠어요'); go('board') } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')') }
+      try { await deletePost(p.id); toast('글을 지웠어요'); S.postFrom === 'admin' ? (go('admin', { admTab: 'board', postFrom: null }), loadAdminBoard()) : go('board') } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')') }
     };
+    v.querySelectorAll('[data-crep]').forEach(bt => bt.onclick = () => { S.replyTo = bt.dataset.crep; render(); $('#cmt')?.focus() });
+    if ($('#rcan')) $('#rcan').onclick = () => { S.replyTo = null; render() };
     v.querySelectorAll('[data-cdel]').forEach(bt => bt.onclick = async () => {
       const b = writeBatch(db); b.delete(doc(db, 'posts', p.id, 'comments', bt.dataset.cdel)); b.update(doc(db, 'posts', p.id), { cc: increment(-1) });
       try { await b.commit(); toast('댓글을 지웠어요') } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')') }
@@ -795,7 +823,8 @@ function render() {
       e.preventDefault();
       const el = $('#cmt'), t = el.value.trim(); if (!t) return;
       el.value = '';
-      try { await addComment(p.id, t) } catch (err) { console.warn(err); el.value = t; toast('댓글을 남기지 못했어요 (' + (err?.code || '') + ')') }
+      const parent = S.replyTo && (B.comments[p.id] || []).some(c => c.id === S.replyTo) ? S.replyTo : null;
+      try { await addComment(p.id, t, parent); S.replyTo = null; render() } catch (err) { console.warn(err); el.value = t; toast('댓글을 남기지 못했어요 (' + (err?.code || '') + ')') }
     };
     return;
   }
@@ -1054,13 +1083,32 @@ async function checkPost(pid) {
   if (S.isAdmin) loadRealNames(pid);
   if (S.screen === 'post') render();
 }
-async function addComment(pid, body) {
+async function deletePost(pid) {
+  if (S.isAdmin) { // 관리자는 댓글까지 같이 정리
+    const q = await getDocs(collection(db, 'posts', pid, 'comments')), ids = []; q.forEach(d => ids.push(d.id));
+    for (let i = 0; i < ids.length; i += 400) { const b = writeBatch(db); ids.slice(i, i + 400).forEach(id => b.delete(doc(db, 'posts', pid, 'comments', id))); await b.commit() }
+  }
+  const b = writeBatch(db); b.delete(doc(db, 'posts', pid)); b.delete(doc(db, 'posts', pid, 'meta', 'author')); await b.commit();
+}
+async function loadAdminBoard() {
+  S.admB = { loading: true, posts: [], author: {} }; render();
+  try {
+    const q = await getDocs(query(collection(db, 'posts'), orderBy('at', 'desc'))), posts = [];
+    q.forEach(d => posts.push({ id: d.id, ...d.data() }));
+    S.admB.posts = posts;
+    await Promise.all(posts.map(async x => { try { const d = await getDoc(doc(db, 'posts', x.id, 'meta', 'author')); if (d.exists()) S.admB.author[x.id] = d.data().uid } catch { } }));
+  } catch (e) { S.admB.err = '불러오지 못했어요 (' + (e.code || e.message) + ')' }
+  S.admB.loading = false;
+  if (S.screen === 'admin') render();
+}
+async function addComment(pid, body, parent) {
   const pref = doc(db, 'posts', pid), cref = doc(collection(db, 'posts', pid, 'comments'));
+  const px = parent ? { p: parent } : {};
   if (await postMine(pid)) { // 글쓴이가 단 댓글
-    const b = writeBatch(db); b.set(cref, { body, at: serverTimestamp(), n: 0, op: true }); b.update(pref, { cc: increment(1) }); return b.commit();
+    const b = writeBatch(db); b.set(cref, { body, at: serverTimestamp(), n: 0, op: true, ...px }); b.update(pref, { cc: increment(1) }); return b.commit();
   }
   const n = await myAlias(pid);
-  if (n) { const b = writeBatch(db); b.set(cref, { body, at: serverTimestamp(), n, op: false }); b.update(pref, { cc: increment(1) }); return b.commit() }
+  if (n) { const b = writeBatch(db); b.set(cref, { body, at: serverTimestamp(), n, op: false, ...px }); b.update(pref, { cc: increment(1) }); return b.commit() }
   // 이 글에 처음 댓글: 다음 번호(익명1, 익명2…)를 받음
   let got = 0;
   await runTransaction(db, async tx => {
@@ -1068,7 +1116,7 @@ async function addComment(pid, body) {
     const seq = (ps.data().seq || 0) + 1;
     tx.set(doc(db, 'posts', pid, 'aliases', S.me.uid), { n: seq });
     tx.update(pref, { seq, cc: (ps.data().cc || 0) + 1 });
-    tx.set(cref, { body, at: serverTimestamp(), n: seq, op: false });
+    tx.set(cref, { body, at: serverTimestamp(), n: seq, op: false, ...px });
     got = seq;
   });
   B.alias[pid] = got;
