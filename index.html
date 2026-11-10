@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1000">
+<meta name="build" content="20261110-1010">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -536,25 +536,26 @@ function render() {
     h.textContent = 'New Message';
     const others = Object.entries(S.users).filter(([u]) => u !== S.me.uid);
     if (!others.length) { v.innerHTML = '<div class="empty">메시지를 보낼 친구가 아직 없어요</div>'; return }
-    const to = S.to && S.users[S.to] ? S.to : others[0][0];
+    const isAll = S.to === '__all__';
+    const to = isAll ? '__all__' : S.to && S.users[S.to] ? S.to : others[0][0];
     const kind = S.kind || 'msg', D = S.draft || {};
     v.innerHTML = `<form class="form" id="sf">
       <div class="seg" role="group" aria-label="보낼 것"><button type="button" data-k="msg" class="${kind === 'msg' ? 'on' : ''}">메시지</button><button type="button" data-k="item" class="${kind === 'item' ? 'on' : ''}">아이템</button></div>
-      <div class="field"><label for="to">TO</label><select id="to">${others.map(([u, n]) => `<option value="${u}" ${u === to ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
+      <div class="field"><label for="to">TO</label><select id="to"><option value="__all__" ${isAll ? 'selected' : ''}>모두에게 (전체 쪽지 · ${others.length}명)</option>${others.map(([u, n]) => `<option value="${u}" ${u === to ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
       ${kind === 'msg' ? `
       <div class="field"><label for="st">TITLE</label><input id="st" maxlength="20" placeholder="제목 (20자)" value="${esc(D.title || '')}"></div>
       <div class="field"><label for="sb">MESSAGE</label><textarea id="sb" maxlength="300" placeholder="메시지를 적어 주세요">${esc(D.body || '')}</textarea><div class="count" id="cnt">${(D.body || '').length}/300</div><div id="ytprev" class="ytprev">${ytThumbs(D.body || '')}</div></div>
-      <div class="attach"><button type="button" class="out" id="addimg">+ 사진 첨부</button><span id="prev"></span></div>
-      <input type="file" id="imgfile" accept="image/*" hidden>` : `
+      ${isAll ? '' : `<div class="attach"><button type="button" class="out" id="addimg">+ 사진 첨부</button><span id="prev"></span></div>
+      <input type="file" id="imgfile" accept="image/*" hidden>`}` : `
       <div class="field"><label>ITEM</label><div class="items">${Object.entries(ITEMS).filter(([, it]) => !it.hidden).map(([k, it]) => `<button type="button" class="itbtn ${S.item === k ? 'on' : ''}" data-it="${k}" aria-pressed="${S.item === k}">${pix(k, 36)}<span class="itname">${esc(it.name).replace(' ', '\n')}</span></button>`).join('')}</div></div>
       <div class="field"><label for="sn">NOTE</label><input id="sn" maxlength="100" placeholder="같이 보낼 한마디 (없어도 돼요)" value="${esc(D.note || '')}"></div>`}
-      <div class="seg" role="group" aria-label="공개 범위"><button type="button" data-v="pub" class="${S.vis === 'pub' ? 'on' : ''}">공개</button><button type="button" data-v="sec" class="${S.vis === 'sec' ? 'on' : ''}">비밀</button></div>
+      ${isAll ? '' : `<div class="seg" role="group" aria-label="공개 범위"><button type="button" data-v="pub" class="${S.vis === 'pub' ? 'on' : ''}">공개</button><button type="button" data-v="sec" class="${S.vis === 'sec' ? 'on' : ''}">비밀</button></div>`}
       <label class="anon"><input type="checkbox" id="anon" ${S.anon ? 'checked' : ''}> 익명으로 보내기</label>
       <p class="hint" id="vh"></p>
       <div class="err" id="err"></div>
       <button class="btn" type="submit">SEND ${kind === 'item' ? 'ITEM' : '✉'}</button>
     </form>`;
-    const hint = () => $('#vh').textContent = (S.vis === 'sec' ? '비밀로 보내면 받는 사람과 나만 볼 수 있어요.' : '공개로 보내면 방명록에 들른 친구 누구나 볼 수 있어요.')
+    const hint = () => $('#vh').textContent = (isAll ? `친구 ${others.length}명 모두의 INBOX에 한 통씩 가요. 받은 사람만 볼 수 있고, 각자 답장할 수 있어요.` : S.vis === 'sec' ? '비밀로 보내면 받는 사람과 나만 볼 수 있어요.' : '공개로 보내면 방명록에 들른 친구 누구나 볼 수 있어요.')
       + (S.anon ? ' 받는 사람에게 보낸 사람이 "익명"으로 보여요.' : '');
     hint();
     const saveDraft = () => { S.draft = { title: $('#st')?.value ?? D.title, body: $('#sb')?.value ?? D.body, note: $('#sn')?.value ?? D.note } };
@@ -562,7 +563,7 @@ function render() {
     v.querySelectorAll('[data-it]').forEach(b => b.onclick = () => { S.item = b.dataset.it; v.querySelectorAll('[data-it]').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b) }) });
     $('#anon').onchange = e => { S.anon = e.target.checked; hint() };
     if ($('#sb')) $('#sb').oninput = e => { $('#cnt').textContent = e.target.value.length + '/300'; $('#ytprev').innerHTML = ytThumbs(e.target.value) };
-    $('#to').onchange = e => S.to = e.target.value;
+    $('#to').onchange = e => { const was = S.to === '__all__', now = e.target.value === '__all__'; S.to = e.target.value; if (was !== now) { saveDraft(); render() } };
     const showPrev = () => { if (!$('#prev')) return; $('#prev').innerHTML = S.attach ? `<img src="${S.attach}" alt=""><button type="button" class="out" id="rmimg">빼기</button>` : ''; if ($('#rmimg')) $('#rmimg').onclick = () => { S.attach = null; showPrev() } };
     showPrev();
     if ($('#addimg')) $('#addimg').onclick = () => $('#imgfile').click();
@@ -579,20 +580,35 @@ function render() {
         title = $('#st').value.trim(); body = $('#sb').value.trim();
         if (!title || !body) { $('#err').textContent = '제목과 내용을 모두 적어 주세요.'; return }
       }
-      const from = anon ? '' : S.me.uid, withImg = kind === 'msg' && !!S.attach;
-      const ref = doc(collection(db, 'messages')), b = writeBatch(db);
-      const base = { to: dest, from, secret, read: false, createdAt: serverTimestamp(), hasImage: withImg, kind, ...(anon ? { anon: true } : {}) };
+      const all = dest === '__all__', dests = all ? others.map(([u]) => u) : [dest];
+      const sec = all ? true : secret, from = anon ? '' : S.me.uid, withImg = !all && kind === 'msg' && !!S.attach;
       const text = { fromNick: anon ? '익명' : S.me.nick, title, body, reply: '', ...(item ? { item } : {}) };
-      if (anon) b.set(doc(ref, 'meta', 'sender'), { uid: S.me.uid });
-      if (secret) { b.set(ref, base); b.set(doc(ref, 'private', 'content'), { to: dest, from, ...text }) }
-      else b.set(ref, { ...base, ...text });
-      if (withImg) b.set(doc(ref, 'media', 'image'), { to: dest, from, secret, data: S.attach });
+      const sent = [];
+      const put = (b, to) => { // 한 사람 몫의 메시지를 묶음에 넣기
+        const ref = doc(collection(db, 'messages'));
+        const base = { to, from, secret: sec, read: false, createdAt: serverTimestamp(), hasImage: withImg, kind, ...(anon ? { anon: true } : {}), ...(all ? { bc: true } : {}) };
+        if (anon) b.set(doc(ref, 'meta', 'sender'), { uid: S.me.uid });
+        if (sec) { b.set(ref, base); b.set(doc(ref, 'private', 'content'), { to, from, ...text }) }
+        else b.set(ref, { ...base, ...text });
+        if (withImg) b.set(doc(ref, 'media', 'image'), { to, from, secret: sec, data: S.attach });
+        sent.push({ id: ref.id, to });
+      };
+      const step = anon ? 3 : 5; // 보안 규칙 검사 한도 때문에 몇 명씩 나눠 보냄
+      const btn = $('#sf button[type="submit"]'); if (btn) btn.disabled = true;
       try {
-        await b.commit();
-        if (anon) { saveLocalAnon(ref.id, { to: dest, from: '', ...text }); anonChk[ref.id] = true; if (secret) S.priv[ref.id] = localAnon[ref.id] }
-        toast(S.users[dest] + '에게 ' + (item ? ITEMS[item].name + '을(를) ' : '') + '보냈어요');
-        go('inbox', { owner: dest, to: null, vis: 'pub', attach: null, draft: null, item: null, anon: false });
-      } catch (err) { console.warn(err); $('#err').textContent = '보내지 못했어요 (' + (err?.code || '') + '). 잠시 후 다시 해 주세요.' }
+        for (let i = 0; i < dests.length; i += step) {
+          const b = writeBatch(db);
+          dests.slice(i, i + step).forEach(to => put(b, to));
+          await b.commit();
+          if (all) $('#err').textContent = `보내는 중… ${Math.min(dests.length, i + step)}/${dests.length}`;
+        }
+        if (anon) sent.forEach(x => { saveLocalAnon(x.id, { to: x.to, from: '', ...text }); anonChk[x.id] = true; if (sec) S.priv[x.id] = localAnon[x.id] });
+        toast(all ? `${dests.length}명 모두에게 ${item ? ITEMS[item].name + '을(를) ' : ''}보냈어요` : S.users[dest] + '에게 ' + (item ? ITEMS[item].name + '을(를) ' : '') + '보냈어요');
+        go('inbox', { owner: all ? S.me.uid : dest, to: null, vis: 'pub', attach: null, draft: null, item: null, anon: false });
+      } catch (err) {
+        console.warn(err); if (btn) btn.disabled = false;
+        $('#err').textContent = (all && sent.length ? `일부만 보내고 멈췄어요 ` : '보내지 못했어요 ') + '(' + (err?.code || '') + '). 잠시 후 다시 해 주세요.';
+      }
     };
     return;
   }
@@ -603,14 +619,13 @@ function render() {
     const A = S.adm || {};
     const nm = u => esc(S.users[u] || '(탈퇴)');
     const who = m => m.anon ? (A.sender?.[m.id] ? nm(A.sender[m.id]) + '(익명)' : '익명') : nm(m.from);
-    v.innerHTML = `<div class="form" style="padding-bottom:0"><button class="btn" id="tobc">전체 쪽지 보내기</button></div><div class="sect">ALL MESSAGES · ${(A.list || []).length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
+    v.innerHTML = `<div class="sect">ALL MESSAGES · ${(A.list || []).length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
       + (A.loading ? '<div class="empty">불러오는 중…</div>' : A.err ? `<div class="empty">${esc(A.err)}</div>`
       : (A.list || []).length ? A.list.map((m, i) => {
         const c = m.secret ? A.priv[m.id] : m;
         return `<button class="row" data-aid="${m.id}"><span class="num">${i + 1}</span>${c?.item ? pix(c.item, 24) : m.secret ? LOCK : ENV_O}<span class="ttl">${c ? esc(c.title) : '(내용 없음)'}<small class="adm-who">${who(m)} → ${nm(m.to)} · ${fmt(m.createdAt)}</small></span>${m.hasImage ? '<span class="meta">IMG</span>' : ''}</button>`;
       }).join('') : '<div class="empty">메시지가 없어요</div>');
     if ($('#areload')) $('#areload').onclick = loadAdmin;
-    $('#tobc').onclick = () => go('admin-bc');
     v.querySelectorAll('[data-aid]').forEach(b => b.onclick = () => go('admin-read', { admOpen: b.dataset.aid }));
     return;
   }
