@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1252">
+<meta name="build" content="20261110-1258">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -178,6 +178,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .links{display:flex;gap:4px 14px;flex-wrap:wrap;justify-content:center}
 .links .out{padding:4px 0}
 .now .track{font-size:15px;line-height:1.4;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.now .track{font-size:15px}
+/* MUSIC 화면: 노래 제목만 그대로 두고 나머지 글씨는 작게 */
+.now .hint,.now .err,.now .sect,.now .listeners span,.now .vol,.now .qt,.now .qt small,.now .ctrl input,.now .ctrl button,.now .links .out,.now .qrow .num,.now .extform input{font-size:10px}
+.now .play{font-size:12px;padding:6px 18px}
+.now .qrow .out{font-size:13px}
+.now .ytopen{font-size:12px}
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
