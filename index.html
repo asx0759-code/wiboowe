@@ -2,9 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1258">
+<meta name="build" content="20261110-1325">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -57,38 +57,38 @@ body{
 .bat{width:30px;height:12px;border:2px solid #222;border-radius:2px;position:relative;padding:1px}
 .bat::after{content:"";position:absolute;right:-5px;top:2px;width:3px;height:5px;background:#222}
 .bat i{display:block;height:100%;width:80%;background:linear-gradient(90deg,#3b2a8f,#e04aa8)}
-.head{background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));color:#fff;text-align:center;font-family:var(--pixel);font-size:20px;padding:10px 40px;position:relative;text-shadow:0 1px 0 rgba(0,0,0,.6);min-height:24px}
-.head button{position:absolute;left:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-family:var(--pixel);font-size:18px;cursor:pointer;padding:4px 8px}
+.head{background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));color:#fff;text-align:center;font-family:var(--pixel);font-size:16px;padding:10px 40px;position:relative;text-shadow:0 1px 0 rgba(0,0,0,.6);min-height:24px}
+.head button{position:absolute;left:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-family:var(--pixel);font-size:16px;cursor:pointer;padding:4px 8px}
 .body{flex:1;overflow-y:auto;min-height:0}
 .nav{display:grid;grid-template-columns:repeat(5,1fr);background:linear-gradient(var(--pink-soft),var(--pink) 50%,var(--pink-deep))}
-.nav button{background:none;border:0;color:#fff;font-family:var(--pixel);font-size:13px;padding:12px 0;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+.nav button{background:none;border:0;color:#fff;font-family:var(--pixel);font-size:12px;padding:12px 0;cursor:pointer;text-shadow:0 1px 0 rgba(0,0,0,.6)}
 .nav button.on{background:rgba(255,255,255,.28)}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px dashed var(--pink-deep);outline-offset:2px}
 
 /* list rows */
 .row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:2px solid var(--line);cursor:pointer;background:var(--lcd);width:100%;border-left:0;border-right:0;border-top:0;text-align:left;font:inherit;color:inherit}
 .row:hover{background:var(--tint)}
-.num{flex:none;width:28px;height:28px;background:var(--pink);color:#fff;font-family:var(--pixel);font-size:14px;display:grid;place-items:center;box-shadow:inset -2px -2px 0 var(--pink-deep)}
+.num{flex:none;width:28px;height:28px;background:var(--pink);color:#fff;font-family:var(--pixel);font-size:12px;display:grid;place-items:center;box-shadow:inset -2px -2px 0 var(--pink-deep)}
 .row svg{flex:none}
-.ttl{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.ttl{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
 .ttl.secret{color:var(--muted)}
 .row .meta{font-family:var(--pixel);font-size:12px;color:var(--muted);flex:none}
-.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:15px}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:12px}
 
 /* forms */
 .form{padding:16px;display:flex;flex-direction:column;gap:12px}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{font-family:var(--pixel);font-size:12px;color:var(--muted);letter-spacing:.06em}
-.field input,.field textarea,.field select{font-family:var(--hand);font-size:16px;border:2px solid var(--line);background:#fff;padding:6px 10px;color:var(--ink);border-radius:0}
+.field input,.field textarea,.field select{font-family:var(--hand);font-size:12px;border:2px solid var(--line);background:#fff;padding:6px 10px;color:var(--ink);border-radius:0}
 .field textarea{resize:none;height:130px;line-height:1.6;background:repeating-linear-gradient(#fff 0 26px,var(--rule) 26px 27px);background-attachment:local}
 .count{font-family:var(--pixel);font-size:12px;color:var(--muted);text-align:right}
-.btn{font-family:var(--pixel);font-size:16px;color:#fff;background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));border:0;padding:11px;cursor:pointer;box-shadow:0 3px 0 #000}
+.btn{font-family:var(--pixel);font-size:12px;color:#fff;background:linear-gradient(var(--pink-soft),var(--pink) 55%,var(--pink-deep));border:0;padding:11px;cursor:pointer;box-shadow:0 3px 0 #000}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #000}
 .tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--line)}
-.tabs button{font-family:var(--pixel);font-size:14px;background:#fff;border:0;padding:10px;color:var(--muted);cursor:pointer}
+.tabs button{font-family:var(--pixel);font-size:12px;background:#fff;border:0;padding:10px;color:var(--muted);cursor:pointer}
 .tabs button.on{color:var(--pink-deep);box-shadow:inset 0 -3px 0 var(--pink)}
 .seg{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--pink)}
-.seg button{font-family:var(--hand);font-size:15px;background:#fff;border:0;padding:6px;cursor:pointer;color:var(--pink-deep)}
+.seg button{font-family:var(--hand);font-size:12px;background:#fff;border:0;padding:6px;cursor:pointer;color:var(--pink-deep)}
 .seg button.on{background:var(--pink);color:#fff}
 .hint{font-size:12px;color:var(--muted);line-height:1.6}
 .err{font-size:12px;color:var(--pink-deep);min-height:1em}
@@ -96,21 +96,21 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 /* read */
 .letter{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .from{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dashed var(--acc);padding-bottom:6px;gap:8px}
-.from b{font-size:17px}
+.from b{font-size:14px}
 .from span{font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--pixel);font-size:12px;color:#fff;background:var(--pink-deep);padding:2px 6px;align-self:flex-start}
 .chip.pub{background:var(--muted)}
-.text{font-size:16px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
-.reply{background:var(--tint);border-left:4px solid var(--pink);padding:8px 10px;font-size:15px;line-height:1.4}
+.text{font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.reply{background:var(--tint);border-left:4px solid var(--pink);padding:8px 10px;font-size:12px;line-height:1.4}
 .reply small{display:block;font-family:var(--pixel);font-size:12px;color:var(--pink-deep);margin-bottom:2px}
 .reply-form{display:flex;gap:6px}
-.reply-form input{flex:1;min-width:0;font-family:var(--hand);font-size:15px;border:2px solid var(--line);padding:4px 8px}
+.reply-form input{flex:1;min-width:0;font-family:var(--hand);font-size:12px;border:2px solid var(--line);padding:4px 8px}
 .reply-form button{font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
 
 /* home */
 .me{display:flex;gap:12px;align-items:center;padding:14px;border-bottom:2px solid var(--line);background:linear-gradient(#fff,var(--tint))}
 .av{width:52px;height:52px;background:var(--pink);border:2px solid var(--pink-deep);display:grid;place-items:center;font-family:var(--pixel);font-size:22px;color:#fff;flex:none}
-.me b{font-size:19px;display:block}
+.me b{font-size:14px;display:block}
 .me span{font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .sect{font-family:var(--pixel);font-size:12px;color:var(--muted);padding:10px 14px 4px;letter-spacing:.06em}
 
@@ -134,7 +134,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .ctrl{display:flex;gap:8px;width:100%}
 .ctrl input{flex:1;min-width:0;font-family:var(--hand);font-size:12px;border:2px solid var(--line);padding:6px 8px}
 .ctrl button,.play{font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;border:0;padding:0 12px;cursor:pointer}
-.play{padding:8px 22px;font-size:15px;box-shadow:0 3px 0 #000}
+.play{padding:8px 22px;font-size:12px;box-shadow:0 3px 0 #000}
 @media (prefers-reduced-motion:reduce){.lp{animation:none}}
 .toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:rgba(34,32,36,.88);color:#fff;font-family:var(--pixel);font-size:12px;padding:8px 14px;white-space:nowrap}
 .lcdwrap{position:relative}
@@ -150,13 +150,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .who{display:flex;align-items:center;gap:8px;min-width:0}
 
 .crop{position:absolute;inset:3px;z-index:20;background:rgba(10,10,12,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
-.crop-title{font-family:var(--pixel);color:#fff;font-size:15px}
+.crop-title{font-family:var(--pixel);color:#fff;font-size:12px}
 .crop-frame{position:relative;width:240px;height:240px;overflow:hidden;background:#000;touch-action:none;cursor:grab;outline:2px solid #fff}
 .crop-frame::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 33.3% 0/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 66.6% 0/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 0 33.3%/100% 1px no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 0 66.6%/100% 1px no-repeat}
 .crop-img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;user-select:none;-webkit-user-drag:none}
 #cz{width:240px;accent-color:#fff}
 .crop-btns{display:flex;gap:10px}
-.crop-btns button{font-family:var(--pixel);font-size:14px;padding:8px 22px;border:2px solid #fff;background:none;color:#fff;cursor:pointer}
+.crop-btns button{font-family:var(--pixel);font-size:12px;padding:8px 22px;border:2px solid #fff;background:none;color:#fff;cursor:pointer}
 .crop-btns #ck{background:#fff;color:#000}
 .crop-hint{font-family:var(--pixel);font-size:12px;color:#aaa;margin:0}
 .attach{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -179,14 +179,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .links .out{padding:4px 0}
 .now .track{font-size:15px;line-height:1.4;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .now .track{font-size:15px}
-/* MUSIC 화면: 노래 제목만 그대로 두고 나머지 글씨는 작게 */
-.now .hint,.now .err,.now .sect,.now .listeners span,.now .vol,.now .qt,.now .qt small,.now .ctrl input,.now .ctrl button,.now .links .out,.now .qrow .num,.now .extform input{font-size:10px}
 .now .play{font-size:12px;padding:6px 18px}
 .now .qrow .out{font-size:13px}
 .now .ytopen{font-size:12px}
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.mtitle{font-size:14px;font-weight:700;line-height:1.4;word-break:keep-all;overflow-wrap:anywhere}
 .ttl.wrap{white-space:normal;overflow:visible;text-overflow:clip;word-break:keep-all;overflow-wrap:anywhere;line-height:1.4}
 .ccnt{margin-left:6px;color:var(--pink-deep);font-family:var(--pixel);font-size:12px}
 .who-anon{font-size:12px;color:var(--muted)}
@@ -205,7 +204,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .arow{cursor:default;padding:0 10px 0 0}
 .abtn{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:12px 0 12px 14px;background:none;border:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .tabs{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:1fr}
-.ctext{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.ctext{font-size:12px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .bc{display:inline-block;font-family:var(--pixel);font-size:12px;background:var(--pink);color:#fff;padding:0 5px;margin-right:6px;vertical-align:1px}
 .rtime{margin-left:8px;color:var(--muted);font-variant-numeric:tabular-nums}
 .text a{color:var(--pink-deep);word-break:break-all}
@@ -228,12 +227,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .itbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 6px;background:#fff;border:2px solid var(--line);cursor:pointer;font-family:var(--hand);font-size:12px;color:var(--ink)}
 .itname{white-space:pre-line;text-align:center;line-height:1.25}
 .itbtn.on{border-color:var(--pink-deep);background:var(--tint);box-shadow:inset 0 0 0 1px var(--pink-deep)}
-.anon{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.anon{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer}
 .anon input{width:16px;height:16px;accent-color:var(--pink-deep);margin:0}
 .reveal{border:2px dashed var(--acc);padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .reveal .hint{margin:0}
 .itembox{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;background:var(--tint);border:2px dashed var(--acc)}
-.itembox b{font-size:16px}
+.itembox b{font-size:14px}
 .itembox span{font-size:12px;color:var(--muted)}
 .adm-who{display:block;font-family:var(--pixel);font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
 .vol{display:flex;align-items:center;gap:8px;width:100%;max-width:260px;font-family:var(--pixel);font-size:12px;color:var(--muted)}
@@ -246,7 +245,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 /* 수정 */
 .edited{font-family:var(--pixel);font-size:12px;color:var(--muted);align-self:flex-end}
 .out.inline{padding:0;font-size:12px;color:var(--pink-deep)}
-.ghostbtn{background:none!important;color:var(--muted)!important;font-size:16px!important}
+.ghostbtn{background:none!important;color:var(--muted)!important;font-size:12px!important}
 /* 모바일: 페이지 전체는 고정하고, 폰 화면 안쪽만 스크롤 */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-bottom,0px));justify-content:center;touch-action:manipulation}
@@ -255,7 +254,6 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .lcd{height:auto;flex:1;min-height:0}
 .body{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .top,.home-btn{flex:none}
-input,textarea,select{font-size:16px!important}
 @media (max-height:760px){
   .phone{padding:16px 12px 18px;border-radius:42px}
   .top{height:26px;margin-bottom:8px}
@@ -502,7 +500,7 @@ function render() {
           <div class="err" id="err"></div>
           <div class="ctrl-row"><button type="button" class="play ghost" id="ecancel">CANCEL</button><button class="play">SAVE</button></div>
         </form>`
-        : c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="text"><b>${esc(c.title)}</b>\n${linkify(c.body)}</div>${ytCards(c.body)}`}
+        : c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="mtitle">${esc(c.title)}</div><div class="text">${linkify(c.body)}</div>${ytCards(c.body)}`}
       ${c.reply && !S.editReply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}<span class="rtime">${c.replyAt ? fmt(c.replyAt) : ''}</span>${isOwner ? ' · <button class="out inline" id="redit">edit</button>' : ''}</small>${esc(c.reply)}</div>` : ''}
       ${isOwner && (!c.reply || S.editReply) && !S.editMsg ? `<form class="reply-form" id="rf"><input id="rt" maxlength="100" placeholder="답장 쓰기 (100자)" value="${S.editReply ? esc(c.reply) : ''}"><button>${S.editReply ? 'OK' : 'RE'}</button>${S.editReply ? '<button type="button" id="rcancel" class="ghostbtn">×</button>' : ''}</form>${S.editReply ? '<p class="hint">비우고 OK를 누르면 답장이 지워져요.</p>' : ''}` : ''}
       ${sentByMe(m) && m.anon && !S.editMsg ? (S.confirmReveal
@@ -742,7 +740,7 @@ function render() {
       ${c.item ? `<div class="itembox">${pix(c.item, 96)}<b>${esc((ITEMS[c.item] || {}).name || c.title)}</b></div>` : ''}
       <span class="chip ${m.secret ? '' : 'pub'}">${m.bc ? '전체 쪽지' : m.secret ? 'SECRET' : 'PUBLIC'}</span>
       ${m.hasImage ? `<div class="photo">${im && im !== 'loading' ? `<img src="${im}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
-      ${c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="text"><b>${esc(c.title)}</b>\n${linkify(c.body)}</div>${ytCards(c.body)}`}
+      ${c.item ? (c.body ? `<div class="text">${linkify(c.body)}</div>${ytCards(c.body)}` : '') : `<div class="mtitle">${esc(c.title)}</div><div class="text">${linkify(c.body)}</div>${ytCards(c.body)}`}
       ${c.reply ? `<div class="reply"><small>RE. ${esc(S.users[m.to] || '')}<span class="rtime">${c.replyAt ? fmt(c.replyAt) : ''}</span></small>${esc(c.reply)}</div>` : ''}
     </div>`;
     return;
