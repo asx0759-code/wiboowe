@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1630">
+<meta name="build" content="20261110-1650">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -124,6 +124,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .listeners span{font-family:var(--pixel);font-size:12px;background:var(--tint);color:var(--pink-deep);padding:3px 8px}
 
 .homewrap{min-height:100%;display:flex;flex-direction:column}
+.wallset{margin:6px 14px 0;padding:12px;border:1px solid var(--line);font-size:12px}
+.wallset b{display:block;font-size:14px;margin-bottom:10px}
+.wallrow{display:flex;gap:12px;align-items:center}
+.wallrow>div{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.wallrow .out{padding:2px 0}
+.wallprev{width:46px;height:82px;flex:none;border:1px solid var(--line);background:#000 center/cover no-repeat;display:grid;place-items:center;color:#888;font-size:11px}
 .foot{margin-top:auto;padding:28px 14px 12px;text-align:center}
 .out{background:none;border:0;font-family:var(--pixel);font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 10px}
 .lp{position:relative;width:150px;height:150px;flex:none;border-radius:50%;background:repeating-radial-gradient(circle,#1b1a1e 0 2px,#2a292e 2px 4px);box-shadow:0 6px 16px rgba(0,0,0,.3);overflow:hidden;animation:spin 5s linear infinite;animation-play-state:paused}
@@ -151,7 +157,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
 .crop{position:absolute;inset:3px;z-index:20;background:rgba(10,10,12,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
 .crop-title{font-family:var(--pixel);color:#fff;font-size:12px}
-.crop-frame{position:relative;width:240px;height:240px;overflow:hidden;background:#000;touch-action:none;cursor:grab;outline:2px solid #fff}
+.crop-frame{position:relative;width:240px;height:240px;flex:none;overflow:hidden;background:#000;touch-action:none;cursor:grab;outline:2px solid #fff}
 .crop-frame::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 33.3% 0/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 66.6% 0/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 0 33.3%/100% 1px no-repeat,linear-gradient(rgba(255,255,255,.25),rgba(255,255,255,.25)) 0 66.6%/100% 1px no-repeat}
 .crop-img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;user-select:none;-webkit-user-drag:none}
 #cz{width:240px;accent-color:#fff}
@@ -209,6 +215,16 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .mg-btn{padding:9px 24px}
 .mg-legend{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:10px;font-size:12px;color:var(--muted)}
 .mg-legend span{display:flex;align-items:center;gap:5px}
+.rank{padding:0 12px 16px}
+.rk{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line);font-size:12px}
+.rk.me{background:var(--tint)}
+.rk-n{width:22px;text-align:center;font-family:var(--pixel);color:var(--muted);flex:none}
+.rk-n.r1{color:#e0a800}.rk-n.r2{color:#8e9aab}.rk-n.r3{color:#c0703a}
+.rk-n.r1,.rk-n.r2,.rk-n.r3{font-size:14px;font-weight:700}
+.rk .mini{width:26px;height:26px;flex:none}
+.rk-nick{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk b{font-variant-numeric:tabular-nums}
+.rk-gap{text-align:center;color:var(--muted);padding:2px 0}
 .lg{display:inline-block;width:14px;height:14px}
 .lg.n{border-radius:50%;background:#6b6a72;border:2px solid #000}
 .lg.c{width:16px;height:auto}
@@ -228,7 +244,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .st-bat i{flex:1;background:#34c759;border-radius:1.5px}
 .st-bolt{position:absolute;left:50%;top:50%;width:6px;height:9px;transform:translate(-50%,-50%);fill:#fff;stroke:#1a5e2b;stroke-width:.6}
 .lcd.dark .status{background:#000;color:#fff}
-.body.homebg{background:#000}
+.body.homebg{background:#000 center/cover no-repeat}
+.body.homebg.haswall .tile{box-shadow:0 4px 10px rgba(0,0,0,.45)}
 .hs{min-height:100%;display:flex;flex-direction:column;padding:16px 14px 10px}
 .hs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .tile{position:relative;aspect-ratio:1;width:100%;border-radius:22%;border:0;padding:0;cursor:pointer;display:grid;place-items:center;overflow:visible;-webkit-tap-highlight-color:transparent}
@@ -443,7 +460,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'game' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (S.screen === 'game' && screen !== 'game') MOLE.stop(); Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); render() }
+function go(screen, extra = {}) { if (S.screen === 'game' && screen !== 'game') MOLE.stop(); Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); render() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -464,6 +481,7 @@ async function loadMe(u) {
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
   S.isAdmin = false; getDoc(doc(db, 'admins', u.uid)).then(d => { S.isAdmin = d.exists(); refresh() }).catch(() => { });
   subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; S.crops = {}; q.forEach(d => { const u = d.data(); S.users[d.id] = u.nick; if (u.photo) S.photos[d.id] = u.photo; if (u.crop) S.crops[d.id] = u.crop }); refresh() });
+  subs.wall = onSnapshot(doc(db, 'walls', u.uid), d => { S.wall = d.exists() ? d.data().img : null; if (S.screen === 'home') applyWall() }, () => { });
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => {
     S.mine = list(q); loadPriv(S.mine);
     // 새로 온 아이템이 있으면 알려 줌 (처음 불러올 때는 제외)
@@ -479,7 +497,7 @@ async function loadMe(u) {
   measureClock(false);
 }
 let mineSeen = null;
-function cleanup() { mineSeen = null; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {} }
+function cleanup() { mineSeen = null; G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 // 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
 const anonChk = {}, privSub = {};
@@ -523,7 +541,7 @@ function content(m) { // 화면에 보여 줄 제목·내용·답장
 function render() {
   const v = $('#view'), h = $('#head');
   $('#nav').hidden = true;
-  h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); $('.lcd').classList.toggle('dark', S.screen === 'home');
+  h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); applyWall(); $('.lcd').classList.toggle('dark', S.screen === 'home');
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (b.dataset.go === 'board' && (S.screen === 'post' || S.screen === 'board-write')) || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
   const back = html => { h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html; $('#back').onclick = () => go('home') };
 
@@ -592,10 +610,15 @@ function render() {
     v.innerHTML = `<div class="homewrap">
       <div class="me"><button class="av avbtn" id="avbtn" aria-label="프로필 사진 바꾸기">${avatar(S.me.uid)}<span class="cam-badge">+</span></button><div><b>${esc(S.me.nick)}</b><span>MY INBOX · ${S.mine.length} MSG · ${S.mine.filter(m => !m.read).length} NEW</span>${S.photos[S.me.uid] ? '<button class="out" id="rmph" style="padding:4px 0">사진 지우기</button>' : '<span>사진을 누르면 프로필 사진을 바꿀 수 있어요</span>'}</div></div>
       <input type="file" id="phfile" accept="image/*" hidden>
+      <div class="wallset"><b>홈 배경 화면</b><div class="wallrow"><span class="wallprev" style="${S.wall ? `background-image:url('${S.wall}')` : ''}">${S.wall ? '' : '기본'}</span><div><button class="out" id="wallbtn">배경 사진 고르기</button>${S.wall ? '<button class="out" id="wallrm">기본 배경으로</button>' : ''}</div></div></div>
+      <input type="file" id="wallfile" accept="image/*" hidden>
       <div class="foot">${S.isAdmin ? '<button class="out" id="adm">admin</button>' : ''}<button class="out" id="out">log out</button></div></div>`;
     $('#out').onclick = () => signOut(auth);
     if ($('#adm')) $('#adm').onclick = () => { go('admin', { admUser: null }); loadAdmin() };
     $('#avbtn').onclick = () => $('#phfile').click();
+    $('#wallbtn').onclick = () => $('#wallfile').click();
+    $('#wallfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setWall(f) };
+    if ($('#wallrm')) $('#wallrm').onclick = async () => { try { await deleteDoc(doc(db, 'walls', S.me.uid)); toast('기본 배경으로 바꿨어요') } catch (e) { toast('바꾸지 못했어요 (' + (e.code || '') + ')') } };
     $('#phfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(f) };
     if ($('#rmph')) $('#rmph').onclick = async () => { try { await updateDoc(doc(db, 'users', S.me.uid), { photo: deleteField(), crop: deleteField() }); toast('사진을 지웠어요') } catch { toast('지우지 못했어요') } };
     return;
@@ -895,7 +918,8 @@ function render() {
     back('Mini Game');
     $('#back').onclick = () => go('home');
     const ids = Object.keys(S.users);
-    MOLE.mount(v, { pick: () => ids[Math.random() * ids.length | 0], face: u => u ? avatar(u) : '?' });
+    MOLE.mount(v, { pick: () => ids[Math.random() * ids.length | 0], face: u => u ? avatar(u) : '?', best: () => G.scores[S.me.uid] || 0, onEnd: saveScore });
+    drawRank();
     return;
   }
 
@@ -1261,7 +1285,7 @@ const MOLE = (() => {
   const KIND = { n: { pts: 1, label: '+1 뿅!' }, c: { pts: 3, label: '+3 왕관!' }, t: { pts: -2, label: '−2 엉엉' } };
   let st = { score: 0, left: 30, tick: null, pop: null, playing: false }, hammer = null, opt = null;
   const $q = s => document.querySelector(s);
-  function bestGet() { try { return +localStorage.getItem('wb_mole') || 0 } catch { return 0 } }
+  function bestGet() { let l = 0; try { l = +localStorage.getItem('wb_mole') || 0 } catch { } return Math.max(l, opt?.best?.() || 0) }
   function bestSet(v) { try { if (v > bestGet()) localStorage.setItem('wb_mole', v) } catch { } }
   function markup() {
     return `<div class="mg-bar"><span>SCORE <b id="mo-s">0</b></span><span>TIME <b id="mo-t">30</b></span><span>BEST <b id="mo-b">${bestGet()}</b></span></div>
@@ -1269,11 +1293,12 @@ const MOLE = (() => {
         <div class="holes" id="holes">${Array.from({ length: 9 }, (_, i) => `<button class="hole" aria-label="구멍 ${i + 1}"><span class="mole"><span class="mface"></span><span class="crown">${CROWN}</span><span class="tear l">${TEAR}</span><span class="tear r">${TEAR}</span></span></button>`).join('')}</div>
         <div class="mg-over" id="mo-o"><big>뿅망치 두더지</big><span>30초 동안 튀어나온 친구를 때려요</span><button class="btn mg-btn" id="mo-go">START</button></div>
       </div>
-      <div class="mg-legend">
+      <div class="mg-legend" id="mo-legend">
         <span><i class="lg n"></i>친구 +1</span>
         <span><i class="lg c">${CROWN}</i>왕관 +3</span>
         <span><i class="lg t">${TEAR}</i>우는 친구 −2</span>
-      </div>`;
+      </div>
+      <div class="sect">RANKING</div><div class="rank" id="mo-rank"><div class="empty">불러오는 중…</div></div>`;
   }
   function show() {
     const H = [...document.querySelectorAll('#holes .hole')], free = H.filter(h => !h.classList.contains('up'));
@@ -1301,7 +1326,7 @@ const MOLE = (() => {
     st.tick = setInterval(() => { st.left--; $q('#mo-t') && ($q('#mo-t').textContent = st.left); if (st.left <= 0) end() }, 1000);
   }
   function end() {
-    stop(true); bestSet(st.score);
+    stop(true); bestSet(st.score); opt?.onEnd?.(st.score);
     const o = $q('#mo-o'); if (!o) return;
     $q('#mo-b').textContent = bestGet();
     o.innerHTML = `<big>TIME UP</big><span>${st.score}점</span><button class="btn mg-btn" id="mo-go">AGAIN</button>`; o.hidden = false; $q('#mo-go').onclick = start;
@@ -1320,8 +1345,39 @@ const MOLE = (() => {
     holes.addEventListener('pointerleave', () => hammer.hidden = true);
     $q('#mo-go').onclick = start;
   }
-  return { mount, stop: () => stop(false), playing: () => st.playing };
+  return { mount, stop: () => stop(false), playing: () => st.playing, setBest: () => { const b = $q('#mo-b'); if (b) b.textContent = bestGet() } };
 })();
+
+/* ===== 두더지 순위 ===== */
+// scores/{uid} = { best, at } — 각자 최고 점수 하나만 저장, 게임 화면에 있을 때만 불러옴
+const G = { scores: {}, loaded: false };
+function watchScores() {
+  const on = S.me && S.screen === 'game';
+  if (on && !subs.scores) subs.scores = onSnapshot(collection(db, 'scores'), q => {
+    G.scores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.scores[d.id] = b }); G.loaded = true;
+    if (!G.synced) { G.synced = true; let l = 0; try { l = +localStorage.getItem('wb_mole') || 0 } catch { } if (l > (G.scores[S.me.uid] || 0) && l <= 300) saveScore(l) } // 예전에 이 기기에서 세운 기록도 순위에 올림
+    if (S.screen === 'game') { drawRank(); MOLE.setBest() }
+  }, () => { G.loaded = true; if (S.screen === 'game') drawRank() });
+  if (!on && subs.scores) unsub('scores');
+}
+function drawRank() {
+  const el = $('#mo-rank'); if (!el) return;
+  if (!G.loaded) return;
+  const me = S.me.uid, arr = Object.entries(G.scores).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
+  if (!arr.length) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
+  let rank = 0, prev = null;
+  const rows = arr.map(([u, b], i) => { if (b !== prev) { rank = i + 1; prev = b } return { u, b, rank } });
+  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}점</b></div>`;
+  const top = rows.slice(0, 10), mine = rows.find(r => r.u === me);
+  el.innerHTML = top.map(line).join('') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
+}
+async function saveScore(score) {
+  const me = S.me?.uid; if (!me || score <= 0 || score <= (G.scores[me] || 0)) return;
+  const was = G.scores[me] || 0;
+  G.scores[me] = score; drawRank(); MOLE.setBest();
+  try { await setDoc(doc(db, 'scores', me), { best: score, at: serverTimestamp() }); toast(was ? `최고 기록 갱신! ${score}점` : `순위에 올랐어요! ${score}점`) }
+  catch (e) { if (was) G.scores[me] = was; else delete G.scores[me]; drawRank(); toast('기록을 저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+}
 
 /* ===== 익명 게시판 ===== */
 // 글쓴이와 댓글 단 사람의 진짜 정체는 관리자(와 본인)만 읽을 수 있는 곳에 따로 저장
@@ -1450,24 +1506,24 @@ async function shrink(file) { // 방명록 첨부 사진: 긴 쪽 900px 이하�
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src);
   return jpeg(c, 450000);
 }
-function cropper(img) { // 끌어서 위치, 막대로 크기 맞추기
+function cropper(img, o = {}) { // 끌어서 위치, 막대로 크기 맞추기 (o.fw/o.fh: 틀 크기, 기본 정사각형)
   return new Promise(resolve => {
-    const F = 240, box = document.createElement('div'); box.className = 'crop';
-    box.innerHTML = `<div class="crop-title">프로필 사진 맞추기</div><div class="crop-frame" id="cf"></div>
+    const F = o.fw || 240, FH = o.fh || F, box = document.createElement('div'); box.className = 'crop';
+    box.innerHTML = `<div class="crop-title">${o.title || '프로필 사진 맞추기'}</div><div class="crop-frame" id="cf"></div>
       <input type="range" id="cz" min="1" max="4" step="0.01" value="1" aria-label="확대">
       <div class="crop-btns"><button type="button" id="cx">취소</button><button type="button" id="ck">완료</button></div>
       <p class="crop-hint">사진을 끌어서 위치를, 막대로 크기를 맞춰요</p>`;
     $('.lcdwrap').appendChild(box);
-    const frame = box.querySelector('#cf'); img.className = 'crop-img'; img.draggable = false; frame.appendChild(img);
-    const base = F / Math.min(img.naturalWidth, img.naturalHeight);
-    let z = 1, x = (F - img.naturalWidth * base) / 2, y = (F - img.naturalHeight * base) / 2;
+    const frame = box.querySelector('#cf'); frame.style.width = F + 'px'; frame.style.height = FH + 'px'; img.className = 'crop-img'; img.draggable = false; frame.appendChild(img);
+    const base = Math.max(F / img.naturalWidth, FH / img.naturalHeight);
+    let z = 1, x = (F - img.naturalWidth * base) / 2, y = (FH - img.naturalHeight * base) / 2;
     const apply = () => {
       const w = img.naturalWidth * base * z, h = img.naturalHeight * base * z;
-      x = Math.min(0, Math.max(F - w, x)); y = Math.min(0, Math.max(F - h, y));
+      x = Math.min(0, Math.max(F - w, x)); y = Math.min(0, Math.max(FH - h, y));
       img.style.transform = `translate(${x}px,${y}px) scale(${base * z})`;
     };
     apply();
-    box.querySelector('#cz').oninput = e => { const nz = +e.target.value, c = F / 2; x = c - (c - x) * nz / z; y = c - (c - y) * nz / z; z = nz; apply() };
+    box.querySelector('#cz').oninput = e => { const nz = +e.target.value, cx = F / 2, cy = FH / 2; x = cx - (cx - x) * nz / z; y = cy - (cy - y) * nz / z; z = nz; apply() };
     let drag = null;
     frame.onpointerdown = e => { drag = { px: e.clientX, py: e.clientY, x, y }; frame.setPointerCapture(e.pointerId) };
     frame.onpointermove = e => { if (!drag) return; x = drag.x + e.clientX - drag.px; y = drag.y + e.clientY - drag.py; apply() };
@@ -1475,12 +1531,31 @@ function cropper(img) { // 끌어서 위치, 막대로 크기 맞추기
     const close = v => { box.remove(); resolve(v) };
     box.querySelector('#cx').onclick = () => close(null);
     box.querySelector('#ck').onclick = () => {
-      const s = base * z, c = document.createElement('canvas'); c.width = c.height = 200;
+      const s = base * z, c = document.createElement('canvas');
+      if (o.ow) { c.width = o.ow; c.height = Math.round(o.ow * FH / F); c.getContext('2d').drawImage(img, -x / s, -y / s, F / s, FH / s, 0, 0, c.width, c.height); close({ url: jpeg(c, o.limit || 300000) }); return }
+      c.width = c.height = 200;
       c.getContext('2d').drawImage(img, -x / s, -y / s, F / s, F / s, 0, 0, 200, 200);
       const w = img.naturalWidth * s, h = img.naturalHeight * s; // 움직이는 사진용: 잘라 낼 위치를 비율로 기억
       close({ url: jpeg(c, 60000), crop: { l: +(x / F * 100).toFixed(2), t: +(y / F * 100).toFixed(2), w: +(w / F * 100).toFixed(2), h: +(h / F * 100).toFixed(2) } });
     };
   });
+}
+function applyWall() {
+  const v = $('#view'), on = S.screen === 'home' && !!S.wall;
+  v.classList.toggle('haswall', on);
+  v.style.backgroundImage = on ? `url('${S.wall}')` : '';
+}
+async function setWall(file) {
+  try {
+    const img = await loadImg(file), vw = $('#view');
+    const ratio = (vw.clientHeight || 560) / (vw.clientWidth || 320);
+    const fh = Math.min(330, Math.round(window.innerHeight * 0.55)), fw = Math.round(fh / ratio);
+    const res = await cropper(img, { title: '홈 배경 맞추기', fw, fh, ow: 720, limit: 300000 });
+    URL.revokeObjectURL(img.src);
+    if (!res) return;
+    await setDoc(doc(db, 'walls', S.me.uid), { img: res.url });
+    toast('홈 배경을 바꿨어요');
+  } catch (e) { toast('배경을 바꾸지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
 }
 async function setPhoto(file) {
   try {
