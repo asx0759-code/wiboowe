@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1250">
+<meta name="build" content="20261110-1252">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -181,6 +181,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
+.ttl.wrap{white-space:normal;overflow:visible;text-overflow:clip;word-break:keep-all;overflow-wrap:anywhere;line-height:1.4}
 .ccnt{margin-left:6px;color:var(--pink-deep);font-family:var(--pixel);font-size:12px}
 .who-anon{font-size:12px;color:var(--muted)}
 .realname{color:var(--pink-deep)}
@@ -658,7 +659,7 @@ function render() {
     } else if (tab === 'board') { // 게시판 관리
       const AB = S.admB || {};
       body = AB.loading ? '<div class="empty">불러오는 중…</div>' : AB.err ? `<div class="empty">${esc(AB.err)}</div>`
-        : (AB.posts || []).length ? AB.posts.map((x, i) => `<div class="row arow"><button class="abtn" data-ap="${x.id}"><span class="num">${i + 1}</span><span class="ttl">${esc(x.title)}${x.cc ? `<span class="ccnt">[${x.cc}]</span>` : ''}<small class="adm-who">${AB.author[x.id] ? nm(AB.author[x.id]) : '익명'} · ${fmt(x.at)}</small></span></button><button class="out" data-apdel="${x.id}">${S.admDel === x.id ? '정말 삭제' : '삭제'}</button></div>`).join('')
+        : (AB.posts || []).length ? AB.posts.map((x, i) => `<div class="row arow"><button class="abtn" data-ap="${x.id}"><span class="num">${i + 1}</span><span class="ttl wrap">${esc(x.title)}${x.cc ? `<span class="ccnt">[${x.cc}]</span>` : ''}<small class="adm-who">${AB.author[x.id] ? nm(AB.author[x.id]) : '익명'} · ${fmt(x.at)}</small></span></button><button class="out" data-apdel="${x.id}">${S.admDel === x.id ? '정말 삭제' : '삭제'}</button></div>`).join('')
         : '<div class="empty">게시판에 글이 없어요</div>';
     } else body = rows(listAll);
     v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button><button id="at-board" class="${tab === 'board' ? 'on' : ''}">게시판</button></div>`)
@@ -745,7 +746,7 @@ function render() {
     h.textContent = 'Board';
     v.innerHTML = `<div class="form" style="padding-bottom:4px"><button class="btn" id="bwrite">익명으로 글쓰기</button></div>
       <div class="sect">ANONYMOUS BOARD · ${B.posts.length}</div>`
-      + (B.posts.length ? B.posts.map((p, i) => `<button class="row" data-p="${p.id}"><span class="num">${i + 1}</span><span class="ttl">${esc(p.title)}${p.cc ? `<span class="ccnt">[${p.cc}]</span>` : ''}<small class="adm-who">익명 · ${fmt(p.at)}</small></span></button>`).join('')
+      + (B.posts.length ? B.posts.map((p, i) => `<button class="row" data-p="${p.id}"><span class="num">${i + 1}</span><span class="ttl wrap">${esc(p.title)}${p.cc ? `<span class="ccnt">[${p.cc}]</span>` : ''}<small class="adm-who">익명 · ${fmt(p.at)}</small></span></button>`).join('')
         : '<div class="empty">아직 글이 없어요.<br>첫 글을 남겨 보세요!</div>');
     $('#bwrite').onclick = () => go('board-write', { editPost: null });
     v.querySelectorAll('[data-p]').forEach(b => b.onclick = () => go('post', { post: b.dataset.p }));
