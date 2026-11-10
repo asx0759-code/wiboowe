@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1912">
+<meta name="build" content="20261110-1925">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -503,6 +503,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .st-up button{flex:1}
 .zoom{position:absolute;inset:3px;z-index:26;background:rgba(0,0,0,.92);display:grid;place-items:center;cursor:zoom-out}
 .zoom img{max-width:100%;max-height:100%;object-fit:contain}
+.nb{position:absolute;left:8px;right:8px;top:6px;z-index:40;display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:18px;background:rgba(30,30,34,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);transform:translateY(-130%);opacity:0;transition:transform .28s cubic-bezier(.2,.9,.3,1.2),opacity .2s}
+.nb.in{transform:none;opacity:1}
+.nb .mini{width:34px;height:34px;border-radius:50%;border:0;flex:none}
+.nb-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.nb-t b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-t small{font-size:11px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb em{font-style:normal;font-size:10px;color:#888;flex:none;align-self:flex-start}
 @keyframes nwf{from{opacity:0}}
 @keyframes nwu{from{transform:translateY(40%)}}
 
@@ -676,6 +683,21 @@ const nickOk = n => n.length >= 1 && n.length <= 12 && !/[\/\s]/.test(n);
 function nickEmail(n) { // 한글 닉네임도 로그인 주소로 쓸 수 있게 바꿔 줌
   return 'u' + Array.from(new TextEncoder().encode(n.normalize('NFC')), b => b.toString(16).padStart(2, '0')).join('') + '@pinkphone.app';
 }
+// 실시간 알림 배너 (아이폰 알림처럼 위에서 내려옴). 사이트가 뒤에 있으면 폰/PC 알림으로
+function ping({ who, title, body, open }) {
+  document.querySelectorAll('.nb').forEach(x => x.remove());
+  const nb = document.createElement('button'); nb.className = 'nb'; nb.type = 'button';
+  nb.innerHTML = `<span class="mini">${who && S.users[who] ? avatar(who) : '<span class="an-q" style="--h:28">?</span>'}</span><span class="nb-t"><b>${esc(title)}</b>${body ? `<small>${esc(body)}</small>` : ''}</span><em>지금</em>`;
+  $('.lcdwrap').appendChild(nb); requestAnimationFrame(() => requestAnimationFrame(() => nb.classList.add('in')));
+  const kill = () => { nb.classList.remove('in'); setTimeout(() => nb.remove(), 300) }, t = setTimeout(kill, 4500);
+  nb.onclick = () => { clearTimeout(t); kill(); open && open() };
+  try { navigator.vibrate?.(60) } catch { }
+  if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+    const opt = { body: body || '', icon: '/icon/icon-192.png', badge: '/icon/icon-192.png', tag: 'wb-' + Date.now() };
+    (navigator.serviceWorker?.getRegistration() || Promise.resolve(null)).then(r => { if (r) r.showNotification(title, opt); else { const n = new Notification(title, opt); n.onclick = () => { window.focus(); open && open(); n.close() } } }).catch(() => { });
+  }
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => { });
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, t.length > 25 ? 4000 : 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
@@ -708,24 +730,29 @@ async function loadMe(u) {
     S.mine = list(q); loadPriv(S.mine);
     // 새로 온 아이템이 있으면 알려 줌 (처음 불러올 때는 제외)
     const ids = new Set(S.mine.map(m => m.id));
-    if (mineSeen && S.mine.some(m => !mineSeen.has(m.id) && m.kind === 'item' && !m.read)) toast('아이템이 도착했어요!');
-    if (mineSeen && S.mine.some(m => !mineSeen.has(m.id) && m.bc && !m.read)) toast('전체 쪽지가 도착했어요!');
+    if (mineSeen) { // 새 방명록 · 아이템 · 전체 쪽지 알림
+      const nw = S.mine.filter(m => !mineSeen.has(m.id) && !m.read && m.from !== u.uid);
+      if (nw.length === 1) {
+        const m = nw[0], name = m.anon ? '익명의 누군가' : (S.users[m.from] || '누군가'), item = m.kind === 'item';
+        ping({ who: m.anon ? null : m.from, title: m.bc ? `${name}님의 전체 쪽지 📢` : item ? `${name}님이 아이템을 보냈어요 🎁` : `${name}님이 방명록을 남겼어요 ✉️`, body: m.secret ? '🔒 비밀 메시지' : item ? '눌러서 열어 보세요' : (m.title || ''), open: () => go('inbox', { owner: u.uid }) });
+      } else if (nw.length > 1) ping({ who: null, title: `새 방명록 ${nw.length}개가 도착했어요 ✉️`, open: () => go('inbox', { owner: u.uid }) });
+    }
     mineSeen = ids; refresh();
   });
   (function subTaps() { subs.taps = onSnapshot(query(collection(db, 'taps'), where('to', '==', u.uid)), q => {
     const first = !P.tapsLoaded; P.taps = []; q.forEach(d => P.taps.push(d.data()));
-    if (!first) q.docChanges().forEach(c => { if (c.type !== 'removed') { const t = c.doc.data(); toast(`${S.users[t.from] || '누군가'}님이 콕 찔렀어요! 👉`) } });
+    if (!first) q.docChanges().forEach(c => { if (c.type !== 'removed') { const t = c.doc.data(); ping({ who: t.from, title: `${S.users[t.from] || '누군가'}님이 콕 찔렀어요! 👉`, open: () => go('now') }) } });
     P.tapsLoaded = true; if (S.screen === 'home' || S.screen === 'now') refresh();
   }, retrySub('taps', subTaps)) })();
   (function subNotif() { subs.notif = onSnapshot(query(collection(db, 'notifs'), where('to', '==', u.uid)), q => {
     const first = !F.nLoaded; F.notifs = []; q.forEach(d => F.notifs.push({ id: d.id, ...d.data() }));
-    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const n = c.doc.data(), who = S.users[n.from] || '누군가'; toast(n.kind === 'like' ? `${who}님이 글을 좋아해요 ♥` : n.kind === 'cmt' ? `${who}님이 댓글을 남겼어요` : n.kind === 'mention' ? `${who}님이 회원님을 언급했어요` : n.kind === 'quote' ? `${who}님이 글을 인용했어요` : `${who}님이 스토리에 반응했어요`) } });
+    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const n = c.doc.data(), who = S.users[n.from] || '누군가'; ping({ who: n.from, body: n.text || '', open: () => n.tw ? go('tweet', { tw: n.tw }) : go('feed', { ftab: 'noti' }), title: n.kind === 'like' ? `${who}님이 글을 좋아해요 ♥` : n.kind === 'cmt' ? `${who}님이 댓글을 남겼어요` : n.kind === 'mention' ? `${who}님이 회원님을 언급했어요` : n.kind === 'quote' ? `${who}님이 글을 인용했어요` : `${who}님이 스토리에 반응했어요` }) } });
     F.nLoaded = true; if (S.screen === 'home' || (S.screen === 'feed' && S.ftab === 'noti')) refresh();
   }, retrySub('notif', subNotif)) })();
   anSubs(u.uid);
   (function subDmIn() { subs.dmIn = onSnapshot(query(collection(db, 'dms'), where('to', '==', u.uid)), q => {
     const first = !P.dmLoaded; P.dmIn = []; q.forEach(d => P.dmIn.push({ id: d.id, ...d.data() }));
-    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (!(S.screen === 'now-chat' && S.chatWith === m.from)) toast(`${S.users[m.from] || '누군가'}님에게 쪽지가 왔어요 💬`) } });
+    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (!(S.screen === 'now-chat' && S.chatWith === m.from && !document.hidden)) ping({ who: m.from, title: `${S.users[m.from] || '누군가'}님에게 쪽지가 왔어요 💬`, body: m.text, open: () => go('now-chat', { chatWith: m.from, chatAnon: false, athread: null }) }) } });
     P.dmLoaded = true; if (S.screen.startsWith('now')) render(); else if (S.screen === 'home') refresh();
   }, retrySub('dmIn', subDmIn)) })();
   subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
@@ -852,11 +879,13 @@ function render() {
       <input type="file" id="phfile" accept="image/*" hidden>
       <div class="wallset"><b>홈 배경 화면</b><div class="wallrow"><span class="wallprev" style="${S.wall ? `background-image:url('${S.wall}')` : ''}">${S.wall ? '' : '기본'}</span><div><button class="out" id="wallbtn">배경 사진 고르기</button>${S.wall ? '<button class="out" id="wallrm">기본 배경으로</button>' : ''}</div></div></div>
       <input type="file" id="wallfile" accept="image/*" hidden>
+      <div class="wallset"><b>알림</b><div class="wallrow" style="justify-content:space-between"><span style="color:var(--muted)">${!('Notification' in window) ? '이 브라우저는 폰 알림을 지원하지 않아요 (사이트 안 알림은 떠요)' : Notification.permission === 'granted' ? '🔔 폰 알림 켜짐 · 사이트가 뒤에 있어도 알려 줘요' : Notification.permission === 'denied' ? '알림이 차단돼 있어요. 브라우저 설정에서 허용해 주세요' : '사이트가 뒤에 있을 때도 폰 알림 받기'}</span>${'Notification' in window && Notification.permission === 'default' ? '<button class="out" id="notibtn">알림 켜기</button>' : ''}</div></div>
       <div class="foot">${S.isAdmin ? '<button class="out" id="adm">admin</button>' : ''}<button class="out" id="out">log out</button></div></div>`;
     $('#out').onclick = () => signOut(auth);
     if ($('#adm')) $('#adm').onclick = () => { go('admin', { admUser: null }); loadAdmin() };
     $('#avbtn').onclick = () => $('#phfile').click();
     $('#wallbtn').onclick = () => $('#wallfile').click();
+    if ($('#notibtn')) $('#notibtn').onclick = async () => { try { const r = await Notification.requestPermission(); toast(r === 'granted' ? '알림을 켰어요' : '알림이 허용되지 않았어요') } catch { toast('알림을 켜지 못했어요') } render() };
     $('#wallfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setWall(f) };
     if ($('#wallrm')) $('#wallrm').onclick = async () => { try { await deleteDoc(doc(db, 'walls', S.me.uid)); toast('기본 배경으로 바꿨어요') } catch (e) { toast('바꾸지 못했어요 (' + (e.code || '') + ')') } };
     $('#phfile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(f) };
@@ -2037,10 +2066,10 @@ function anSubs(u) {
     const first = !AN.loaded, old = AN.toMe; AN.toMe = {}; q.forEach(d => AN.toMe[d.id] = d.data());
     if (!first) Object.entries(AN.toMe).forEach(([id, t]) => {
       const o = old[id];
-      if (!o) toast('익명의 누군가에게 쪽지가 왔어요 🤫');
+      if (!o) ping({ who: null, title: '익명의 누군가에게 쪽지가 왔어요 🤫', body: t.last, open: () => go('now-achat', { athread: id }) });
       else if (t.rev && !o.rev) toast(`익명의 누군가는 ${S.users[t.rev] || '?'}님이었어요! 🎉`);
       else if (t.hint && t.hint !== o.hint) toast('익명 대화에 힌트가 도착했어요 💡');
-      else if (t.ls === 'a' && ms(t.at) > ms(o.at) && !(S.screen === 'now-achat' && S.athread === id)) toast('익명 쪽지가 왔어요 🤫');
+      else if (t.ls === 'a' && ms(t.at) > ms(o.at) && !(S.screen === 'now-achat' && S.athread === id && !document.hidden)) ping({ who: t.rev || null, title: t.rev ? `${S.users[t.rev] || ''}님의 쪽지 💬` : '익명 쪽지가 왔어요 🤫', body: t.last, open: () => go('now-achat', { athread: id }) });
     });
     AN.loaded = true; anRefresh();
   }, retrySub('anTo', subAnTo)) })();
@@ -2053,7 +2082,7 @@ function anSubs(u) {
         if (!s.exists()) { delete AN.mine[d.id]; anRefresh(); return }
         const o = AN.mine[d.id], t = s.data(); AN.mine[d.id] = t;
         const here = S.screen === 'now-chat' && S.athread === d.id;
-        if (o && t.ls === 'b' && ms(t.at) > ms(o.at) && !here) toast(`익명 대화에 ${S.users[t.to] || ''}님이 답장했어요 💬`);
+        if (o && t.ls === 'b' && ms(t.at) > ms(o.at) && !(here && !document.hidden)) ping({ who: t.to, title: `익명 대화에 ${S.users[t.to] || ''}님이 답장했어요 💬`, body: t.last, open: () => go('now-chat', { chatWith: t.to, chatAnon: true, athread: d.id }) });
         if (o && t.hintOn && !o.hintOn) toast(`${S.users[t.to] || ''}님이 힌트를 원해요! 💡`);
         if (o && t.blocked && !o.blocked) toast(`${S.users[t.to] || ''}님이 익명 대화를 막았어요`);
         anRefresh();
