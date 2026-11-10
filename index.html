@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1510">
+<meta name="build" content="20261110-1615">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -216,6 +216,77 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .mg-hammer{position:fixed;width:44px;height:44px;pointer-events:none;z-index:50;transform:translate(-30%,-80%) rotate(-25deg);transform-origin:50% 90%;transition:transform .06s}
 .mg-hammer.swing{transform:translate(-30%,-80%) rotate(25deg)}
 @media (prefers-reduced-motion:reduce){.mole,.mg-hammer{transition:none}}
+/* 홈 화면 (검은 배경 + 위젯 + 사진 아이콘) */
+.status{display:flex;align-items:center;justify-content:space-between;padding:5px 12px 4px 16px;background:#fff;color:#000;border-bottom:0;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+.st-time{display:flex;align-items:center;gap:3px;font-size:13px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.st-loc{width:9px;height:9px;fill:currentColor}
+.st-right{display:flex;align-items:center;gap:5px}
+.st-sig{width:16px;height:10px;fill:currentColor}
+.st-wifi{width:14px;height:10px;fill:currentColor}
+.st-bat{position:relative;width:24px;height:11px;border:1px solid rgba(127,127,127,.6);border-radius:3px;padding:1px;display:flex}
+.st-bat::after{content:"";position:absolute;right:-3px;top:3px;width:1.5px;height:4px;border-radius:0 1px 1px 0;background:rgba(127,127,127,.7)}
+.st-bat i{flex:1;background:#34c759;border-radius:1.5px}
+.st-bolt{position:absolute;left:50%;top:50%;width:6px;height:9px;transform:translate(-50%,-50%);fill:#fff;stroke:#1a5e2b;stroke-width:.6}
+.lcd.dark .status{background:#000;color:#fff}
+.body.homebg{background:#000}
+.hs{min-height:100%;display:flex;flex-direction:column;padding:16px 14px 10px}
+.hs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{position:relative;aspect-ratio:1;width:100%;border-radius:22%;border:0;padding:0;cursor:pointer;display:grid;place-items:center;overflow:visible;-webkit-tap-highlight-color:transparent}
+.tile:active{transform:scale(.94);filter:brightness(.9)}
+.tile.photo .appav{width:100%;height:100%;border-radius:22%;overflow:hidden;position:relative;display:grid;place-items:center;background:#e9e8ec;font-family:var(--pixel);font-size:22px;color:var(--ink)}
+.tile.photo .appav img{width:100%;height:100%;object-fit:cover;max-width:none}
+.tile.light{background:linear-gradient(160deg,#fff,#e6e5ec)}
+.w-cal{grid-column:1/3;grid-row:1/3;border-radius:16%/16%;background:linear-gradient(160deg,#2c2b31,#141417);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);color:#fff;padding:12px 10px 8px;display:flex;flex-direction:column;gap:6px;aspect-ratio:1}
+.w-cal b{font-family:var(--pixel);font-size:12px;font-weight:400;letter-spacing:.04em;padding-left:2px}
+.calg{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px;text-align:center;font-family:var(--pixel);font-size:10px;line-height:15px;font-variant-numeric:tabular-nums}
+.calg i{font-style:normal;color:#c9c8cf}
+.calg .we{color:#7d7c84}
+.calg .today{background:#fff;color:#000;border-radius:3px}
+.calg .got{text-decoration:underline;text-underline-offset:2px}
+.w-clock{background:none;cursor:default}
+.w-clock:active{transform:none;filter:none}
+.w-clock svg{width:100%;height:100%;border-radius:22%;background:#fff;font-family:Helvetica,Arial,sans-serif}
+.folder{background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);padding:14%;place-items:start}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8%;width:100%}
+.fi{aspect-ratio:1;border-radius:24%;overflow:hidden;position:relative;background:#e9e8ec;display:grid;place-items:center;font-family:var(--pixel);font-size:8px;color:var(--ink)}
+.fi img{width:100%;height:100%;object-fit:cover;max-width:none}
+.fi svg{width:80%;height:80%}
+.folder .fi:has(svg){background:#55545c}
+.badge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#ff3b30;color:#fff;font-family:var(--pixel);font-size:12px;line-height:20px;text-align:center;z-index:2}
+.hs-dock{margin-top:auto;display:flex;justify-content:space-around;gap:14px;padding:12px;border-radius:26px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.dk svg{width:58%;height:58%}
+.hs-dock .tile{width:calc((100% - 30px) / 4);flex:none}
+
+.wt{background:#fff;color:#111}
+/* 말랑한 3D 아이콘 */
+.p3{color:#fff;background:linear-gradient(165deg,var(--l),var(--b) 70%);box-shadow:inset 0 3px 2px rgba(255,255,255,.55),inset 0 -6px 9px rgba(0,0,0,.22),0 6px 10px rgba(0,0,0,.45)}
+.p3 .vi{width:56%;height:56%;--d:var(--b);filter:drop-shadow(0 3px 2px rgba(0,0,0,.28)) drop-shadow(0 -1px 0 rgba(255,255,255,.5))}
+.p3f{box-shadow:inset 0 3px 2px rgba(255,255,255,.55),inset 0 -6px 9px rgba(0,0,0,.2),0 6px 10px rgba(0,0,0,.45);border-radius:22%}
+.tile.photo.p3f .appav{box-shadow:inset 0 0 0 3px rgba(255,255,255,.9)}
+.w-clock.p3f svg{box-shadow:inset 0 0 0 3px #fff}
+.c-game{--l:#b48cff;--b:#6c3ef0}
+.c-friends{--l:#ffffff;--b:#dcdbe3;color:#8b93a7}
+.c-friends .vi{filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
+.c-admin{--l:#5a6b8f;--b:#263252}
+.c-inbox{--l:#6fd0ff;--b:#1f7ef0}
+.c-board{--l:#ffffff;--b:#dcdbe3}
+.c-board .vi{width:74%;height:74%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
+.c-music{--l:#ff7d95;--b:#ec1f4b}
+.wt .vi{width:52%;height:52%}
+.compose .vi,.wbtn .vi{width:16px;height:16px;color:#fff}
+.compose .vi path+path,.wbtn .vi path+path{stroke:var(--pink)}
+.ic-game{background:linear-gradient(160deg,#7c5cff,#3b1fa8)}
+.ic-game svg,.ic-friends svg,.ic-admin svg{width:58%;height:58%}
+.ic-friends{background:linear-gradient(160deg,#ffcf9a,#f0883e)}
+.ic-admin{background:linear-gradient(160deg,#8e8d95,#4a4950)}
+.dk-mail{background:linear-gradient(160deg,#fff,#e9eef7)}.dk-mail rect{fill:#2f7cf6}
+.dk-board{background:linear-gradient(160deg,#fff,#eef7ee)}.dk-board rect{fill:#22a447}
+.dk-music{background:linear-gradient(160deg,#fff,#ece9f2)}.dk-music rect{fill:#e0244a}
+.compose{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px}
+.compose svg{width:16px;height:16px}
+.frow{padding:0 10px 0 0;cursor:default}
+.wbtn{flex:none;width:34px;height:34px;display:grid;place-items:center;background:var(--pink);border:0;cursor:pointer;box-shadow:0 2px 0 #000}
+.wbtn svg{width:16px;height:16px}
 #yt-box{position:fixed;left:-1000px;top:0;width:240px;height:200px;overflow:hidden;pointer-events:none}
 #yt-box.show{position:absolute;left:22px;right:22px;top:auto;bottom:62px;width:auto;height:200px;opacity:1;pointer-events:auto;z-index:5;border:3px solid #000;background:#000}
 .btn:disabled{opacity:.6}
@@ -302,11 +373,12 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
   <div class="lcdwrap">
     <div class="lcd">
       <div class="status">
-        <div class="icons">
-          <svg width="22" height="14" viewBox="0 0 22 14"><path d="M1 1h8L5 6z" fill="#2a6fd8"/><rect x="4.5" y="6" width="1.5" height="8" fill="#2a6fd8"/><rect x="9" y="9" width="2" height="5" fill="#2a6fd8"/><rect x="12" y="7" width="2" height="7" fill="#2a6fd8"/><rect x="15" y="4" width="2" height="10" fill="#9ab8e8"/><rect x="18" y="1" width="2" height="13" fill="#9ab8e8"/></svg>
-          <svg width="16" height="14" viewBox="0 0 16 14"><rect x="0.5" y="0.5" width="15" height="13" rx="2" fill="#2a6fd8"/><path d="M5 4l5 5-2.5 2.5V2.5L10 5l-5 5" stroke="#fff" stroke-width="1.3" fill="none"/></svg>
-        </div>
-        <div class="icons"><span id="clock">20:00</span><span class="bat"><i></i></span></div>
+        <span class="st-time"><span id="clock">20:00</span><svg class="st-loc" viewBox="0 0 10 10" aria-hidden="true"><path d="M9.5.5 .8 4.3l3.9.9.9 3.9z"/></svg></span>
+        <span class="st-right" aria-hidden="true">
+          <svg class="st-sig" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx=".7"/><rect x="4.6" y="5" width="3" height="6" rx=".7"/><rect x="9.2" y="2.6" width="3" height="8.4" rx=".7"/><rect x="13.8" y="0" width="3" height="11" rx=".7"/></svg>
+          <svg class="st-wifi" viewBox="0 0 15 11"><path d="M7.5 2.2c2.2 0 4.2.8 5.7 2.2l1.2-1.3A10 10 0 0 0 7.5.4 10 10 0 0 0 .6 3.1l1.2 1.3a8.3 8.3 0 0 1 5.7-2.2zm0 3.1c1.3 0 2.5.5 3.5 1.3l1.2-1.3A6.8 6.8 0 0 0 7.5 3.5c-1.8 0-3.4.7-4.7 1.8l1.2 1.3c1-.8 2.2-1.3 3.5-1.3zm0 3.1c-.6 0-1.1.2-1.5.6L7.5 10.6 9 9c-.4-.4-.9-.6-1.5-.6z"/></svg>
+          <span class="st-bat"><i></i><svg class="st-bolt" viewBox="0 0 8 12"><path d="M4.6 0 0 6.8h3.2L2.6 12 8 4.8H4.6z"/></svg></span>
+        </span>
       </div>
       <div class="head" id="head"></div>
       <div class="body" id="view"></div>
@@ -449,7 +521,8 @@ function content(m) { // 화면에 보여 줄 제목·내용·답장
 /* ===== 화면 ===== */
 function render() {
   const v = $('#view'), h = $('#head');
-  $('#nav').hidden = S.screen === 'login';
+  $('#nav').hidden = S.screen === 'login' || S.screen === 'home';
+  h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); $('.lcd').classList.toggle('dark', S.screen === 'home');
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (b.dataset.go === 'board' && (S.screen === 'post' || S.screen === 'board-write')) || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
   const back = html => h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html;
 
@@ -472,18 +545,53 @@ function render() {
     return;
   }
 
-  if (S.screen === 'home') {
-    h.textContent = 'Home';
+  if (S.screen === 'home') { // 아이폰 홈 화면처럼: 검은 배경 + 시계 위젯 + 앱 아이콘
+    const unread = S.mine.filter(m => !m.read).length;
+    const tile = (id, cls, inner, label, badge) => `<button class="tile ${cls}" data-app="${id}" aria-label="${label}">${inner}${badge ? `<span class="badge">${badge > 99 ? '99+' : badge}</span>` : ''}</button>`;
+    v.innerHTML = `<div class="hs">
+      <div class="hs-grid">
+        <div class="tile w-clock p3f" aria-label="시계">${clockSVG()}</div>
+        ${tile('me', 'photo p3f', `<span class="appav">${avatar(S.me.uid)}</span>`, '프로필')}
+        ${tile('game', 'p3 c-game', ico('pad'), '게임')}
+        ${tile('friends', 'p3 c-friends', ico('friends'), '친구들')}
+        ${S.isAdmin ? tile('admin', 'p3 c-admin', ico('gear'), '관리자') : ''}
+      </div>
+      <div class="hs-dock">
+        ${tile('inbox', 'p3 c-inbox', ico('mail'), 'INBOX', unread)}
+        ${tile('board', 'p3 c-board', ico('dial'), 'BOARD')}
+        ${tile('music', 'p3 c-music', ico('note'), 'MUSIC')}
+      </div>
+    </div>`;
+    tickClock();
+    v.querySelectorAll('[data-app]').forEach(b => b.onclick = () => {
+      const a = b.dataset.app;
+      if (a === 'admin') { go('admin', { admUser: null }); loadAdmin() }
+      else if (a === 'inbox') go('inbox', { owner: S.me.uid });
+      else go(a);
+    });
+    return;
+  }
+
+  if (S.screen === 'friends') {
+    back('Friends');
+    $('#back').onclick = () => go('home');
     const others = Object.entries(S.users).filter(([u]) => u !== S.me.uid).sort((a, b) => a[1].localeCompare(b[1]));
+    v.innerHTML = `<div class="form" style="padding-bottom:6px"><button class="btn compose" id="compose">${ico('pen')}<span>쪽지 · 아이템 보내기</span></button></div>
+      <div class="sect">FRIENDS' INBOX · ${others.length}</div>`
+      + (others.length ? others.map(([u, n], i) => `<div class="row frow"><button class="abtn" data-u="${u}"><span class="num">${i + 1}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}의 방명록</span></button><button class="wbtn" data-w="${u}" aria-label="${esc(n)}에게 쓰기">${ico('pen')}</button></div>`).join('') : '<div class="empty">아직 다른 친구가 없어요.<br>초대 코드를 알려 주세요!</div>');
+    v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('inbox', { owner: b.dataset.u }));
+    v.querySelectorAll('[data-w]').forEach(b => b.onclick = () => go('send', { to: b.dataset.w }));
+    $('#compose').onclick = () => go('send');
+    return;
+  }
+
+  if (S.screen === 'me') {
+    back('Profile');
+    $('#back').onclick = () => go('home');
     v.innerHTML = `<div class="homewrap">
       <div class="me"><button class="av avbtn" id="avbtn" aria-label="프로필 사진 바꾸기">${avatar(S.me.uid)}<span class="cam-badge">+</span></button><div><b>${esc(S.me.nick)}</b><span>MY INBOX · ${S.mine.length} MSG · ${S.mine.filter(m => !m.read).length} NEW</span>${S.photos[S.me.uid] ? '<button class="out" id="rmph" style="padding:4px 0">사진 지우기</button>' : '<span>사진을 누르면 프로필 사진을 바꿀 수 있어요</span>'}</div></div>
       <input type="file" id="phfile" accept="image/*" hidden>
-      <button class="row" id="togame"><span class="num">G</span><span class="ic">${pix('hammer', 22)}</span><span class="ttl">미니 게임 · 뿅망치 두더지</span></button>
-      <div class="sect">FRIENDS' INBOX</div>
-      ${others.length ? others.map(([u, n], i) => `<button class="row" data-u="${u}"><span class="num">${i + 1}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}의 방명록</span></button>`).join('') : '<div class="empty">아직 다른 친구가 없어요.<br>초대 코드를 알려 주세요!</div>'}
       <div class="foot">${S.isAdmin ? '<button class="out" id="adm">admin</button>' : ''}<button class="out" id="out">log out</button></div></div>`;
-    v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('inbox', { owner: b.dataset.u }));
-    $('#togame').onclick = () => go('game');
     $('#out').onclick = () => signOut(auth);
     if ($('#adm')) $('#adm').onclick = () => { go('admin', { admUser: null }); loadAdmin() };
     $('#avbtn').onclick = () => $('#phfile').click();
@@ -508,7 +616,7 @@ function render() {
       if (b.dataset.locked) { toast('주인과 보낸 사람만 볼 수 있어요'); return }
       go('read', { open: b.dataset.id });
     });
-    if ($('#back')) $('#back').onclick = () => go('home');
+    if ($('#back')) $('#back').onclick = () => go('friends');
     if ($('#write')) $('#write').onclick = () => go('send', { to: owner });
     return;
   }
@@ -1052,6 +1160,60 @@ function pix(id, size) {
   it.art.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.' && PAL[ch]) r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${PAL[ch]}"/>` }));
   return `<svg class="pix" width="${size}" height="${size}" viewBox="0 0 ${it.art[0].length} ${it.art.length}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
+
+/* ===== 홈 화면 앱 아이콘 그림 (흰색 픽셀) ===== */
+const GLYPH = {
+  mail: ['............', '............', 'wwwwwwwwwwww', 'ww........ww', 'w.w......w.w', 'w..w....w..w', 'w...w..w...w', 'w....ww....w', 'w..........w', 'wwwwwwwwwwww', '............', '............'],
+  pen: ['.........ww.', '........wwww', '.......wwww.', '......wwww..', '.....wwww...', '....wwww....', '...wwww.....', '..wwww......', '..www.......', '..ww........', '............', '............'],
+  list: ['............', 'ww.wwwwwwww.', 'ww.wwwwwwww.', '............', 'ww.wwwwwwww.', 'ww.wwwwwwww.', '............', 'ww.wwwwwwww.', 'ww.wwwwwwww.', '............', '............', '............'],
+  note: ['............', '....wwwwwww.', '....wwwwwww.', '....w.....w.', '....w.....w.', '....w.....w.', '....w.....w.', '..www...www.', '.wwww..wwww.', '.wwww..wwww.', '..ww....ww..', '............'],
+  people: ['............', '..ww....ww..', '.wwww..wwww.', '.wwww..wwww.', '..ww....ww..', '............', '.wwww..wwww.', 'wwwwwwwwwwww', 'wwwwwwwwwwww', 'wwwwwwwwwwww', '............', '............'],
+  pad: ['............', '............', '............', '.wwwwwwwwww.', 'ww.wwwwwwwww', 'w...wwww.w.w', 'ww.wwwww.w.w', 'wwwwwwwwwwww', 'wwww....wwww', '.ww......ww.', '............', '............'],
+  book: ['............', '.wwwwwwwww..', '.w.......ww.', '.w...ww..w..', '.w..wwww.ww.', '.w..wwww.w..', '.w...ww..ww.', '.w.wwwwww.w.', '.w.wwwwww.w.', '.w.......w..', '.wwwwwwwww..', '............'],
+  chat: ['............', '..wwwwwwww..', '.wwwwwwwwww.', 'wwwwwwwwwwww', 'ww..ww..ww.w', 'ww..ww..ww.w', 'wwwwwwwwwwww', '.wwwwwwwwww.', '..wwwwwwww..', '..www.......', '.ww.........', '............'],
+  gear: ['.....ww.....', '..w.wwww.w..', '.wwwwwwwwww.', '..wwwwwwww..', '.www....www.', 'wwww....wwww', 'wwww....wwww', '.www....www.', '..wwwwwwww..', '.wwwwwwwwww.', '..w.wwww.w..', '.....ww.....']
+};
+/* ===== 홈 화면 아이콘 (흰 바탕 + 검은 그림) ===== */
+const VICON = {
+  friends: '<circle cx="9" cy="9" r="3.4" fill="currentColor"/><path d="M2.6 20c.4-3.8 3.1-6.1 6.4-6.1s6 2.3 6.4 6.1z" fill="currentColor"/><circle cx="16.4" cy="10" r="2.8" fill="currentColor" opacity=".7"/><path d="M14.2 14.6c.7-.3 1.4-.4 2.2-.4 2.8 0 4.9 2 5.2 5.8h-5.6c-.2-2.2-.8-4-1.8-5.4z" fill="currentColor" opacity=".7"/><path d="M19.3 3.2c-.9 0-1.5.6-1.8 1.2-.3-.6-.9-1.2-1.8-1.2-1.1 0-1.9.9-1.9 2 0 2 3.7 4.2 3.7 4.2s3.7-2.2 3.7-4.2c0-1.1-.8-2-1.9-2z" fill="#ff4f8b"/>',
+  mail: '<rect x="2.5" y="5" width="19" height="14" rx="2.2" fill="currentColor"/><path d="M4 7.2l8 5.8 8-5.8" fill="none" style="stroke:var(--d,#fff)" stroke-width="1.7" stroke-linejoin="round"/><path d="M4.2 17.2l5.6-5M19.8 17.2l-5.6-5" style="stroke:var(--d,#fff)" stroke-width="1.3"/>',
+  note: '<path d="M19.5 3.2v12.4a3.1 3.1 0 1 1-2.2-3V7.6L10 9.1v8.4a3.1 3.1 0 1 1-2.2-3V5.6z" fill="currentColor"/>',
+  dial: '<defs><linearGradient id="gdl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fe9d8"/><stop offset="1" stop-color="#1aa596"/></linearGradient></defs><circle cx="12" cy="12" r="10" fill="url(#gdl)"/><circle cx="12" cy="12" r="10" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".6"/><path d="M12 6.2l4.4 5.8h-8.8z" fill="#ff4f8b"/><path d="M12 17.8l-4.4-5.8h8.8z" fill="#fff"/><path d="M12 4.3l.7 1.4h-1.4zM12 19.7l.7-1.4h-1.4zM4.3 12l1.4-.7v1.4zM19.7 12l-1.4-.7v1.4z" fill="#fff" opacity=".85"/><circle cx="12" cy="12" r="1.2" fill="#fff" stroke="#1aa596" stroke-width=".5"/>',
+  board: '<rect x="5" y="4.2" width="14" height="17" rx="2.4" fill="currentColor"/><path d="M8.5 10h7M8.5 13.3h7M8.5 16.6h4.5" style="stroke:var(--d,#fff)" stroke-width="1.6" stroke-linecap="round"/><path d="M9 2.6v3.2M12 2.6v3.2M15 2.6v3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M9 4.4v1.4M12 4.4v1.4M15 4.4v1.4" style="stroke:var(--d,#fff)" stroke-width=".9" stroke-linecap="round"/>',
+  chat: '<path d="M12 3.8c-4.9 0-8.8 3.2-8.8 7.2 0 2.2 1.2 4.2 3.1 5.5l-.9 3.9 4.3-2.1c.7.2 1.5.3 2.3.3 4.9 0 8.8-3.2 8.8-7.2S16.9 3.8 12 3.8z" fill="currentColor"/>',
+  pad: '<path d="M7.4 6.8h9.2a5 5 0 0 1 4.9 5.9l-.7 3.7a2.7 2.7 0 0 1-4.7 1.3L14.4 15.2H9.6l-1.7 2.5a2.7 2.7 0 0 1-4.7-1.3l-.7-3.7a5 5 0 0 1 4.9-5.9z" fill="currentColor"/><path d="M7.6 9.4v4.2M5.5 11.5h4.2" style="stroke:var(--d,#fff)" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.6" cy="10.4" r="1.15" style="fill:var(--d,#fff)"/><circle cx="17.8" cy="12.6" r="1.15" style="fill:var(--d,#fff)"/>',
+  gear: '<path d="M12.00 4.60 L13.87 2.58 L15.67 3.13 L16.11 5.85 L17.23 6.77 L19.98 6.67 L20.87 8.33 L19.26 10.56 L19.40 12.00 L21.42 13.87 L20.87 15.67 L18.15 16.11 L17.23 17.23 L17.33 19.98 L15.67 20.87 L13.44 19.26 L12.00 19.40 L10.13 21.42 L8.33 20.87 L7.89 18.15 L6.77 17.23 L4.02 17.33 L3.13 15.67 L4.74 13.44 L4.60 12.00 L2.58 10.13 L3.13 8.33 L5.85 7.89 L6.77 6.77 L6.67 4.02 L8.33 3.13 L10.56 4.74Z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.1" style="fill:var(--d,#fff)"/>',
+  pen: '<path d="M4 20l.9-4.6L15.6 4.7a2.2 2.2 0 0 1 3.1 3.1L8 18.6z" fill="currentColor"/><path d="M13.8 6.5l3.1 3.1" style="stroke:var(--d,#fff)" stroke-width="1.2"/>'
+};
+function ico(k) { return `<svg class="vi" viewBox="0 0 24 24" aria-hidden="true">${VICON[k]}</svg>` }
+// 홈 화면 달력 위젯: 이번 달, 월요일 시작, 오늘 표시, 메시지 받은 날 밑줄
+function calWidget() {
+  const d = new Date(), y = d.getFullYear(), m = d.getMonth(), first = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate();
+  const got = new Set(S.mine.filter(x => x.createdAt?.toDate).map(x => x.createdAt.toDate()).filter(t => t.getFullYear() === y && t.getMonth() === m).map(t => t.getDate()));
+  let cells = 'MTWTFSS'.split('').map((c, i) => `<i class="${i > 4 ? 'we' : ''}">${c}</i>`).join('') + '<span></span>'.repeat(first);
+  for (let k = 1; k <= n; k++) { const col = (first + k - 1) % 7; cells += `<span class="${col > 4 ? 'we' : ''}${k === d.getDate() ? ' today' : ''}${got.has(k) ? ' got' : ''}">${k}</span>` }
+  return `<b>${['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'][m]}</b><div class="calg">${cells}</div>`;
+}
+// 홈 화면 시계 위젯 (바늘이 실제 시간대로 움직임)
+function clockSVG() {
+  let ticks = '';
+  for (let i = 0; i < 60; i++) { const a = i * 6 * Math.PI / 180, r1 = i % 5 ? 44 : 40; ticks += `<line x1="${50 + Math.sin(a) * r1}" y1="${50 - Math.cos(a) * r1}" x2="${50 + Math.sin(a) * 46}" y2="${50 - Math.cos(a) * 46}" stroke="#1a191c" stroke-width="${i % 5 ? .6 : 1.4}"/>` }
+  const num = [[12, 50, 22], [3, 79, 53.5], [6, 50, 85], [9, 21, 53.5]].map(([t, x, y]) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="10" fill="#1a191c">${t}</text>`).join('');
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#fff"/>${ticks}${num}
+    <line id="ch" x1="50" y1="50" x2="50" y2="28" stroke="#1a191c" stroke-width="3" stroke-linecap="round"/>
+    <line id="cm" x1="50" y1="50" x2="50" y2="16" stroke="#1a191c" stroke-width="2" stroke-linecap="round"/>
+    <line id="cs" x1="50" y1="56" x2="50" y2="12" stroke="#f08c2e" stroke-width=".8"/>
+    <circle cx="50" cy="50" r="2" fill="#f08c2e"/></svg>`;
+}
+function tickClock() {
+  const hEl = document.getElementById('ch'); if (!hEl) return;
+  const d = new Date(), s = d.getSeconds(), m = d.getMinutes() + s / 60, h = d.getHours() % 12 + m / 60;
+  hEl.setAttribute('transform', `rotate(${h * 30} 50 50)`);
+  document.getElementById('cm').setAttribute('transform', `rotate(${m * 6} 50 50)`);
+  document.getElementById('cs').setAttribute('transform', `rotate(${s * 6} 50 50)`);
+}
+setInterval(tickClock, 1000);
+function glyph(k) { return `<svg width="30" height="30" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">${GLYPH[k].map((r, y) => [...r].map((c, x) => c === 'w' ? `<rect x="${x}" y="${y}" width="1" height="1" fill="#fff"/>` : '').join('')).join('')}</svg>` }
 
 /* ===== 방명록 속 링크 / 유튜브 미리보기 ===== */
 function ytIdsIn(t) {
@@ -1711,7 +1873,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 /* ===== 공통 ===== */
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.go, { owner: S.me?.uid }));
 $('#homebtn').onclick = () => { if (S.me) go('home') };
-function tick() { const d = new Date(); $('#clock').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') }
+function tick() { const d = new Date(), t = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); $('#clock').textContent = t; if ($('#hstime')) $('#hstime').textContent = t }
 tick(); setInterval(tick, 30000);
 render();
 </script>
