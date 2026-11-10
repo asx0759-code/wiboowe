@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-1625">
+<meta name="build" content="20261110-1630">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z%22 fill=%22%23000%22/%3E%3C/svg%3E">
@@ -525,7 +525,7 @@ function render() {
   $('#nav').hidden = true;
   h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); $('.lcd').classList.toggle('dark', S.screen === 'home');
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (b.dataset.go === 'board' && (S.screen === 'post' || S.screen === 'board-write')) || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
-  const back = html => h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html;
+  const back = html => { h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html; $('#back').onclick = () => go('home') };
 
   if (S.screen === 'login') {
     const join = S.authTab === 'join';
@@ -603,7 +603,7 @@ function render() {
 
   if (S.screen === 'inbox') {
     const owner = S.owner || S.me.uid, mine = owner === S.me.uid, arr = mine ? msgsOf(owner) : msgsOf(owner).filter(m => !(m.bc && m.secret)); // 비밀 전체 쪽지는 남의 방명록에선 안 보임
-    if (mine) h.textContent = `Inbox {${arr.length}}`; else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
+    if (mine) back(`Inbox {${arr.length}}`); else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
     v.innerHTML = (arr.length ? arr.map((m, i) => {
       const c = content(m);
       // 아이템은 목록에서 무엇인지 보이지 않게: 공개면 선물상자, 비밀이면 자물쇠. 눌러서 열어야 확인 가능
@@ -617,7 +617,7 @@ function render() {
       if (b.dataset.locked) { toast('주인과 보낸 사람만 볼 수 있어요'); return }
       go('read', { open: b.dataset.id });
     });
-    if ($('#back')) $('#back').onclick = () => go('friends');
+    if (!mine) $('#back').onclick = () => go('friends');
     if ($('#write')) $('#write').onclick = () => go('send', { to: owner });
     return;
   }
@@ -702,7 +702,7 @@ function render() {
   }
 
   if (S.screen === 'send') {
-    h.textContent = 'New Message';
+    back('New Message'); if (S.to) $('#back').onclick = () => go('friends');
     const others = Object.entries(S.users).filter(([u]) => u !== S.me.uid);
     if (!others.length) { v.innerHTML = '<div class="empty">메시지를 보낼 친구가 아직 없어요</div>'; return }
     const isAll = S.to === '__all__';
@@ -900,7 +900,7 @@ function render() {
   }
 
   if (S.screen === 'board') {
-    h.textContent = 'Board';
+    back('Board');
     v.innerHTML = `<div class="form" style="padding-bottom:4px"><button class="btn" id="bwrite">익명으로 글쓰기</button></div>
       <div class="sect">ANONYMOUS BOARD · ${B.posts.length}</div>`
       + (B.posts.length ? B.posts.map((p, i) => `<button class="row" data-p="${p.id}"><span class="num">${i + 1}</span><span class="ttl wrap">${esc(p.title)}${p.cc ? `<span class="ccnt">[${p.cc}]</span>` : ''}<small class="adm-who">익명 · ${fmt(p.at)}</small></span></button>`).join('')
@@ -988,7 +988,7 @@ function render() {
   }
 
   if (S.screen === 'music') {
-    h.textContent = 'Listen Together';
+    back('Listen Together');
     // 다시 그려도 쓰던 글자와 커서가 지워지지 않게
     const keepIn = ['yturl'].map(id => { const el = $('#' + id); return el ? { id, v: el.value, f: document.activeElement === el, p: el.selectionStart } : null }).filter(Boolean);
     const r = S.room, t = r?.videoId, now = srvNow(), q = r?.queue || [];
