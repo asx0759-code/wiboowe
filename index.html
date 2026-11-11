@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0420">
+<meta name="build" content="20261112-0440">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1028,13 +1028,13 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
   .home-btn{width:42px;height:42px;margin-top:10px}
 }
 @media (max-width:420px){ body{padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))} }
-/* 휴대폰에서는 가짜 폰 테두리·상태바·홈 버튼 없이 화면 끝(노치·아래 바 자리)까지 배경으로 꽉 채움 (PC에서는 폰 모양 그대로) */
+/* 가짜 폰 테두리·상태바·동그란 홈 버튼 없이 화면 위아래 끝까지 꽉 채움 (휴대폰·PC 모두). PC에서는 가운데에 폭 560px로 */
 .hbar{display:none}
 .nw-lock{position:absolute;right:6px;top:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);display:grid;place-items:center;font-size:12px;z-index:2}
 .nw-acts button:disabled{opacity:.6;flex:1}
 .tile-lock{position:absolute;right:-4px;bottom:-4px;width:22px;height:22px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:11px;box-shadow:0 2px 4px rgba(0,0,0,.3)}
 .tile.locked .vi{opacity:.55}
-@media (max-width:520px){
+@media all{
   body{padding:0;gap:0;background:#0b0b0d}
   .phone{width:100%;height:100%;max-height:none;border-radius:0;padding:0;background:none;box-shadow:none}
   .top,.home-btn,.lcd>.status{display:none}
@@ -1050,6 +1050,19 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
   .hbar[hidden]{display:none}
   .hbar i{width:134px;height:5px;border-radius:3px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.25),0 1px 3px rgba(0,0,0,.35)}
   .hbar:active i{transform:scaleX(.92)}
+}
+/* PC: 최신 아이폰 프로 모양 테두리 (다이내믹 아일랜드 · 얇은 티타늄 테두리 · 홈 버튼 없음) */
+@media (min-width:561px){
+  body{background:radial-gradient(ellipse at 50% 30%,#2a2a33,#0b0b0d 70%);align-items:center;justify-content:center}
+  .phone{position:relative;width:auto;height:min(940px,calc(100vh - 36px));aspect-ratio:9/19.5;max-width:none;margin:auto;padding:11px;border-radius:58px;
+    background:linear-gradient(145deg,#8a8580,#3b3936 30%,#6e6a65 55%,#2c2a28 80%,#7c7873);
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25),inset 0 0 0 4px #121212,0 30px 60px rgba(0,0,0,.6),0 0 0 1px #000}
+  .phone::before{content:"";position:absolute;left:50%;top:22px;transform:translateX(-50%);width:31%;height:33px;border-radius:20px;background:#000;z-index:70;box-shadow:inset 0 0 0 1px #111}
+  .phone::after{content:"";position:absolute;right:-3px;top:23%;width:4px;height:11%;border-radius:0 3px 3px 0;background:linear-gradient(90deg,#3b3936,#6e6a65)}
+  .lcd{border-radius:47px;overflow:hidden;box-shadow:0 0 0 2px #000}
+  .lcd .head{padding-top:54px}
+  .lcd .head button{top:calc(50% + 22px)}
+  .hs{padding-top:66px}
 }
 </style>
 </head>
