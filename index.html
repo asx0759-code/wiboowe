@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0730">
+<meta name="build" content="20261111-2230">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -553,14 +553,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .tr-fan button{position:absolute;bottom:0;left:calc(50% - 29px);width:58px;aspect-ratio:300/527;border:0;border-radius:8px;padding:0;background:none;transform-origin:50% 260%;transition:opacity .2s;cursor:pointer}
 .tr-fan button .tr-back{border-width:2px}.tr-fan button .tr-back i{font-size:14px}
 .tr-fan button.pick{opacity:.12;pointer-events:none}
-.tr-strip{width:calc(100% + 24px);margin:0 -12px;overflow-x:auto;overflow-y:visible;padding:18px 12px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.tr-strip::-webkit-scrollbar{display:none}
-.tr-row{display:flex;width:max-content;padding:0 40px}
-.tr-row button{flex:none;width:56px;aspect-ratio:300/527;margin-right:-34px;border:0;padding:0;background:none;border-radius:8px;cursor:pointer;transition:transform .15s,opacity .2s;box-shadow:-4px 4px 8px #0006;position:relative}
-.tr-row button:nth-child(odd){transform:translateY(4px)}
-.tr-row button:hover,.tr-row button:focus-visible{transform:translateY(-14px);z-index:2}
-.tr-row button .tr-back{border-width:2px}.tr-row button .tr-back i{font-size:13px}
-.tr-row button.pick{opacity:.1;transform:translateY(-30px);pointer-events:none}
+.tr-wheel{position:relative;width:calc(100% + 24px);margin:4px -12px 0;height:222px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;-webkit-mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.tr-wheel:active{cursor:grabbing}
+.tr-wheel button{position:absolute;top:26px;left:calc(50% - 29px);width:58px;aspect-ratio:300/527;border:0;padding:0;background:none;border-radius:8px;transform-origin:50% 310%;transition:top .15s,opacity .2s;box-shadow:-4px 3px 8px #0007;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tr-wheel button .tr-back{border-width:2px}.tr-wheel button .tr-back i{font-size:13px}
+@media (hover:hover){.tr-wheel button:hover{top:12px}}
+.tr-wheel button.pick{top:4px;opacity:.12;pointer-events:none}
+.tr-wheel-cnt{text-align:center;font-size:11px;opacity:.6;margin-top:-6px}
 .tr-spread,.tr-pair{display:flex;gap:8px;justify-content:center;align-items:center}
 .tr-spread figure,.tr-pair figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#a99cc8}
 .tr-sum{border-top:1px dashed #3b2f63;padding-top:8px}.tr-sum b{color:#ff8fb8;font-weight:400}
@@ -3887,13 +3886,26 @@ const TAROT = (() => {
   }
   // ---------- 78장 펼쳐 놓고 고르기 (옆으로 밀어서 구경) ----------
   const shuffle = () => [...Array(78).keys()].sort(() => Math.random() - .5);
+  const wpos = {};
   function strip(deck, used, label) {
-    return `<p class="tr-hint">${label}</p><div class="tr-strip" id="tr-strip"><div class="tr-row">${deck.map((ci, k) => `<button data-k="${k}" class="${used.includes(k) ? 'pick' : ''}" aria-label="카드 ${k + 1}">${BACK}</button>`).join('')}</div></div><p class="tr-sub" style="text-align:center">← 옆으로 밀면 78장 전부 볼 수 있어요 →</p>`;
+    return `<p class="tr-hint">${label}</p><div class="tr-wheel" id="tr-strip">${deck.map((ci, k) => `<button data-k="${k}" class="${used.includes(k) ? 'pick' : ''}" aria-label="카드 ${k + 1}">${BACK}</button>`).join('')}</div><p class="tr-sub" style="text-align:center">← 카드를 옆으로 밀어서 돌려 봐요 · 78장 →</p>`;
   }
-  function bindStrip(onPick) {
+  // 둥근 부채 모양 · 좌우로 밀면 바퀴처럼 돌아가요
+  function bindStrip(onPick, key = 'x') {
     const el = $q('#tr-strip'); if (!el) return;
-    el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
-    el.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { if (b.classList.contains('pick')) return; b.classList.add('pick'); try { navigator.vibrate?.(10) } catch { } setTimeout(() => onPick(+b.dataset.k), 180) });
+    const bs = [...el.querySelectorAll('[data-k]')], STEP = 4.2, PX = 18, N = bs.length;
+    let off = wpos[key] ?? (N - 1) / 2, v = 0, raf = 0;
+    const clamp = x => Math.max(0, Math.min(N - 1, x));
+    const draw = () => { bs.forEach((b, k) => { const a = (k - off) * STEP; b.style.transform = `rotate(${a}deg)`; b.style.visibility = Math.abs(a) > 62 ? 'hidden' : '' }); wpos[key] = off };
+    draw();
+    const glide = () => { v *= .94; off = clamp(off + v); draw(); if (Math.abs(v) > .01 && off > 0 && off < N - 1) raf = requestAnimationFrame(glide) };
+    let sx = 0, so = 0, moved = false, tgt = null, lx = 0, lt = 0, down = false;
+    el.onpointerdown = e => { cancelAnimationFrame(raf); down = true; moved = false; sx = lx = e.clientX; lt = performance.now(); so = off; v = 0; tgt = e.target.closest('[data-k]'); try { el.setPointerCapture(e.pointerId) } catch { } };
+    el.onpointermove = e => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 6) moved = true; if (!moved) return; off = clamp(so - dx / PX); const t = performance.now(); v = -(e.clientX - lx) / PX / Math.max(1, (t - lt) / 16); lx = e.clientX; lt = t; draw() };
+    const up = e => { if (!down) return; down = false; if (moved) { if (performance.now() - lt > 80) v = 0; raf = requestAnimationFrame(glide); return } if (tgt && !tgt.classList.contains('pick')) { const b = tgt; b.classList.add('pick'); try { navigator.vibrate?.(10) } catch { } setTimeout(() => onPick(+b.dataset.k), 200) } };
+    el.onpointerup = up; el.onpointercancel = () => { down = false };
+    el.onwheel = e => { e.preventDefault(); cancelAnimationFrame(raf); off = clamp(off + (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) / 40); draw() };
+    el.onkeydown = e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { off = clamp(off + (e.key === 'ArrowRight' ? 1 : -1)); draw() } };
   }
   // ---------- 오늘의 카드 (하루 한 장 직접 뽑기) ----------
   let todayDeck = null, todayPick = undefined, justPicked = false;
@@ -3935,9 +3947,7 @@ const TAROT = (() => {
     $q('#tr-qi').oninput = e => ask.q = e.target.value;
     $q('#tr-qf').onsubmit = e => e.preventDefault();
     document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { ask.q = b.dataset.q; $q('#tr-qi').value = ask.q });
-    const keep = $q('#tr-strip').scrollLeft;
-    bindStrip(k => { if (!ask.q.trim()) { toast('질문을 먼저 적어 줘요'); $q('#tr-qi').focus(); askView(); return } ask.picks.push([ask.deck[k], Math.random() < .3, k]); const sl = $q('#tr-strip')?.scrollLeft; askView(); if (ask.picks.length < 3 && $q('#tr-strip')) $q('#tr-strip').scrollLeft = sl });
-    if (ask.picks.length) $q('#tr-strip').scrollLeft = keep;
+    bindStrip(k => { if (!ask.q.trim()) { toast('질문을 먼저 적어 줘요'); $q('#tr-qi').focus(); askView(); return } ask.picks.push([ask.deck[k], Math.random() < .3, k]); askView() }, 'ask');
   }
   function askResult() {
     const pos = ['과거', '현재', '미래'], P = ask.picks;
@@ -3947,7 +3957,7 @@ const TAROT = (() => {
         <div class="tr-sum"><b>한 줄 요약</b> · ${summary(P)}</div><div class="tr-btns"><button class="tr-btn" id="tr-again">다른 질문 하기</button><button class="tr-btn g" id="tr-share">피드에 공유</button></div></div>`;
     let opened = 0;
     document.querySelectorAll('.tr-spread .tr-card').forEach(c => c.onclick = () => { if (c.classList.contains('open')) return; c.classList.add('open'); if (++opened === 3) { setTimeout(() => { $q('#tr-rd').hidden = false; $q('#tr-h2').hidden = true }, 500); addHist('질문: ' + ask.q, P.map(p => [p[0], p[1]])) } });
-    $q('#tr-again').onclick = () => { ask = { q: '', picks: [], deck: [] }; askView() };
+    $q('#tr-again').onclick = () => { ask = { q: '', picks: [], deck: [] }; delete wpos.ask; askView() };
     $q('#tr-share').onclick = () => fortShare(`🔮 "${ask.q}"\n과거 ${CARDS[P[0][0]].n} · 현재 ${CARDS[P[1][0]].n} · 미래 ${CARDS[P[2][0]].n}\n${summary(P)}`);
   }
   function summary(P) {
@@ -3959,14 +3969,12 @@ const TAROT = (() => {
   function loveView() {
     const others = Object.entries(S.users).filter(([u]) => u !== me()).sort((a, b) => a[1].localeCompare(b[1]));
     $q('#tr-st').innerHTML = `<p class="tr-hint">궁합 볼 친구를 골라요</p><div class="tr-mem">${others.map(([u, n]) => `<button data-m="${u}" class="${who === u ? 'on' : ''}">${esc(n)}</button>`).join('')}</div><div id="tr-lv" class="tr-lv"></div>`;
-    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (who !== b.dataset.m) lv = { deck: [], picks: [] }; who = b.dataset.m; loveView() });
+    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (who !== b.dataset.m) { lv = { deck: [], picks: [] }; delete wpos.love } who = b.dataset.m; loveView() });
     if (!who || !S.users[who]) return;
     if (lv.picks.length < 2) {
       if (!lv.deck.length) lv.deck = shuffle();
       $q('#tr-lv').innerHTML = strip(lv.deck, lv.picks.map(p => p[1]), lv.picks.length ? `이번엔 <b>${esc(S.users[who])}</b>의 카드를 골라요 · 1/2` : `먼저 <b>내</b> 카드를 골라요 · 0/2`);
-      const keep = G.trLvScroll;
-      bindStrip(k => { lv.picks.push([lv.deck[k], k]); G.trLvScroll = $q('#tr-strip')?.scrollLeft; loveView() });
-      if (lv.picks.length && keep != null) $q('#tr-strip').scrollLeft = keep;
+      bindStrip(k => { lv.picks.push([lv.deck[k], k]); loveView() }, 'love');
       return;
     }
     const a = lv.picks[0][0], b = lv.picks[1][0], r = rng(hash([a, b].sort().join('+') + [me(), who].sort().join('+'))), score = 30 + Math.floor(r() * 70), line = LOVE.find(x => score >= x[0])[1];
@@ -3975,7 +3983,7 @@ const TAROT = (() => {
         <p class="tr-sub">${esc(S.me.nick)}는 '${CARDS[a].n}', ${esc(S.users[who])}는 '${CARDS[b].n}' · ${CARDS[a].kw[0]}과 ${CARDS[b].kw[0]}이 만나는 날</p>
         <div class="tr-btns"><button class="tr-btn" id="tr-re">다시 뽑기</button><button class="tr-btn g" id="tr-send">${esc(S.users[who])}에게 결과 보내기</button></div></div>`;
     setTimeout(() => { const i = $q('.tr-bar i'); if (i) i.style.width = score + '%' }, 80);
-    $q('#tr-re').onclick = () => { lv = { deck: [], picks: [] }; loveView() };
+    $q('#tr-re').onclick = () => { lv = { deck: [], picks: [] }; delete wpos.love; loveView() };
     $q('#tr-send').onclick = () => go('send', { to: who, kind: 'msg', attach: null, draft: { title: '🔮 타로 궁합', body: `오늘 우리 궁합 ${score}%!\n${line}\n나: ${CARDS[a].n} · 너: ${CARDS[b].n}` } });
     const key = who + a + '_' + b; if (G.trLoveSaved !== key) { G.trLoveSaved = key; addHist(`궁합 · ${S.users[who]} ${score}%`, [[a, false], [b, false]]) }
   }
