@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0320">
+<meta name="build" content="20261112-0420">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -466,6 +466,28 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .bt-on.hush{background:#f3eefe;color:#7a4fd0}
 .bt-hushnote{flex:none;margin:0;padding:8px 12px 12px;font-size:11px;color:#7a4fd0;text-align:center;border-top:1px solid #eef2f6}
 .bt-real{font-style:normal;color:#7a4fd0;background:#f3eefe;border-radius:6px;padding:0 5px}
+.bt-sky.sm{height:22%;min-height:110px}.bt-sky.sm .bt-boat{width:34%;margin-bottom:8%}
+.bt-lobby{overflow-y:auto}
+.bt-lb{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 16px 16px}
+.bt-lbh{display:flex;justify-content:space-between;align-items:center}.bt-lbh h2{margin:0;font-size:20px}
+.bt-lb .bt-okmsg{margin:0;font-size:14px;text-align:center}
+.bt-adm{display:flex;gap:6px}
+.bt-chip{border:0;border-radius:999px;padding:7px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:#eef2f6;color:#3a4656}.bt-chip.on{background:#f3eefe;color:#7a4fd0}
+.bt-rooms{display:flex;flex-direction:column;gap:8px}
+.bt-room-c{display:flex;align-items:center;gap:10px;border:0;border-radius:18px;padding:12px 14px;background:#f0f8fe;box-shadow:0 3px 0 #d6eaf8;font:inherit;color:#1d2430;text-align:left;cursor:pointer}
+.bt-room-c:active{transform:translateY(2px);box-shadow:0 1px 0 #d6eaf8}
+.bt-rb{font-size:22px}.bt-rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.bt-rt b{font-size:15px}.bt-rt small{font-size:11px;color:#7a8596}
+.bt-room-c i{font-style:normal;font-size:16px;padding:4px}
+.bt-new{display:flex;gap:8px}.bt-new input{flex:1;min-width:0;border:1px solid #d5dde5;border-radius:999px;padding:10px 14px;font:inherit;font-size:15px}
+.bt-btn.sm{min-width:0;padding:10px 18px;font-size:14px}
+.bt-lb>.bt-btn{align-self:center}
+.bt-link{border:0;background:none;color:#7a8596;font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;align-self:center}
+.bt-back{border:0;background:#eef2f6;color:#3a4656;border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;flex:none}
+.bt-top .bt-on{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.bt-rn{font-style:normal;font-weight:400;font-size:11px;color:#2e9be0}
+.bt-askc{width:100%;background:#fff;border-radius:22px 22px 0 0;padding:20px 16px 22px;text-align:center;display:flex;flex-direction:column;gap:8px}
+.bt-askc b{font-size:17px}.bt-askc p{margin:0;font-size:13px;color:#7a8596}.bt-askc>div{display:flex;gap:8px;margin-top:6px}.bt-askc .bt-pill{flex:1}
+.bt-okmsg small{font-size:11px;color:#7a8596;font-weight:400}
 .bt-sys{align-self:center;margin:6px 0;font-size:11px;color:#7a8596;background:#f1f4f7;border-radius:999px;padding:3px 10px}
 .bt-chat{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
 .bt-empty{margin:auto;font-size:13px;color:#9aa4b2}
@@ -3337,22 +3359,33 @@ const SKETCH = (() => {
   return { mount, stop };
 })();
 
-/* ===== 울렁울렁 나룻배 (선장 허가제 · 10분 · 엄지 뽀뽀 + 대화) ===== */
-// boatreq/{uid} = { status: wait|ok|no|done, start, at } — 탑승 신청·허가 (본인과 관리자만 읽기)
-// boatmsgs/{id} = { tok, name, c, text, at } — 배 안 대화 (탄 사람만 · 진짜 누구인지는 안 남김)
-// boatlog/{id} = { by, anon, name, text, kind, at } — 관리자 로그 (관리자만 읽기)
-// boatlive/{tok} = { name, c, x, y, down, at } — 지금 탄 사람과 엄지 위치
+/* ===== 울렁울렁 나룻배 (선장 허가제 · 10분 · 배를 여러 척 띄워서 따로따로) ===== */
+// boatreq/{uid} = { status: ok|done|no|wait, start, at } — 탑승 허가 (본인과 관리자만 읽기). start = 처음 배에 탄 시각, 거기서 10분
+// boats/{bid} = { name, at, last } — 띄운 배(대화방) 목록
+// boats/{bid}/msgs/{id} = { tok, name, c, text, sys?, at } — 그 배 안 대화 (탄 사람만 · 진짜 누구인지는 안 남김)
+// boats/{bid}/draw/{id} = { tok, c, w, pts, at } — 그 배 그림판
+// boatlog/{id} = { by, anon, name, text, kind, room, rname, at } — 관리자 로그 (관리자만 읽기)
+// boatlive/{tok} = { name, c, x, y, down, pad, cur, room, at } — 지금 어느 배에 탔는지 · 엄지 위치
 const BOAT = (() => {
-  const LIMIT = 10 * 60 * 1000, ANIMALS = ['물고기', '오리', '개구리', '해달', '펭귄', '고래', '꽃게', '수달'], COLS = ['#ff7ab8', '#2f86ff', '#ff9a1a', '#3fbf4a', '#8b3ff0', '#e8283c', '#12a3a3'];
-  let req = null, reqs = {}, live = {}, msgs = [], timerT = null, beatT = null, sendT = null, lastSend = 0, down = false, pos = [0.5, 0.5], kissCool = 0, alias = '', col = '', logged = false, sheetTab = 'req';
-  let anon = false, tok = '';
-  try { anon = localStorage.getItem('wb_boatanon') === '1'; tok = localStorage.getItem('wb_boattok') || '' } catch { }
+  const LIMIT = 10 * 60 * 1000, COLS = ['#ff7ab8', '#2f86ff', '#ff9a1a', '#3fbf4a', '#8b3ff0', '#e8283c', '#12a3a3'];
+  const PCOLS = ['#ff4f8b', '#2f86ff', '#ff9a1a', '#3fbf4a', '#26262e'];
+  let req = null, reqs = {}, boats = {}, live = {}, room = null, msgs = [], strokes = [], logs = [], firstMsgs = true;
+  let timerT = null, beatT = null, sendT = null, lastSend = 0, down = false, pos = [0.5, 0.5], kissCool = 0, cur = null;
+  let padOpen = false, mode = 'thumb', pcol = PCOLS[0], sheetTab = 'req', making = false, col = COLS[Math.random() * COLS.length | 0];
+  let anon = false, tok = '', stealth = true, view = null;
+  try { anon = localStorage.getItem('wb_boatanon') === '1'; tok = localStorage.getItem('wb_boattok') || ''; stealth = localStorage.getItem('wb_stealth') !== '0' } catch { }
   if (!tok) { tok = Math.random().toString(36).slice(2, 12); try { localStorage.setItem('wb_boattok', tok) } catch { } }
   const $q = s => document.querySelector(s), me = () => S.me.uid;
-  const startMs = () => req?.start ? ms(req.start) : 0;
-  const left = () => S.isAdmin && !req?.start ? Infinity : startMs() + LIMIT - Date.now();
-  const riding = () => S.isAdmin || (req?.status === 'ok' && req.start && left() > 0);
-  const myName = () => anon ? alias : S.me.nick;
+  // 10분은 배마다: 두 사람 이상 탄 순간부터 세고, 끝나면 그 배에 탄 사람 모두 같이 내림
+  const bStart = id => boats[id]?.start ? ms(boats[id].start) : 0;
+  const bLeft = id => bStart(id) ? bStart(id) + LIMIT - Date.now() : null;
+  const alive = id => !!boats[id] && (!bStart(id) || bLeft(id) > 0);
+  const startMs = () => room && bStart(room) ? bStart(room) : Date.now();
+  const pass = () => S.isAdmin || req?.status === 'ok';
+  const hush = () => S.isAdmin && stealth; // 관리자 몰래 보기
+  const myName = () => anon && !S.isAdmin ? '익명' : S.me.nick;
+  const rname = id => boats[id]?.name || '이름 없는 배';
+  const inRoom = id => Object.values(live).filter(x => x.room === id);
   // ---------- 진동 (안드로이드는 진동, 아이폰은 iOS 18 이상에서 '톡' 하는 햅틱을 시도) ----------
   let hapEl = null;
   function haptic(strong) {
@@ -3361,62 +3394,110 @@ const BOAT = (() => {
   }
   // ---------- 화면 ----------
   function mount(v) {
-    stop(true);
-    if (!alias) { alias = '익명'; col = COLS[Math.random() * COLS.length | 0] }
-    if (riding()) room(v); else dock(v);
+    view = v; leaveRoomSubs();
+    if (!pass()) return noAccess(v);
+    watchBase();
+    if (room) roomView(v); else lobby(v);
+    clearInterval(timerT); timerT = setInterval(tick, 1000); tick();
+    const bk = $q('#back'); if (bk) bk.onclick = () => room && !hush() ? askLeave(() => go('home')) : go('home');
   }
-  function dock(v) { // 선착장: 신청 · 대기 · 허가
-    const st = req?.status, expired = st === 'ok' && req.start && left() <= 0, ok = st === 'ok' && !req.start;
+  function noAccess(v) {
     v.innerHTML = `<div class="bt bt-dock"><div class="bt-sky"><div class="bt-boat">${BOAT_SVG}</div><div class="bt-waves"><i></i><i></i></div></div>
-      <div class="bt-card"><h2>울렁울렁 나룻배</h2>
-      <p>선장 <b>${esc(S.users[captain()] || '밤티')}</b>님이 허락한 사람만 탈 수 있어요.<br>한 번 타면 <b>10분</b> 동안 엄지 뽀뽀도 하고 이야기도 나눠요.</p>
-      ${ok ? `<div class="bt-okmsg">🎉 탑승 허가가 났어요!</div>
-        <label class="bt-anon"><input type="checkbox" id="bt-anon" ${anon ? 'checked' : ''}> 익명으로 탈래요 <small>(${anon ? '익명' : '닉네임'}으로 보여요)</small></label>
-        <button class="bt-btn" id="bt-board">🚣 배에 타기 <small>10:00</small></button>`
-      : `<div class="bt-note">🔒 접근 권한이 없어요<br><small>선장님이 탑승을 허가해 주면 들어올 수 있어요</small></div>`}
-      <small class="bt-foot">배 안에서 나눈 대화는 선장님 로그에 남아요</small></div></div>`;
-    if ($q('#bt-anon')) $q('#bt-anon').onchange = e => { anon = e.target.checked; try { localStorage.setItem('wb_boatanon', anon ? '1' : '0') } catch { } dock(v) };
-    if (false) $q('#bt-req').onclick = async () => {
-      try { await setDoc(doc(db, 'boatreq', me()), { status: 'wait', start: null, at: serverTimestamp() }); toast('탑승 신청을 보냈어요 ⛵') } catch (e) { toast('신청하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
-    };
-    if ($q('#bt-board')) $q('#bt-board').onclick = async () => {
-      haptic();
-      try { await setDoc(doc(db, 'boatreq', me()), { status: 'ok', start: serverTimestamp(), at: serverTimestamp() }) } catch (e) { toast('타지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
-    };
+      <div class="bt-card"><h2>울렁울렁 나룻배</h2><div class="bt-note">🔒 접근 권한이 없어요<br><small>선장님이 탑승을 허가해 주면 들어올 수 있어요</small></div></div></div>`;
   }
-  // ---------- 배 안: 대화 + (열고 닫는) 그림판 · 엄지 뽀뽀 ----------
-  // boatdraw/{id} = { tok, c, w, pts:[x,y…(0~1)], at } — 그림판 선 (탄 사람만)
-  let stealth = true, logs = [];
-  try { stealth = localStorage.getItem('wb_stealth') !== '0' } catch { }
-  const hush = () => S.isAdmin && stealth; // 관리자 몰래 보기: 탄 사람 수·엄지·알림에 안 잡힘
-  let padOpen = false, mode = 'thumb', pcol = '#ff4f8b', cur = null, strokes = [], firstMsgs = true;
-  const PCOLS = ['#ff4f8b', '#2f86ff', '#ff9a1a', '#3fbf4a', '#26262e'];
-  function room(v) {
-    v.innerHTML = `<div class="bt bt-room" id="bt"><div class="bt-top"><span class="bt-on${hush() ? ' hush' : ''}">${hush() ? '👀 몰래 보는 중' : '🚣 탑승 중'} <b id="bt-who"></b></span><span class="bt-time" id="bt-time"></span></div>
-      <div class="bt-bar"><button class="bt-pill${padOpen ? ' on' : ''}" id="bt-padb">${padOpen ? '💬 그림판 닫기' : '🎨 그림판 열기'}</button>${S.isAdmin ? `<button class="bt-pill g" id="bt-hush">${stealth ? '🙋 같이 타기' : '👀 몰래 보기'}</button><button class="bt-pill g" id="bt-cap">⚓</button>` : '<button class="bt-pill g" id="bt-out">내리기</button>'}</div>
+  function lobby(v) { // 선착장: 띄운 배 목록 · 새 배 띄우기
+    const list = Object.entries(boats).filter(([id, b]) => alive(id) && (inRoom(id).length || Date.now() - ms(b.last || b.at) < 3 * 3600000)).sort((a, b) => ms(b[1].last || b[1].at) - ms(a[1].last || a[1].at));
+    const first = false;
+    v.innerHTML = `<div class="bt bt-lobby"><div class="bt-sky sm"><div class="bt-boat">${BOAT_SVG}</div><div class="bt-waves"><i></i><i></i></div></div>
+      <div class="bt-lb">
+        <div class="bt-lbh"><h2>선착장</h2></div>
+        ${S.isAdmin ? '' : '<p class="bt-okmsg">🎉 탑승 허가가 났어요!<br><small>배에 두 명이 타는 순간부터 10분이에요</small></p>'}
+        ${S.isAdmin ? `<div class="bt-adm"><button class="bt-chip${stealth ? ' on' : ''}" id="bt-hush">${stealth ? '👀 몰래 보기 켜짐' : '🙋 같이 타기'}</button><button class="bt-chip" id="bt-cap">⚓ 선장실</button></div>`
+          : `<label class="bt-anon"><input type="checkbox" id="bt-anon" ${anon ? 'checked' : ''}> 익명으로 탈래요</label>`}
+        <div class="bt-rooms">${list.length ? list.map(([id, b]) => { const n = inRoom(id).length; return `<button class="bt-room-c" data-room="${id}"><span class="bt-rb">⛵</span><span class="bt-rt"><b>${esc(b.name)}</b><small>${n ? `🚣 ${n}명` : '아무도 없어요'} · ${bStart(id) ? `⏳ ${Math.max(1, Math.ceil(bLeft(id) / 60000))}분 남음` : '출항 전'}</small></span>${S.isAdmin ? `<i data-sink="${id}" title="가라앉히기">🗑</i>` : ''}</button>` }).join('') : '<p class="bt-e">아직 떠 있는 배가 없어요. 첫 배를 띄워 봐요!</p>'}</div>
+        ${making ? `<form class="bt-new" id="bt-new"><input id="bt-nn" maxlength="16" placeholder="배 이름 (예: 수다배)" autocomplete="off"><button class="bt-btn sm">띄우기</button></form>` : '<button class="bt-btn" id="bt-mk">⛵ 새 배 띄우기</button>'}
+        <small class="bt-foot">배 안에서 나눈 대화는 선장님 로그에 남아요</small></div></div>`;
+    if ($q('#bt-anon')) $q('#bt-anon').onchange = e => { anon = e.target.checked; try { localStorage.setItem('wb_boatanon', anon ? '1' : '0') } catch { } };
+    if ($q('#bt-hush')) $q('#bt-hush').onclick = () => { stealth = !stealth; try { localStorage.setItem('wb_stealth', stealth ? '1' : '0') } catch { } lobby(v) };
+    if ($q('#bt-cap')) $q('#bt-cap').onclick = captainRoom;
+    if ($q('#bt-mk')) $q('#bt-mk').onclick = () => { making = true; lobby(v); $q('#bt-nn')?.focus() };
+    if ($q('#bt-new')) $q('#bt-new').onsubmit = async e => {
+      e.preventDefault(); const name = $q('#bt-nn').value.trim() || `${Object.keys(boats).length + 1}번 배`;
+      const ref = doc(collection(db, 'boats'));
+      try { await setDoc(ref, { name, at: serverTimestamp(), last: serverTimestamp(), start: null }); boats[ref.id] = { name, at: null, start: null }; making = false; enter(ref.id, true) } catch (err) { toast('배를 띄우지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) }
+    };
+    v.querySelectorAll('[data-room]').forEach(b => b.onclick = async e => {
+      const sink = e.target.closest('[data-sink]');
+      if (sink) { e.stopPropagation(); try { await deleteDoc(doc(db, 'boats', sink.dataset.sink)); toast('배를 가라앉혔어요') } catch (err) { toast('지우지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) } return }
+      try { if (!alive(b.dataset.room)) { toast('이미 도착한 배예요'); return } enter(b.dataset.room) } catch (err) { toast('타지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) }
+    });
+    tick();
+  }
+  function askLeave(yes) { // 실수로 내리지 않게 한 번 더 물어봄
+    const bt = $q('.bt'); if (!bt) return yes();
+    $q('#bt-ask')?.remove();
+    bt.insertAdjacentHTML('beforeend', `<div class="bt-sheet" id="bt-ask"><div class="bt-askc"><b>정말 배에서 내릴까요?</b><p>${bStart(room) ? '내리면 이 배로 다시 못 돌아올 수도 있어요' : '아직 출항 전이에요'}</p><div><button class="bt-pill g" id="bt-ano">계속 탈래요</button><button class="bt-pill" id="bt-ayes">내릴래요</button></div></div></div>`);
+    $q('#bt-ano').onclick = () => $q('#bt-ask').remove();
+    $q('#bt-ayes').onclick = () => { $q('#bt-ask').remove(); yes() };
+    $q('#bt-ask').onclick = e => { if (e.target.id === 'bt-ask') $q('#bt-ask').remove() };
+  }
+  function maybeStart() { // 두 명 이상 타면 출항 (10분 시작)
+    if (!room || !boats[room] || boats[room].start || G.btStarting === room) return;
+    if (inRoom(room).length + (hush() ? 0 : 1) < 2) return;
+    G.btStarting = room;
+    updateDoc(doc(db, 'boats', room), { start: serverTimestamp() }).catch(() => { }).finally(() => { G.btStarting = null });
+  }
+  async function arrive() { // 10분이 다 됨: 이 배에 탄 사람 모두 같이 내림
+    const r = room; if (!r) return;
+    if (!hush()) await log('out', `'${rname(r)}' 10분이 지나 다 같이 내렸어요`);
+    leaveRoomSubs(); room = null; down = false; cur = null; padOpen = false;
+    if (!hush()) deleteDoc(doc(db, 'boatlive', tok)).catch(() => { });
+    toast('⏳ 10분이 지나 배가 선착장에 도착했어요 🏝️');
+    if (!S.isAdmin) { try { await setDoc(doc(db, 'boatreq', me()), { status: 'done', start: req?.start || null, at: serverTimestamp() }) } catch { } go('home') }
+    else if (view) lobby(view);
+  }
+  function enter(id, made) {
+    room = id; G.btEnterAt = Date.now(); padOpen = false; firstMsgs = true; msgs = []; strokes = []; logs = [];
+    if (!hush()) { log('in', made ? `'${rname(id)}'을(를) 띄웠어요` : `'${rname(id)}'에 탔어요`); sysSay(made ? '배를 띄웠어요 ⛵' : '배에 탔어요 🚣') }
+    roomView(view);
+  }
+  function exitRoom() {
+    if (room && !hush()) { sysSay('배에서 내렸어요 👋'); log('out', `'${rname(room)}'에서 내렸어요`) }
+    leaveRoomSubs(); room = null; down = false; cur = null; padOpen = false;
+    if (!hush()) deleteDoc(doc(db, 'boatlive', tok)).catch(() => { });
+  }
+  function roomView(v) {
+    v.innerHTML = `<div class="bt bt-room" id="bt"><div class="bt-top"><button class="bt-back" id="bt-dock">⬅ 선착장</button><span class="bt-on${hush() ? ' hush' : ''}">${hush() ? '👀' : '⛵'} ${esc(rname(room))} <b id="bt-who"></b></span><span class="bt-time" id="bt-time"></span></div>
+      <div class="bt-bar"><button class="bt-pill${padOpen ? ' on' : ''}" id="bt-padb">${padOpen ? '💬 그림판 닫기' : '🎨 그림판 열기'}</button>${S.isAdmin ? `<button class="bt-pill g" id="bt-hush">${stealth ? '🙋 같이 타기' : '👀 몰래 보기'}</button>` : ''}</div>
       ${padOpen ? `<div class="bt-pad" id="bt-pad"><canvas id="bt-cv"></canvas><canvas id="bt-lv"></canvas>
-        <div class="bt-tools"><button data-md="thumb" class="${mode === 'thumb' ? 'on' : ''}">👍 엄지</button><button data-md="draw" class="${mode === 'draw' ? 'on' : ''}">✏️ 그리기</button>${mode === 'draw' ? PCOLS.map(c => `<button data-pc="${c}" class="dot${pcol === c ? ' on' : ''}" style="background:${c}" aria-label="색"></button>`).join('') + '<button id="bt-clr">내 그림 지우기</button>' : ''}</div>
-        <p class="bt-hint">${mode === 'thumb' ? '꾹 눌러 엄지를 대 봐요 · 엄지끼리 닿으면 쪽♥' : '손가락으로 슥슥 그려요'}</p></div>` : ''}
+        ${hush() ? '' : `<div class="bt-tools"><button data-md="thumb" class="${mode === 'thumb' ? 'on' : ''}">👍 엄지</button><button data-md="draw" class="${mode === 'draw' ? 'on' : ''}">✏️ 그리기</button>${mode === 'draw' ? PCOLS.map(c => `<button data-pc="${c}" class="dot${pcol === c ? ' on' : ''}" style="background:${c}" aria-label="색"></button>`).join('') + '<button id="bt-clr">내 그림 지우기</button>' : ''}</div>`}
+        <p class="bt-hint">${hush() ? '몰래 보는 중' : mode === 'thumb' ? '꾹 눌러 엄지를 대 봐요 · 엄지끼리 닿으면 쪽♥' : '손가락으로 슥슥 그려요'}</p></div>` : ''}
       <div class="bt-chat" id="bt-chat"></div>
       ${hush() ? '<p class="bt-hushnote">몰래 보는 중이라 탄 사람들에게 안 보여요 · 진짜 닉네임도 같이 보여요</p>' : ''}<form class="bt-in" id="bt-in"${hush() ? ' hidden' : ''}><input id="bt-t" maxlength="200" placeholder="${anon && !S.isAdmin ? '익명으로 말하기' : '메시지'}" autocomplete="off"><button aria-label="보내기">↑</button></form>
       <div class="bt-flash" id="bt-flash"></div></div>`;
-    if (S.isAdmin && !req?.start) anon = false;
-    if ($q('#bt-hush')) $q('#bt-hush').onclick = () => { stealth = !stealth; try { localStorage.setItem('wb_stealth', stealth ? '1' : '0') } catch { } if (stealth) { deleteDoc(doc(db, 'boatlive', tok)).catch(() => { }) } else { sendLive(true); if (!logged) { logged = true; log('in', '배에 탔어요') } } room(v) };
-    $q('#bt-padb').onclick = () => { padOpen = !padOpen; down = false; cur = null; if (!hush()) sysSay(padOpen ? '그림판으로 이동했어요 🎨' : '대화로 돌아왔어요 💬'); sendLive(true); room(v); drawChat() };
+    $q('#bt-dock').onclick = () => hush() ? (exitRoom(), lobby(v)) : askLeave(() => { exitRoom(); lobby(v) });
+    if ($q('#bt-hush')) $q('#bt-hush').onclick = () => { stealth = !stealth; try { localStorage.setItem('wb_stealth', stealth ? '1' : '0') } catch { } if (stealth) deleteDoc(doc(db, 'boatlive', tok)).catch(() => { }); else { sendLive(true); sysSay('배에 탔어요 🚣'); log('in', `'${rname(room)}'에 탔어요`) } roomView(v); drawChat() };
+    $q('#bt-padb').onclick = () => { padOpen = !padOpen; down = false; cur = null; sysSay(padOpen ? '그림판으로 이동했어요 🎨' : '대화로 돌아왔어요 💬'); sendLive(true); roomView(v); drawChat() };
     $q('#bt-in').onsubmit = e => { e.preventDefault(); const t = $q('#bt-t').value.trim(); if (!t) return; $q('#bt-t').value = ''; say(t) };
-    if ($q('#bt-out')) $q('#bt-out').onclick = async () => { await log('out', '스스로 내렸어요'); try { await setDoc(doc(db, 'boatreq', me()), { status: 'done', start: req.start, at: serverTimestamp() }) } catch { } };
-    if ($q('#bt-cap')) $q('#bt-cap').onclick = captainRoom;
     if (padOpen) setupPad(v);
-    watch(); tick(); clearInterval(timerT); timerT = setInterval(tick, 1000); drawChat(); drawWho();
-    if (!logged && !hush()) { logged = true; G.btOutLogged = 0; log('in', '배에 탔어요') }
+    watchRoom(); tick(); drawChat(); drawWho(); sendLive(true); maybeStart();
   }
+  function tick() {
+    if (!room) { if ($q('.bt-lobby') && Date.now() - (G.btLobbyT || 0) > 30000 && !making) { G.btLobbyT = Date.now(); lobby(view) } return }
+    const el = $q('#bt-time'); if (!el) return;
+    if (!bStart(room)) { el.textContent = '⏳ 출항 전'; el.classList.remove('low'); return }
+    const l = Math.max(0, bLeft(room)), m = Math.floor(l / 60000), s = Math.floor(l / 1000) % 60;
+    el.textContent = `⏳ ${m}:${String(s).padStart(2, '0')}`; el.classList.toggle('low', l < 60000);
+    if (l <= 0) arrive();
+  }
+  // ---------- 그림판 ----------
   function setupPad(v) {
     const pad = $q('#bt-pad'), cv = $q('#bt-cv'), lv = $q('#bt-lv');
     const size = () => { const r = pad.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); [cv, lv].forEach(c => { c.width = Math.round(r.width * d); c.height = Math.round(r.height * d) }); paintAll(); paintLive() };
     size(); new ResizeObserver(size).observe(pad);
-    pad.querySelectorAll('[data-md]').forEach(b => b.onclick = e => { e.stopPropagation(); mode = b.dataset.md; room(v) });
-    pad.querySelectorAll('[data-pc]').forEach(b => b.onclick = e => { e.stopPropagation(); pcol = b.dataset.pc; room(v) });
-    if ($q('#bt-clr')) $q('#bt-clr').onclick = async e => { e.stopPropagation(); const mine = strokes.filter(x => x.tok === tok); try { const b = writeBatch(db); mine.forEach(x => b.delete(doc(db, 'boatdraw', x.id))); await b.commit() } catch (err) { toast('지우지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) } };
+    pad.querySelectorAll('[data-md]').forEach(b => b.onclick = e => { e.stopPropagation(); mode = b.dataset.md; roomView(v); drawChat() });
+    pad.querySelectorAll('[data-pc]').forEach(b => b.onclick = e => { e.stopPropagation(); pcol = b.dataset.pc; roomView(v); drawChat() });
+    if ($q('#bt-clr')) $q('#bt-clr').onclick = async e => { e.stopPropagation(); const mine = strokes.filter(x => x.tok === tok && !x.id.startsWith('tmp')); try { const b = writeBatch(db); mine.forEach(x => b.delete(doc(db, 'boats', room, 'draw', x.id))); await b.commit() } catch (err) { toast('지우지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) } };
     const at = e => { const r = pad.getBoundingClientRect(); return [Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))].map(n => Math.round(n * 1000) / 1000) };
     pad.addEventListener('pointerdown', e => { if (e.target.closest('.bt-tools') || hush()) return; e.preventDefault(); pad.setPointerCapture(e.pointerId); pos = at(e);
       if (mode === 'thumb') { down = true; haptic(); drawThumbs(); checkKiss() } else { cur = { c: pcol, pts: pos.slice() }; paintLive() } sendLive(true) });
@@ -3431,68 +3512,74 @@ const BOAT = (() => {
   const lw = W => Math.max(3, W / 90);
   function paintAll() { const cv = $q('#bt-cv'); if (!cv) return; const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height); strokes.forEach(s => line(g, s.pts, s.c, lw(cv.width), cv.width, cv.height)) }
   function paintLive() { const lv = $q('#bt-lv'); if (!lv) return; const g = lv.getContext('2d'); g.clearRect(0, 0, lv.width, lv.height);
-    Object.values(live).forEach(x => { if (x.cur?.pts) line(g, x.cur.pts, x.cur.c, lw(lv.width), lv.width, lv.height) });
+    inRoom(room).forEach(x => { if (x.cur?.pts) line(g, x.cur.pts, x.cur.c, lw(lv.width), lv.width, lv.height) });
     if (cur) line(g, cur.pts, cur.c, lw(lv.width), lv.width, lv.height) }
   async function saveStroke(d) { if (d.pts.length < 2) return; strokes.push({ id: 'tmp' + Math.random(), tok, c: d.c, pts: d.pts }); paintAll();
-    try { await setDoc(doc(collection(db, 'boatdraw')), { tok, c: d.c, w: 1, pts: d.pts, at: serverTimestamp() }) } catch (e) { toast('그림을 저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } }
-  function tick() {
-    const el = $q('#bt-time'); if (!el) return;
-    if (left() === Infinity) { el.textContent = '⚓ 선장'; return }
-    const l = Math.max(0, left()), m = Math.floor(l / 60000), s = Math.floor(l / 1000) % 60;
-    el.textContent = `⏳ ${m}:${String(s).padStart(2, '0')}`; el.classList.toggle('low', l < 60000);
-    if (l <= 3000 && !G.btOutLogged) { G.btOutLogged = 1; log('out', '시간이 다 돼서 내렸어요') }
-    if (l <= 0) { stop(); toast('10분이 지나 선착장에 도착했어요 🏝️'); go('home') }
-  }
+    try { await setDoc(doc(collection(db, 'boats', room, 'draw')), { tok, c: d.c, w: 1, pts: d.pts, at: serverTimestamp() }) } catch (e) { toast('그림을 저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } }
   // ---------- 서버 ----------
-  function watch() {
-    const since = new Date(S.isAdmin && !req?.start ? Date.now() - 3600000 : startMs());
+  function watchBase() {
+    if (!subs.btBoats) subs.btBoats = onSnapshot(collection(db, 'boats'), q => {
+      boats = {}; q.forEach(d => boats[d.id] = d.data({ serverTimestamps: 'estimate' }));
+      if (room) { tick(); maybeStart() }
+      if (room && !boats[room] && !q.metadata?.hasPendingWrites) { toast('배가 가라앉았어요 🌊'); leaveRoomSubs(); room = null; if (view && S.screen === 'boat') lobby(view) }
+      else if (!room && view && S.screen === 'boat' && !making) lobby(view);
+    }, () => unsub('btBoats'));
     if (!subs.btLive) subs.btLive = onSnapshot(collection(db, 'boatlive'), q => {
       live = {}; q.forEach(d => { if (d.id !== tok) { const x = d.data({ serverTimestamps: 'estimate' }); if (Date.now() - ms(x.at) < 40000) live[d.id] = x } });
-      drawThumbs(); drawWho(); checkKiss(); paintLive();
+      const sig = Object.values(live).map(x => x.room || '').sort().join();
+      if (room) { drawThumbs(); drawWho(); checkKiss(); paintLive(); maybeStart() } else if (sig !== G.btSig && view && S.screen === 'boat' && !making && $q('.bt-lobby')) lobby(view);
+      G.btSig = sig;
     }, () => unsub('btLive'));
-    if (!subs.btMsg) subs.btMsg = onSnapshot(query(collection(db, 'boatmsgs'), where('at', '>=', since)), q => {
+    if (!beatT) beatT = setInterval(() => { if (room) sendLive(true) }, 15000);
+  }
+  function watchRoom() {
+    const since = new Date(S.isAdmin ? Date.now() - 3 * 3600000 : (G.btEnterAt || Date.now()) - 5000);
+    const r = room;
+    if (!subs.btMsg) subs.btMsg = onSnapshot(query(collection(db, 'boats', r, 'msgs'), where('at', '>=', since)), q => {
+      if (r !== room) return;
       const a = []; q.forEach(d => a.push({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
       const old = new Set(msgs.map(x => x.id));
       msgs = a.sort((x, y) => ms(x.at) - ms(y.at)); drawChat();
       if (!firstMsgs) a.forEach(m => { if (!old.has(m.id) && m.sys && m.tok !== tok) toast(`${m.name}님이 ${m.text}`) });
       firstMsgs = false;
     }, () => unsub('btMsg'));
-    if (!subs.btDraw) subs.btDraw = onSnapshot(query(collection(db, 'boatdraw'), where('at', '>=', since)), q => {
+    if (!subs.btDraw) subs.btDraw = onSnapshot(query(collection(db, 'boats', r, 'draw'), where('at', '>=', since)), q => {
+      if (r !== room) return;
       const a = []; q.forEach(d => a.push({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
       strokes = a.sort((x, y) => ms(x.at) - ms(y.at)); paintAll();
     }, () => unsub('btDraw'));
     if (S.isAdmin && !subs.btLog) subs.btLog = onSnapshot(query(collection(db, 'boatlog'), where('at', '>=', since)), q => {
-      const a = []; q.forEach(d => a.push({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
+      const a = []; q.forEach(d => { const x = d.data({ serverTimestamps: 'estimate' }); if (x.room === r) a.push(x) });
       logs = a.sort((x, y) => ms(x.at) - ms(y.at)); if (hush()) drawChat();
     }, () => unsub('btLog'));
-    sendLive(true); if (!beatT) beatT = setInterval(() => sendLive(true), 15000);
   }
+  function leaveRoomSubs() { unsub('btMsg'); unsub('btDraw'); unsub('btLog'); clearTimeout(sendT); sendT = null }
   function sendLive(force) {
-    if (hush()) return;
+    if (hush() || !room) return;
     const now = Date.now(); if (!force && now - lastSend < 150) { if (!sendT) sendT = setTimeout(() => { sendT = null; sendLive(true) }, 150 - (now - lastSend)); return }
     lastSend = now;
-    setDoc(doc(db, 'boatlive', tok), { name: myName(), c: anon ? col : '#8fd3ff', x: pos[0], y: pos[1], down: padOpen && down, pad: padOpen, cur: cur ? { c: cur.c, pts: cur.pts.slice(-300) } : null, at: serverTimestamp() }).catch(() => { });
+    setDoc(doc(db, 'boatlive', tok), { name: myName(), c: anon && !S.isAdmin ? col : '#8fd3ff', x: pos[0], y: pos[1], down: padOpen && down, pad: padOpen, cur: cur ? { c: cur.c, pts: cur.pts.slice(-300) } : null, room, at: serverTimestamp() }).catch(() => { });
   }
   async function say(t) {
     const b = writeBatch(db);
-    b.set(doc(collection(db, 'boatmsgs')), { tok, name: myName(), c: anon ? col : '', text: t, at: serverTimestamp() });
-    b.set(doc(collection(db, 'boatlog')), { by: me(), anon, name: myName(), text: t, kind: 'msg', at: serverTimestamp() });
+    b.set(doc(collection(db, 'boats', room, 'msgs')), { tok, name: myName(), c: anon && !S.isAdmin ? col : '', text: t, at: serverTimestamp() });
+    b.set(doc(collection(db, 'boatlog')), { by: me(), anon: anon && !S.isAdmin, name: myName(), text: t, kind: 'msg', room, rname: rname(room), at: serverTimestamp() });
+    b.update(doc(db, 'boats', room), { last: serverTimestamp() });
     try { await b.commit() } catch (e) { toast('보내지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
   }
-  function sysSay(t) { if (hush()) return; setDoc(doc(collection(db, 'boatmsgs')), { tok, name: myName(), c: anon ? col : '', text: t, sys: true, at: serverTimestamp() }).catch(() => { }) }
-  function log(kind, text) { if (hush()) return Promise.resolve(); return setDoc(doc(collection(db, 'boatlog')), { by: me(), anon, name: myName(), text, kind, at: serverTimestamp() }).catch(() => { }) }
-  function stop(keepLog) {
-    clearInterval(timerT); timerT = null; clearInterval(beatT); beatT = null; clearTimeout(sendT); sendT = null;
-    if (subs.btLive && S.me && !hush()) deleteDoc(doc(db, 'boatlive', tok)).catch(() => { });
-    unsub('btLive'); unsub('btMsg'); unsub('btDraw'); unsub('btLog'); logs = []; down = false; cur = null; live = {}; msgs = []; strokes = []; firstMsgs = true;
-    if (!keepLog) { logged = false; padOpen = false }
+  function sysSay(t) { if (hush() || !room) return; setDoc(doc(collection(db, 'boats', room, 'msgs')), { tok, name: myName(), c: anon && !S.isAdmin ? col : '', text: t, sys: true, at: serverTimestamp() }).catch(() => { }) }
+  function log(kind, text) { if (hush()) return Promise.resolve(); return setDoc(doc(collection(db, 'boatlog')), { by: me(), anon: anon && !S.isAdmin, name: myName(), text, kind, room: room || '', rname: room ? rname(room) : '', at: serverTimestamp() }).catch(() => { }) }
+  function stop() {
+    if (room) exitRoom();
+    clearInterval(timerT); timerT = null; clearInterval(beatT); beatT = null;
+    leaveRoomSubs(); unsub('btBoats'); unsub('btLive'); live = {}; msgs = []; strokes = []; logs = []; making = false; view = null;
   }
   // ---------- 그리기 ----------
   const thumbSVG = c => `<svg viewBox="0 0 60 74" aria-hidden="true"><ellipse cx="30" cy="37" rx="27" ry="34" fill="${c}" opacity=".25"/>${[6, 11, 16, 21, 26].map(r => `<path d="M${30 - r} ${44} C${30 - r} ${44 - r * 1.6} ${30 + r} ${44 - r * 1.6} ${30 + r} ${44}" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>`).join('')}<path d="M18 52 C22 60 38 60 42 52" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" opacity=".9"/></svg>`;
   function drawThumbs() {
     const pad = $q('#bt-pad'); if (!pad) return;
-    const want = { ...(down ? { [tok]: { x: pos[0], y: pos[1], c: anon ? col : '#2f86ff', name: '나', down: true } } : {}) };
-    Object.entries(live).forEach(([k, x]) => { if (x.down) want[k] = x });
+    const want = { ...(down ? { [tok]: { x: pos[0], y: pos[1], c: anon && !S.isAdmin ? col : '#2f86ff', name: '나', down: true } } : {}) };
+    Object.entries(live).forEach(([k, x]) => { if (x.down && x.room === room) want[k] = x });
     pad.querySelectorAll('[data-th]').forEach(el => { if (!want[el.dataset.th]) el.remove() });
     Object.entries(want).forEach(([k, x]) => {
       let el = pad.querySelector(`[data-th="${k}"]`);
@@ -3503,16 +3590,16 @@ const BOAT = (() => {
   }
   function drawWho() {
     const el = $q('#bt-who'); if (!el) return;
-    const n = Object.keys(live).length + (hush() ? 0 : 1), inPad = Object.values(live).filter(x => x.pad).length + (padOpen && !hush() ? 1 : 0);
-    el.textContent = `· ${hush() ? '탄 사람 ' : ''}${n}명${inPad ? ` (그림판 ${inPad})` : ''}`;
+    const here = inRoom(room), n = here.length + (hush() ? 0 : 1), inPad = here.filter(x => x.pad).length + (padOpen && !hush() ? 1 : 0);
+    el.textContent = `· ${n}명${inPad ? ` (그림판 ${inPad})` : ''}`;
   }
   function drawChat() {
     const el = $q('#bt-chat'); if (!el) return;
     const near = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
-    if (hush()) { // 관리자 몰래 보기: 진짜 닉네임이 같이 보이는 로그
+    if (hush()) { // 관리자 몰래 보기: 이 배의 로그 (진짜 닉네임이 같이 보임)
       el.innerHTML = logs.length ? logs.map(x => x.kind === 'msg'
         ? `<small class="bt-nm">${esc(x.name)}${x.anon ? ` <em class="bt-real">${esc(S.users[x.by] || '?')}</em>` : ''}</small><div class="bt-msg"><span>${esc(x.text)}</span></div>`
-        : `<div class="bt-sys">${x.kind === 'kiss' ? '💋' : x.kind === 'in' ? '🚣' : '🏝️'} ${esc(S.users[x.by] || '?')}${x.anon ? '(익명)' : ''} · ${esc(x.text)}</div>`).join('') : '<div class="bt-empty">최근 1시간 동안 조용했어요</div>';
+        : `<div class="bt-sys">${x.kind === 'kiss' ? '💋' : x.kind === 'in' ? '🚣' : '🏝️'} ${esc(S.users[x.by] || '?')}${x.anon ? '(익명)' : ''} · ${esc(x.text)}</div>`).join('') : '<div class="bt-empty">아직 조용한 배예요</div>';
       if (near) el.scrollTop = el.scrollHeight; return;
     }
     let prev = '';
@@ -3526,7 +3613,7 @@ const BOAT = (() => {
   function checkKiss() {
     if (!down || Date.now() < kissCool) return;
     const pad = $q('#bt-pad'); if (!pad) return; const r = pad.getBoundingClientRect();
-    const hit = Object.values(live).find(x => x.down && Math.hypot((x.x - pos[0]) * r.width, (x.y - pos[1]) * r.height) < 46);
+    const hit = inRoom(room).find(x => x.down && Math.hypot((x.x - pos[0]) * r.width, (x.y - pos[1]) * r.height) < 46);
     if (!hit) return;
     kissCool = Date.now() + 2500; kiss(hit);
   }
@@ -3543,7 +3630,7 @@ const BOAT = (() => {
   // ---------- 선장실 (관리자) ----------
   function captainRoom() {
     const old = $q('#bt-sheet'); if (old) old.remove();
-    const bt = $q('#bt'); if (!bt) return;
+    const bt = $q('.bt'); if (!bt) return;
     bt.insertAdjacentHTML('beforeend', `<div class="bt-sheet" id="bt-sheet"><div><h3>⚓ 선장실 <button data-x aria-label="닫기">✕</button></h3>
       <div class="bt-tabs"><button data-st="req" class="${sheetTab === 'req' ? 'on' : ''}">승객 관리</button><button data-st="log" class="${sheetTab === 'log' ? 'on' : ''}">대화 로그</button></div><div id="bt-sb"></div></div></div>`);
     const s = $q('#bt-sheet');
@@ -3554,15 +3641,14 @@ const BOAT = (() => {
   function drawReqs() {
     const el = $q('#bt-sb'); if (!el) return;
     const all = Object.entries(reqs).filter(([u]) => S.users[u]), nm = u => esc(S.users[u]);
-    const wait = all.filter(([, x]) => x.status === 'wait'), on = all.filter(([, x]) => x.status === 'ok' && x.start && ms(x.start) + LIMIT > Date.now()), ready = all.filter(([, x]) => x.status === 'ok' && !x.start);
+    const ok = all.filter(([, x]) => x.status === 'ok');
     const row = (u, extra, btns) => `<div class="bt-rq"><span class="mini">${avatar(u)}</span><b>${nm(u)}</b><small>${extra}</small>${btns}</div>`;
-    el.innerHTML = `<h4>탑승 신청 ${wait.length}</h4>` + (wait.length ? wait.map(([u, x]) => row(u, relT(x.at), `<button data-ok="${u}">허가</button><button data-no="${u}" class="g">거절</button>`)).join('') : '<p class="bt-e">기다리는 사람이 없어요</p>')
-      + `<h4>지금 탄 사람 ${on.length}</h4>` + (on.length ? on.map(([u, x]) => { const l = ms(x.start) + LIMIT - Date.now(); return row(u, `${Math.floor(l / 60000)}분 ${Math.floor(l / 1000) % 60}초 남음`, `<button data-kick="${u}" class="g">내리게 하기</button>`) }).join('') : '<p class="bt-e">아무도 안 탔어요</p>')
-      + `<h4>허가했지만 아직 안 탄 사람 ${ready.length}</h4>` + (ready.length ? ready.map(([u]) => row(u, '배에 타기를 누르면 10분이 시작돼요', `<button data-kick="${u}" class="g">허가 취소</button>`)).join('') : '<p class="bt-e">없어요</p>')
-      + `<h4>바로 허가하기</h4><div class="bt-pick">${Object.entries(S.users).filter(([u]) => u !== me() && !(reqs[u]?.status === 'ok')).map(([u, n]) => `<button data-ok="${u}">${esc(n)}</button>`).join('')}</div>`;
+    const sail = Object.entries(boats).filter(([id]) => alive(id) && inRoom(id).length);
+    el.innerHTML = `<h4>지금 떠 있는 배 ${sail.length}</h4>` + (sail.length ? sail.map(([id]) => `<div class="bt-rq"><b>⛵ ${esc(rname(id))}</b><small>${inRoom(id).length}명 · ${bStart(id) ? `${Math.max(1, Math.ceil(bLeft(id) / 60000))}분 남음` : '출항 전'}</small></div>`).join('') : '<p class="bt-e">사람이 탄 배가 없어요</p>')
+      + `<h4>탑승 허가된 사람 ${ok.length}</h4>` + (ok.length ? ok.map(([u]) => row(u, '배 시간이 끝나면 허가도 끝나요', `<button data-kick="${u}" class="g">허가 취소</button>`)).join('') : '<p class="bt-e">없어요</p>')
+      + `<h4>탑승 허가하기</h4><div class="bt-pick">${Object.entries(S.users).filter(([u]) => u !== me() && reqs[u]?.status !== 'ok').map(([u, n]) => `<button data-ok="${u}">${esc(n)}</button>`).join('')}</div>`;
     const set = async (u, d, msg) => { try { await setDoc(doc(db, 'boatreq', u), { ...d, at: serverTimestamp() }); toast(msg) } catch (e) { toast('바꾸지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } };
     el.querySelectorAll('[data-ok]').forEach(b => b.onclick = () => set(b.dataset.ok, { status: 'ok', start: null }, `${S.users[b.dataset.ok]}님 탑승을 허가했어요`));
-    el.querySelectorAll('[data-no]').forEach(b => b.onclick = () => set(b.dataset.no, { status: 'no', start: null }, '거절했어요'));
     el.querySelectorAll('[data-kick]').forEach(b => b.onclick = () => set(b.dataset.kick, { status: 'done', start: reqs[b.dataset.kick]?.start || null }, '내리게 했어요'));
   }
   async function drawLog() {
@@ -3570,20 +3656,20 @@ const BOAT = (() => {
     try {
       const q = await getDocs(query(collection(db, 'boatlog'), orderBy('at', 'desc'), limit(300))), a = []; q.forEach(d => a.push(d.data()));
       const t = x => { const d = x.at?.toDate ? x.at.toDate() : new Date(); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` };
-      el.innerHTML = a.length ? `<div class="bt-log">${a.map(x => `<div class="${x.kind}"><small>${t(x)}</small><b>${esc(S.users[x.by] || '(탈퇴)')}${x.anon ? ` <em>${esc(x.name)}</em>` : ''}</b><span>${x.kind === 'msg' ? '' : x.kind === 'kiss' ? '💋 ' : x.kind === 'in' ? '🚣 ' : '🏝️ '}${esc(x.text)}</span></div>`).join('')}</div>` : '<p class="bt-e">아직 기록이 없어요</p>';
+      el.innerHTML = a.length ? `<div class="bt-log">${a.map(x => `<div class="${x.kind}"><small>${t(x)}</small><b>${esc(S.users[x.by] || '(탈퇴)')}${x.anon ? ` <em>${esc(x.name)}</em>` : ''}${x.rname ? ` <i class="bt-rn">⛵ ${esc(x.rname)}</i>` : ''}</b><span>${x.kind === 'msg' ? '' : x.kind === 'kiss' ? '💋 ' : x.kind === 'in' ? '🚣 ' : '🏝️ '}${esc(x.text)}</span></div>`).join('')}</div>` : '<p class="bt-e">아직 기록이 없어요</p>';
     } catch (e) { el.innerHTML = `<p class="bt-e">불러오지 못했어요 (${e?.code || ''})</p>` }
   }
-  const captain = () => Object.keys(S.users).find(u => S.users[u] === '밤티') || '';
   return {
     mount, stop, haptic,
-    setReq(x) { const before = riding(); req = x; if (S.screen === 'boat' && (before !== riding() || !$q('#bt'))) render() },
+    leaveThen(fn) { if (S.screen === 'boat' && room && !hush()) askLeave(fn); else fn() },
+    setReq(x) { const before = pass(); req = x; if (S.screen === 'boat' && before !== pass()) render() },
     setReqs(x) { reqs = x; if ($q('#bt-sb') && sheetTab === 'req') drawReqs() }
   };
 })();
 const BOAT_SVG = '<svg viewBox="0 0 120 70" aria-hidden="true"><path d="M8 38h104l-14 22H22z" fill="#c98a3a"/><path d="M8 38h104l-3 5H11z" fill="#e0a95a"/><path d="M58 6v32" stroke="#6b4a22" stroke-width="3"/><path d="M61 9l30 24H61z" fill="#fff"/><path d="M55 12L30 33h25z" fill="#ffd6e2"/><circle cx="44" cy="49" r="3" fill="#7a4a14"/><circle cx="76" cy="49" r="3" fill="#7a4a14"/><path d="M84 18c2-4 8-4 8 1 0 4-8 8-8 8s-8-4-8-8c0-5 6-5 8-1z" fill="#ff4f8b"/></svg>';
 
 // 나룻배에 들어갈 수 있는지: 관리자이거나, 허가받고 아직 안 탔거나, 탄 지 10분이 안 됐을 때
-function boatPass() { const x = G.myBoat; return !!S.isAdmin || (!!x && x.status === 'ok' && (!x.start || ms(x.start) + 600000 > Date.now())) }
+function boatPass() { const x = G.myBoat; return !!S.isAdmin || (!!x && x.status === 'ok') }
 // 관리자 알림 (낙서장 입장 · 나룻배 신청)과 내 탑승 허가 알림 — 어느 화면에 있든 받음
 function watchAlerts() {
   if (!S.me) return;
@@ -5300,9 +5386,9 @@ document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dat
 $('#homebtn').onclick = () => { if (S.me) go('home') };
 // 휴대폰: 화면 맨 아래 작은 바를 누르거나 위로 쓸어 올리면 홈으로
 (() => { const b = $('#hbar'); let y0 = null;
-  b.onclick = () => { if (S.me) go('home') };
+  b.onclick = () => { if (S.me) BOAT.leaveThen(() => go('home')) };
   b.addEventListener('pointerdown', e => { y0 = e.clientY });
-  b.addEventListener('pointerup', e => { if (y0 !== null && y0 - e.clientY > 15 && S.me) go('home'); y0 = null });
+  b.addEventListener('pointerup', e => { if (y0 !== null && y0 - e.clientY > 15 && S.me) { y0 = null; BOAT.leaveThen(() => go('home')); return } y0 = null });
 })();
 function tick() { const d = new Date(), t = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); $('#clock').textContent = t; if ($('#hstime')) $('#hstime').textContent = t }
 tick(); setInterval(tick, 30000);
