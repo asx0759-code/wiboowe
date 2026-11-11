@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1402">
+<meta name="build" content="20261111-1415">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -269,6 +269,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .rm-next{display:flex;flex-direction:column;gap:8px;width:100%}
 .rm-next .mg-btn{width:100%}
 .rm-next .hot{background:#ff4f8b;color:#fff}
+.rm-card.hid{background:linear-gradient(160deg,rgba(255,210,63,.22),rgba(180,120,255,.2));border-color:#f2c94c;animation:rmhid 1.6s ease-in-out infinite alternate}
+@keyframes rmhid{to{box-shadow:0 0 18px rgba(255,210,63,.55)}}
+.rm-hid{font-weight:700;font-size:13px;letter-spacing:.08em;color:#b8860b;animation:rmb .8s ease-in-out infinite}
+.rm-ch .t-대박{background:#fff1d9;color:#b96b00}.rm-ch .t-초대박{background:linear-gradient(90deg,#ffe0f0,#efe0ff);color:#8b3ff0}
 .rm-pick{font-size:11px;color:var(--muted);background:rgba(0,0,0,.04);border-radius:8px;padding:3px 8px}
 .mg-tabs{flex-wrap:wrap}.mg-tabs button{min-width:30%}
 .ft-arena{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin:10px 12px 0;padding:26px 10px 12px;border-radius:14px;background:linear-gradient(180deg,#2a1640,#120a1f);color:#fff;overflow:hidden}
@@ -2683,6 +2687,16 @@ const ROMANCE = (() => {
     ] },
   ];
   const NAME = '밤티';
+  // 돌발 미션: 첫 데이트를 성공하면 고백 전에 꼭 나옴 (확률 낮은 대신 배수 큼)
+  const H_SAFE = { p: .85, m: 1.2, tag: '안전' }, H_BIG = { p: .4, m: 3, tag: '대박' }, H_JACK = { p: .15, m: 7, tag: '초대박' };
+  const HIDDEN = [
+    { q: '데이트 중, 밤티가 지나가던 시온과 눈이 마주쳤다. “잘생겼당…” 밤티가 넋을 놓았다!', a: [
+      ['“나도 오늘 머리 감았는데…” 조용히 어필', H_SAFE, '밤티: “어? 진짜네 ㅋㅋ 샴푸 냄새 좋다” 정신 차림 완료', '밤티: “응…” 대답은 하는데 눈은 아직 시온 쪽이다'],
+      ['시온보다 잘생긴 척 머리를 쓸어 넘긴다', H_BIG, '그 순간 바람이 딱 맞춰 불었다. 밤티: “…헐 너도 잘생겼네?” 💘', '머리 넘기다 눈을 찔렀다. 밤티가 시온한테 휴지를 빌려 왔다'],
+      ['시온에게 가서 “제 사람한테 눈빛 쏘지 마세요”', H_JACK, '시온: “앗 죄송합니다…” 감동한 밤티가 팔짱을 꼈다 🤝', '시온: “저 밤티 사촌인데요?” 다음 주 밤티네 가족 모임에 끌려가게 됐다'],
+    ] },
+  ];
+  const pickHidden = () => { const sc = HIDDEN[Math.random() * HIDDEN.length | 0]; return { q: sc.q, hidden: 1, a: shuffle(sc.a.map(x => [x[0], { ...x[1], p: Math.min(.95, Math.max(.08, x[1].p + (Math.random() * .1 - .05))) }, x[2], x[3]])) } };
   let opt, st = { mode: 'idle' }, busy = false;
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
@@ -2711,18 +2725,18 @@ const ROMANCE = (() => {
     const s = STAGES[st.i], sc = st.scene;
     const face = `<div class="rm-face"><span class="mini">${bamFace()}</span><b>${NAME}</b></div>`;
     if (st.mode === 'ask') {
-      box.innerHTML = top + hearts(st.i) + `<div class="rm-card">${face}<div class="rm-pot">걸린 코인 <b>${st.pot}</b></div><p class="rm-q">${fill(sc.q)}</p>
+      box.innerHTML = top + hearts(st.i) + `<div class="rm-card ${sc.hidden ? 'hid' : ''}">${sc.hidden ? '<div class="rm-hid">🚨 돌발 미션 🚨</div>' : ''}${face}<div class="rm-pot">걸린 코인 <b>${st.pot}</b></div><p class="rm-q">${fill(sc.q)}</p>
         <div class="rm-ch">${sc.a.map((x, k) => `<button data-k="${k}"><span>${fill(x[0])}</span><em class="t-${x[1].tag}">${x[1].tag} ${Math.round(x[1].p * 100)}% · ×${x[1].m}</em></button>`).join('')}</div></div>`;
       box.querySelectorAll('[data-k]').forEach(b => b.onclick = () => choose(+b.dataset.k));
     } else if (st.mode === 'wait') {
       box.innerHTML = top + hearts(st.i) + `<div class="rm-card">${face}<div class="rm-doki">두근두근…</div><p class="rm-q">${fill(sc.a[st.k][0])}</p></div>`;
     } else if (st.mode === 'win') {
       const last = st.i >= STAGES.length - 1;
-      box.innerHTML = top + hearts(st.i + 1) + `<div class="rm-card ok">${face}<div class="rm-res">성공! 💕</div><small class="rm-pick">내 선택: ${fill(sc.a[st.k][0])}</small><p class="rm-q">${fill(sc.a[st.k][2])}</p><div class="rm-pot">걸린 코인 <b>${st.pot}</b></div>
+      box.innerHTML = top + hearts(st.i + 1) + `<div class="rm-card ok ${sc.hidden ? 'hid' : ''}">${face}<div class="rm-res">${sc.hidden ? '✨ 미션 클리어! ✨' : '성공! 💕'}</div><small class="rm-pick">내 선택: ${fill(sc.a[st.k][0])}</small><p class="rm-q">${fill(sc.a[st.k][2])}</p><div class="rm-pot">걸린 코인 <b>${st.pot}</b></div>
         ${last ? '<div class="rm-next"><button class="btn mg-btn hot" id="rm-cashc">코인 받기</button></div>' : `<div class="rm-next"><button class="btn mg-btn" id="rm-cash">그만하고 ${st.pot}코인 받기</button><button class="btn mg-btn hot" id="rm-cont">다음 단계: ${STAGES[st.i + 1].name} →</button></div>`}</div>`;
       if ($q('#rm-cash')) $q('#rm-cash').onclick = () => cash(false);
       if ($q('#rm-cashc')) $q('#rm-cashc').onclick = () => cash(true);
-      if ($q('#rm-cont')) $q('#rm-cont').onclick = () => { st.i++; st.scene = pick(st.i); st.mode = 'ask'; view() };
+      if ($q('#rm-cont')) $q('#rm-cont').onclick = () => { if (st.hidAt === st.i && !st.hidDone) { st.hidDone = true; st.scene = pickHidden() } else { st.i++; st.scene = pick(st.i) } st.mode = 'ask'; view() };
     } else if (st.mode === 'lose') {
       box.innerHTML = top + hearts(st.i) + `<div class="rm-card bad">${face}<div class="rm-res">${st.failT}</div><small class="rm-pick">내 선택: ${fill(sc.a[st.k][0])}</small><p class="rm-q">${fill(sc.a[st.k][3])}</p><p class="rm-lost">걸린 ${st.pot}코인을 잃었어요</p><button class="btn mg-btn" id="rm-again">처음으로</button></div>`;
       $q('#rm-again').onclick = () => { st = { mode: 'idle' }; view() };
@@ -2747,7 +2761,7 @@ const ROMANCE = (() => {
   }
   async function start() {
     if (busy || coins() < STAKE) return; busy = true;
-    try { await write(coins() - STAKE, G.coins[me()]?.w || 0, -STAKE); st = { mode: 'ask', i: 0, pot: STAKE }; st.scene = pick(0) }
+    try { await write(coins() - STAKE, G.coins[me()]?.w || 0, -STAKE); st = { mode: 'ask', i: 0, pot: STAKE, hidAt: 2 }; st.scene = pick(0) }
     catch (e) { toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
     busy = false; view();
   }
