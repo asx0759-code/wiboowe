@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1120">
+<meta name="build" content="20261111-1145">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -435,6 +435,15 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .nw-edit button{flex:none;padding:0 18px}
 .nw-edit button.gray{background:#2a2a31;color:#ddd;font-weight:400;padding:0 12px}
 .nw-music{padding:8px 14px 0}
+.nw-nm{display:flex;align-items:center;gap:8px;min-width:0}
+.nw-nm b{flex:none}
+.nw-sp{display:flex;align-items:center;gap:5px;min-width:0;max-width:60%;height:24px;padding:0 9px 0 3px;border:0;border-radius:12px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;font:inherit;font-size:11px;cursor:pointer}
+.nw-sp i{font-style:normal;width:18px;height:18px;border-radius:50%;background:#ff8a1f;display:grid;place-items:center;font-size:8px;flex:none}
+.nw-sp img{width:18px;height:18px;border-radius:4px;object-fit:cover;flex:none}
+.nw-sp span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nw-sp.on img{animation:nwspin 3s linear infinite;border-radius:50%}
+@keyframes nwspin{to{transform:rotate(360deg)}}
+.nw-yt{position:absolute;width:1px;height:1px;left:-9px;top:-9px;opacity:0;pointer-events:none;border:0}
 .nw-music .ytwrap{border-radius:14px;overflow:hidden;margin:0}
 .nw-song{position:absolute;bottom:34px;right:5px;width:18px;height:18px;border-radius:50%;background:rgba(255,138,31,.9);color:#fff;font-size:11px;line-height:18px;text-align:center}
 .head .hd-r{left:auto;right:6px;font-size:12px;display:flex;align-items:center;gap:4px}
@@ -2316,22 +2325,29 @@ function openNow(u) {
   const pics = P.pics[u] || [];
   box.innerHTML = `<div class="nw-card">
     <div class="nw-big" id="nw-big"><span class="nw-ph" id="nw-ph">${pics[0] ? `<img src="${pics[0]}" alt="">` : avatar(u)}</span>${pics.length > 1 ? `<div class="nw-bars">${pics.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}<button class="nw-x" id="nw-x" aria-label="닫기">✕</button>
-      <div class="nw-info"><b>${esc(S.users[u])}${mine ? ' (나)' : ''}</b><span><i class="dot ${x.on ? x.act : ''}"></i>${statusText(x)}</span></div></div>
+      <div class="nw-info"><div class="nw-nm"><b>${esc(S.users[u])}${mine ? ' (나)' : ''}</b>${x.song ? `<button class="nw-sp" id="nw-sp" aria-label="프로필 음악 듣기"><i>▶</i><img src="https://i.ytimg.com/vi/${x.song}/default.jpg" alt=""><span class="ytt" data-id="${x.song}">프로필 음악</span></button>` : ''}</div><span><i class="dot ${x.on ? x.act : ''}"></i>${statusText(x)}</span></div></div>
     ${mine ? `<div class="nw-lab" style="padding:14px 14px 0">NOW 사진 (최대 3장 · 첫 장이 대표 사진)</div>
       <div class="nw-pics">${[0, 1, 2].map(i => pics[i] ? `<div class="nw-slot"><img src="${pics[i]}" alt=""><button data-rm="${i}" aria-label="사진 지우기">✕</button>${i ? `<button class="fst" data-fst="${i}">대표로</button>` : '<span class="fst on">대표</span>'}</div>` : `<button class="nw-slot add" data-add="1" ${i > pics.length ? 'disabled' : ''}>+</button>`).join('')}</div>
       <input type="file" id="nw-file" accept="image/*" hidden>
       <div class="nw-lab" style="padding:14px 14px 0">♪ 프로필 음악 (유튜브 링크)</div>
-      ${x.song ? `<div class="nw-music">${ytCards('https://youtu.be/' + x.song)}</div>` : ''}
       <div class="nw-edit" style="padding-bottom:0"><input id="nw-song" placeholder="유튜브 링크 붙여 넣기" value="${x.song ? 'https://youtu.be/' + x.song : ''}"><button id="nw-songsave">${x.song ? '바꾸기' : '저장'}</button>${x.song ? '<button id="nw-songrm" class="gray">지우기</button>' : ''}</div>
       <div class="nw-edit"><input id="nw-in" maxlength="40" placeholder="친구들에게 보일 한마디 (40자)" value="${esc(x.msg)}"><button id="nw-save">저장</button></div>`
       : `<div class="nw-msg">${x.msg ? '“' + esc(x.msg) + '”' : '<i>한마디가 아직 없어요</i>'}</div>
-    ${x.song ? `<div class="nw-lab" style="padding:12px 14px 0">♪ 프로필 음악</div><div class="nw-music">${ytCards('https://youtu.be/' + x.song)}</div>` : ''}
+
     <div class="nw-acts"><button class="pk" id="nw-pk">👉 콕 찌르기</button><button id="nw-dm">🤫 쪽지</button><button id="nw-gb">방명록</button></div>`}
   </div>`;
   $('.lcdwrap').appendChild(box); fillYtTitles();
   const close = () => box.remove();
   box.onclick = e => { if (e.target === box) close() };
   box.querySelector('#nw-x').onclick = close;
+  const sp = box.querySelector('#nw-sp'); // 닉네임 옆 작은 음악: 누르면 재생/정지 (화면엔 안 보이는 플레이어)
+  if (sp) sp.onclick = e => {
+    e.stopPropagation();
+    const old = box.querySelector('.nw-yt');
+    if (old) { old.remove(); sp.classList.remove('on'); sp.querySelector('i').textContent = '▶'; return }
+    box.insertAdjacentHTML('beforeend', `<iframe class="nw-yt" src="https://www.youtube.com/embed/${x.song}?autoplay=1&playsinline=1" allow="autoplay; encrypted-media" title="프로필 음악"></iframe>`);
+    sp.classList.add('on'); sp.querySelector('i').textContent = '❚❚';
+  };
   if (pics.length > 1) { // 사진 누르면 넘기기 (왼쪽 1/3은 이전, 나머지는 다음)
     let i = 0; const big = box.querySelector('#nw-big');
     big.onclick = e => {
