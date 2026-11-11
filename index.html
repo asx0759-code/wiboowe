@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1710">
+<meta name="build" content="20261111-1750">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -250,6 +250,28 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .sd-acts button{border:0;border-radius:12px;padding:10px 4px;background:rgba(0,0,0,.35);color:#fff;font:inherit;font-weight:700;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
 .sd-acts button.hot{background:#ffe14a;color:#1a1a1a}.sd-acts button small{font-size:9.5px;font-weight:400;opacity:.8;line-height:1.3}.sd-acts button:disabled{opacity:.4}
 .sd-res{font-family:var(--pixel);font-size:14px;padding:8px 14px;border-radius:10px;background:rgba(0,0,0,.35)}.sd-res.win{color:#ffe14a}.sd-res.lose{color:#ffb0b0}
+.rc-list{margin:2px 10px 0;display:flex;flex-direction:column;gap:8px}
+.rc-team{display:flex;flex-direction:column;gap:6px;padding:9px 11px 10px;border:2px solid var(--line);border-left:8px solid var(--tc);border-radius:14px;background:#fff;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.rc-team.on{border-color:var(--tc);background:var(--tl)}
+.rc-th{display:flex;justify-content:space-between;align-items:center}.rc-th b{font-family:var(--pixel);font-size:15px;color:var(--tc)}
+.rc-mem{display:flex;align-items:center;gap:8px}.rc-mem i{font-style:normal;font-family:var(--pixel);font-size:10px;color:var(--muted);width:10px}
+.rc-mem .mini{width:28px;height:28px;border-radius:50%;border:0}
+.rc-nm{flex:1;min-width:0;display:flex;flex-direction:column}.rc-nm b{font-size:13px}.rc-nm small{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-od{font-family:var(--pixel);font-size:16px;color:var(--ink)}
+.rc-foot{position:sticky;bottom:0;margin-top:8px;padding:10px;background:rgba(255,255,255,.94);border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;align-items:stretch;text-align:center}
+.rc-bets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rc-bets button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 0;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}.rc-bets button.on{background:var(--ink);color:#fff;border-color:transparent}.rc-bets button:disabled{opacity:.35}
+.rc-foot .mg-btn:disabled{opacity:.45}
+.rc-say{margin:2px 10px 6px;padding:9px 12px;border-radius:12px;background:#1a191c;color:#ffe14a;font-family:var(--pixel);font-size:13px;text-align:center;min-height:38px}
+.rc-track{position:relative;margin:0 10px;border-radius:12px;overflow:hidden;background:#c97b4a;box-shadow:inset 0 0 0 3px #7ac74f}
+.rc-lane{position:relative;height:58px;border-bottom:2px solid rgba(255,255,255,.55)}.rc-lane:last-of-type{border-bottom:0}.rc-lane.my{background:rgba(255,225,74,.3)}
+.rc-lane em{position:absolute;left:6px;top:3px;font-style:normal;font-family:var(--pixel);font-size:10px;color:#fff;background:var(--tc);padding:1px 5px;border-radius:6px;z-index:4}
+.rc-r{position:absolute;top:17px;left:0;width:34px;height:34px;border-radius:50%;border:3px solid var(--tc);margin-left:4px;transition:opacity .2s,transform .2s}
+.rc-r.wait{transform:scale(.72);opacity:.75}.rc-r.doneR{opacity:.35}
+.rc-zone{position:absolute;top:0;bottom:0;width:2px;background:repeating-linear-gradient(#fff 0 5px,transparent 5px 10px);opacity:.6}
+.rc-fin{position:absolute;top:0;bottom:0;right:6px;width:8px;background:repeating-conic-gradient(#fff 0 25%,#1a191c 0 50%) 0 0/8px 8px}
+.rc-podium{display:flex;justify-content:center;gap:16px;padding:12px 10px 4px;font-size:13px}.rc-podium span{display:flex;align-items:center;gap:5px}.rc-podium b{font-family:var(--pixel);color:#e0a800}.rc-podium i{width:10px;height:10px;border-radius:50%}
+.rc-again{display:block;margin:8px auto 4px}
 .tt-stage{display:flex;justify-content:center}
 .tt-wrap{position:relative;display:flex;gap:8px;align-items:flex-start}
 .tt-wrap #tt-cv{border-radius:8px;touch-action:none;display:block}
@@ -855,7 +877,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop() } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function go(screen, extra = {}) { if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop() } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -1583,6 +1605,7 @@ function render() {
     v.innerHTML = '';
     if (gt === 'cat') CATRUN.mount(v, { best: () => G.cscores[S.me.uid] || 0, onEnd: saveCScore });
     else if (gt === 'sutda') SUTDA.mount(v);
+    else if (gt === 'race') RACE.mount(v);
     else if (gt === 'shoot') SHOOT.mount(v, { best: () => G.sscores[S.me.uid] || 0, onEnd: saveSScore });
     else if (gt === 'fight') FIGHT.mount(v);
     else if (gt === 'love') ROMANCE.mount(v, {});
@@ -3552,6 +3575,107 @@ const CATRUN = (() => {
   return { mount, stop, setBest: () => { const b = $q('#ct-b'); if (b) b.textContent = bestGet() } };
 })();
 
+/* ===== 달리기 (운동회 이어달리기 · 팀에 코인 걸기) ===== */
+const RACE = (() => {
+  const BETS = [10, 30, 50, 100], EDGE = .12;
+  const TEAMS = [{ n: '홍팀', c: '#e8283c', l: '#ffe3e6' }, { n: '청팀', c: '#2456c8', l: '#e2ebff' }, { n: '백팀', c: '#8a8f9c', l: '#f3f4f7' }];
+  const COND = [ // 컨디션 한마디: 잘 뛸수록 앞쪽 묶음에서 나옴
+    ['어제 9시에 잠', '아침에 고기 먹고 옴', '새 운동화 개시', '오늘따라 다리가 가벼움', '출발선에서 눈빛이 다름', '몸 풀다가 이미 한 바퀴 돎'],
+    ['컨디션 그냥저냥', '커피 한 잔 하고 옴', '스트레칭은 했음', '의욕은 있음', '어제 계단 좀 걸음', '평소대로'],
+    ['어제 야식으로 치킨 먹음', '슬리퍼 신고 옴', '방금 일어남', '신발끈이 자꾸 풀림', '밥 먹고 바로 옴', '달리기 싫다고 함', '출발선에서 하품함']
+  ];
+  const GAG = ['{n}, 신발끈 묶는 중!', '{n}, 관중석에 손 흔드는 중!', '{n}, 바통을 떨어뜨릴 뻔!', '{n}, 숨이 턱까지 찼다!', '{n}, 방향을 잠깐 헷갈림!', '{n}, 갑자기 전력 질주!', '{n}, 응원 소리에 힘이 난다!'];
+  const LEAD = ['{t} 선두!', '{t} 치고 나간다!', '{t} 앞서갑니다!', '지금 1등은 {t}!'];
+  let st = null, busy = false, raf = null, last = 0, sel = null, bet = 10;
+  const $q = s => document.querySelector(s);
+  const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
+  const gap = async () => { const w = 1150 - (Date.now() - last); if (w > 0) await new Promise(r => setTimeout(r, w)) };
+  const gauss = () => { let a = 0; for (let i = 0; i < 4; i++) a += Math.random(); return (a - 2) * 1.73 };
+  const pickOf = a => a[Math.random() * a.length | 0];
+  function lineup() { // 판마다 9명을 새로 뽑아 3팀으로 나누고, 컨디션(=확률)과 배당도 새로 정함
+    let ids = Object.keys(S.users); for (let i = ids.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [ids[i], ids[j]] = [ids[j], ids[i]] }
+    const size = Math.max(1, Math.min(3, Math.floor(ids.length / 3)));
+    const run = ids.slice(0, size * 3).map(u => ({ u, w: Math.exp(gauss() * .6) }));
+    const sorted = run.slice().sort((a, b) => b.w - a.w);
+    run.forEach(r => { const k = sorted.indexOf(r) / Math.max(1, run.length - 1); r.cond = pickOf(COND[k < .3 ? 0 : k < .7 ? 1 : 2]) });
+    const teams = TEAMS.map((t, i) => ({ ...t, i, m: run.slice(i * size, i * size + size) })).filter(t => t.m.length);
+    teams.forEach(t => t.W = Math.pow(t.m.reduce((a, r) => a + r.w, 0), 1.6));
+    const sum = teams.reduce((a, t) => a + t.W, 0);
+    teams.forEach(t => { t.p = t.W / sum; t.odds = Math.min(15, Math.max(1.2, Math.round((1 - EDGE) / t.p * 10) / 10)) });
+    st = { mode: 'bet', teams }; sel = null;
+  }
+  function view() {
+    const box = $q('#rc'); if (!box) return; if (!st) lineup();
+    const c = coins(), T = st.teams, top = `<div class="mg-bar"><span>COIN <b>${c ?? '…'}</b></span><span>${st.mode === 'bet' ? '팀과 배당은 판마다 바뀌어요' : `내 선택 <b>${T[st.pick].n}</b> · ${st.bet}코인`}</span></div>`;
+    if (st.mode === 'bet') {
+      const can = c !== null && sel !== null && c >= bet && !busy;
+      box.innerHTML = top + `<div class="rc-list">${T.map(t => `<button class="rc-team${sel === t.i ? ' on' : ''}" data-t="${t.i}" style="--tc:${t.c};--tl:${t.l}"><span class="rc-th"><b>${t.n}</b><span class="rc-od">×${t.odds.toFixed(1)}</span></span>
+          ${t.m.map((r, j) => `<span class="rc-mem"><i>${j + 1}</i><span class="mini">${avatar(r.u)}</span><span class="rc-nm"><b>${esc(S.users[r.u])}${r.u === me() ? ' (나)' : ''}</b><small>${r.cond}</small></span></span>`).join('')}</button>`).join('')}</div>
+        <div class="rc-foot"><div class="rc-bets">${BETS.map(b => `<button data-b="${b}" class="${bet === b ? 'on' : ''}" ${c !== null && c >= b ? '' : 'disabled'}>${b}</button>`).join('')}</div>
+        <button class="btn mg-btn" id="rc-go" ${can ? '' : 'disabled'}>${sel !== null ? `${T[sel].n}에 ${bet}코인 걸기 · 맞히면 +${Math.floor(bet * T[sel].odds) - bet}` : '1등 할 것 같은 팀을 골라요'}</button>
+        ${c !== null && c < 10 ? '<small class="rm-note">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note">이어달리기 · 1번 → 2번 → 3번 순서로 달려요 · 게임 코인은 진짜 돈이 아니에요</small></div>`;
+      box.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { sel = +b.dataset.t; view() });
+      box.querySelectorAll('[data-b]').forEach(b => b.onclick = () => { bet = +b.dataset.b; view() });
+      $q('#rc-go').onclick = start;
+      return;
+    }
+    const done = st.mode === 'end';
+    box.innerHTML = top + `<div class="rc-say" id="rc-say">${done ? st.resText : '준비… 탕!'}</div>
+      <div class="rc-track">${T.map(t => `<div class="rc-lane${t.i === st.pick ? ' my' : ''}" style="--tc:${t.c}"><em>${t.n}</em>${t.m.map((r, j) => `<span class="mini rc-r" data-r="${t.i}-${j}">${avatar(r.u)}</span>`).join('')}</div>`).join('')}<i class="rc-zone" style="left:33.3%"></i><i class="rc-zone" style="left:66.6%"></i><i class="rc-fin"></i></div>
+      ${done ? `<div class="rc-podium">${st.rank.map((i, k) => `<span><b>${k + 1}등</b><i style="background:${T[i].c}"></i>${T[i].n}</span>`).join('')}</div><button class="btn mg-btn rc-again" id="rc-again">다음 경기</button>` : ''}`;
+    place(done ? 1e9 : 0);
+    if (done) $q('#rc-again').onclick = () => { lineup(); view() };
+  }
+  // 팀 t의 시간 t에서: 지금 뛰는 주자 번호와 전체 진행도(0~1)
+  function prog(t, ms) {
+    const n = t.m.length; let acc = 0;
+    for (let j = 0; j < n; j++) { const L = t.legs[j]; if (ms < acc + L || j === n - 1) { const u = Math.min(1, Math.max(0, (ms - acc) / L)), e = Math.min(1, Math.pow(u, t.k[j]) + t.a[j] * Math.sin(u * Math.PI * 2) * (1 - u) * u * 4); return { j, pos: (j + e) / n, fin: j === n - 1 && u >= 1 } } acc += L }
+  }
+  function place(ms) {
+    st.teams.forEach(t => { if (!t.legs) return; const p = prog(t, ms), n = t.m.length;
+      t.m.forEach((r, j) => { const el = document.querySelector(`[data-r="${t.i}-${j}"]`); if (!el) return; const x = j < p.j ? (j + 1) / n : j === p.j ? p.pos : j / n;
+        el.style.left = `calc(${x} * (100% - 44px))`; el.classList.toggle('wait', j !== p.j); el.classList.toggle('doneR', j < p.j); el.style.zIndex = j === p.j ? 3 : 1 }) });
+  }
+  async function start() {
+    const c = coins(); if (busy || sel === null || c === null || c < bet) return; busy = true; view();
+    await gap();
+    try { await coinWrite({ c: coins() - bet }); last = Date.now() } catch (e) { busy = false; toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); view(); return }
+    // 순위는 확률대로 뽑고, 달리는 모습(구간별 빠르기)은 그 결과에 맞춰 보여 줌
+    const pool = st.teams.slice(), rank = [];
+    while (pool.length) { let x = Math.random() * pool.reduce((a, t) => a + t.p, 0), i = 0; while (i < pool.length - 1 && (x -= pool[i].p) > 0) i++; rank.push(pool.splice(i, 1)[0]) }
+    let T = 9000; rank.forEach(t => { t.T = T; T += 350 + Math.random() * 700;
+      const sp = t.m.map(r => (1 / Math.pow(r.w, .35)) * (.8 + Math.random() * .4)), s = sp.reduce((a, b) => a + b, 0); // 잘 뛰는 주자 구간이 더 짧게 걸림
+      t.legs = sp.map(x => x / s * t.T); t.k = t.m.map(() => .8 + Math.random() * .5); t.a = t.m.map(() => (Math.random() - .5) * .3) });
+    Object.assign(st, { mode: 'run', pick: sel, bet, rank: rank.map(t => t.i), t0: performance.now(), paid: false, say: 600 });
+    busy = false; view(); loop();
+  }
+  function loop() {
+    cancelAnimationFrame(raf);
+    const step = now => {
+      if (!st || st.mode !== 'run') return; const ms = now - st.t0, Tw = st.teams[st.rank[0]].T; place(ms);
+      if (ms > st.say && ms < Tw) { st.say = ms + 900; const ps = st.teams.map(t => ({ t, p: prog(t, ms) })).sort((a, b) => b.p.pos - a.p.pos), say = $q('#rc-say'), g = pickOf(ps);
+        if (say) say.textContent = Math.random() < .35 ? pickOf(GAG).replace('{n}', S.users[g.t.m[g.p.j].u]) : pickOf(LEAD).replace('{t}', `${ps[0].t.n} ${S.users[ps[0].t.m[ps[0].p.j].u]}`) }
+      if (ms >= Tw + 1600) return settle();
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  }
+  async function settle() { // 결과 정산 (경기 도중에 나가도 한 번은 정산됨)
+    if (!st || st.mode !== 'run' || st.paid) return; st.paid = true; cancelAnimationFrame(raf);
+    const win = st.rank[0] === st.pick, T = st.teams, pay = win ? Math.floor(st.bet * T[st.pick].odds) : 0;
+    st.mode = 'end'; st.resText = win ? `적중! ${T[st.pick].n} 1등 · +${pay - st.bet}코인` : `${T[st.rank[0]].n} 우승! ${T[st.pick].n}은 ${st.rank.indexOf(st.pick) + 1}등… -${st.bet}코인`;
+    view();
+    if (pay) { await gap(); try { await coinWrite({ c: coins() + pay }); last = Date.now() } catch (e) { toast('코인을 정산하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } view() }
+  }
+  function mount(v) {
+    busy = false;
+    v.insertAdjacentHTML('beforeend', `<div id="rc"></div><div class="sect">코인 부자 RANKING · 가진 코인</div><div class="rank" id="sd-rank"><div class="empty">불러오는 중…</div></div>`);
+    if (st && st.mode === 'run') { view(); loop() } else view();
+    coinEnsure();
+  }
+  return { mount, stop: () => { if (st && st.mode === 'run') settle(); cancelAnimationFrame(raf) }, refresh: () => { if ($q('#rc') && st && st.mode !== 'run' && !busy) view(); coinEnsure() } };
+})();
+
 /* ===== 게임 폴더 (아이콘 모음) ===== */
 const GAMES = [
   { id: 'mole', name: '두더지', bg: ['#b7f06a', '#3f9a2e'], pal: { b: '#8a5a33', d: '#5c3a1e', e: '#1a1a1a', p: '#ff8fb0', w: '#fff', h: '#2c1a0c', y: '#ffd23f', r: '#e8283c' },
@@ -3568,6 +3692,8 @@ const GAMES = [
     px: ['.y.......w..', '.....ww.....', '.....ww...y.', '....wccw....', '....wccw....', '.w.wwwwww.w.', '.wwwwwwwwww.', '.wrwwwwwwrw.', '.w..wwww..w.', '.....oo.....', '..w..yy.....', '.....y....w.'] },
   { id: 'sutda', name: '섯다', bg: ['#3fbf7a', '#0e5a34'], pal: { r: '#e8283c', w: '#fff', k: '#1a1a1a', y: '#ffd23f', p: '#ff7ab8' },
     px: ['............', '.wwwww......', '.wkwww.wwwww', '.wwrrw.wkwww', '.wrrrw.wwwyw', '.wrrrw.wwyyw', '.wwrww.wyyyw', '.wwwkw.wwyww', '.wwwww.wwwkw', '.......wwwww', '..yy........', '..yy..yy....'] },
+  { id: 'race', name: '달리기', bg: ['#7fe8d6', '#12897c'], pal: { s: '#fff', k: '#1a1a1a', w: '#fff', y: '#ffd23f' },
+    px: ['............', '.s..........', '.skwkwkwkw..', '.swkwkwkwk..', '.skwkwkwkw..', '.swkwkwkwk..', '.skwkwkwkw..', '.s..........', '.s..........', '.s......yy..', '.s.....yyyy.', '............'] },
   { id: 'cat', name: '간식 냥이', bg: ['#ffe89a', '#ff9a3c'], pal: { o: '#1c1c22', e: '#ffd23f', p: '#ff7fa8', b: '#4aa3ff', k: '#123' },
     px: ['............', '.oo.....oo..', '.ooo...ooo..', '.ooooooooo..', '.ooooooooo..', '.oeoooooeo..', '.ooooppooo..', '.ooooooooo..', '..ooooooo...', '.........bb.', '.......bbbkb', '.........bb.'] }
 ];
@@ -3599,7 +3725,7 @@ function watchScores() {
   }, () => { G.tloaded = true; unsub('tscores') });
   if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
     G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null, g: Number.isFinite(x.g) ? x.g : null } }); G.cloaded = true;
-    if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh(); SUTDA.refresh() }
+    if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh(); SUTDA.refresh(); RACE.refresh() }
   }, () => { G.cloaded = true; unsub('coins') });
   if (on && !subs.sscores) subs.sscores = onSnapshot(collection(db, 'sscores'), q => {
     G.sscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.sscores[d.id] = b }); G.sloaded = true;
