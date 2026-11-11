@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-2400">
+<meta name="build" content="20261112-0220">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -406,6 +406,90 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .sk-alb .empty{grid-column:1/-1;color:#9a96a8}
 .sk-big{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;cursor:pointer}
 .sk-big canvas{max-width:100%;max-height:85%;border-radius:8px}.sk-big p{margin:0;font-size:12px;color:#ccc}
+.c-boat{--l:#a8ecff;--b:#2e9be0}
+.bt{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,#dff3ff,#f6fbff 45%,#fff);color:#1d2430;font-family:var(--pixel)}
+.bt-dock{justify-content:flex-start}
+.bt-sky{position:relative;height:42%;min-height:160px;background:linear-gradient(180deg,#9fd8ff,#d9f1ff);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.bt-boat{width:56%;max-width:220px;margin-bottom:14%;animation:btrock 3s ease-in-out infinite;transform-origin:50% 90%;z-index:2}
+@keyframes btrock{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-6px)}}
+.bt-waves{position:absolute;left:0;right:0;bottom:0;height:34%;pointer-events:none}
+.bt-waves i{position:absolute;left:-50%;width:200%;height:100%;bottom:0;background:radial-gradient(40px 14px at 40px 0,transparent 98%,#5cc0f2 100%) 0 0/80px 100% repeat-x;opacity:.55;animation:btwave 6s linear infinite}
+.bt-waves i+i{bottom:-8px;opacity:.85;animation-duration:9s;animation-direction:reverse;background:radial-gradient(40px 14px at 40px 0,transparent 98%,#2e9be0 100%) 0 0/80px 100% repeat-x}
+@keyframes btwave{to{transform:translateX(80px)}}
+.bt-card{flex:1;display:flex;flex-direction:column;align-items:center;gap:12px;padding:18px 20px;text-align:center}
+.bt-card h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.bt-card p{margin:0;font-size:14px;line-height:1.6;color:#4a5566}
+.bt-go{width:100%;max-width:300px;background:#2e9be0;border-color:#2e9be0}
+.bt-okmsg{font-size:16px;font-weight:700;color:#2e9be0}
+.bt-anon{display:flex;align-items:center;gap:8px;font-size:14px}.bt-anon small{color:#7a8596}.bt-anon input{width:18px;height:18px;accent-color:#2e9be0}
+.bt-wait{display:flex;flex-direction:column;gap:4px;font-size:15px;color:#2e9be0;font-weight:700}.bt-wait small{font-weight:400;color:#7a8596;font-size:12px}
+.bt-note{font-size:13px;color:#7a8596;background:#eef6fc;border-radius:10px;padding:8px 12px}
+.bt-foot{font-size:11px;color:#9aa4b2;margin-top:auto}
+.bt-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:220px;padding:14px 26px;border:0;border-radius:999px;background:linear-gradient(180deg,#7fd0ff,#2e9be0);color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 6px 0 #1d7cbd,0 10px 18px rgba(46,155,224,.35);transition:transform .1s,box-shadow .1s}
+.bt-btn small{font-size:12px;font-weight:600;background:rgba(255,255,255,.25);border-radius:999px;padding:2px 8px}
+.bt-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #1d7cbd,0 4px 8px rgba(46,155,224,.3)}
+.bt-btn:focus-visible,.bt-pill:focus-visible{outline:3px solid #ffd23f;outline-offset:3px}
+.bt-room{background:#fff}
+.bt-top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 14px 4px}
+.bt-on{font-size:13px;font-weight:700;color:#2e9be0;background:#e8f5fe;border-radius:999px;padding:5px 12px}.bt-on b{font-weight:600;color:#5a8fb8}
+.bt-time{font-weight:700;font-size:14px;color:#2e9be0;font-variant-numeric:tabular-nums}.bt-time.low{color:#e8283c;animation:skbob .5s infinite alternate}
+.bt-bar{flex:none;display:flex;gap:8px;padding:6px 12px 8px;border-bottom:1px solid #eef2f6}
+.bt-pill{flex:1;border:0;border-radius:999px;padding:10px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(180deg,#fff0f5,#ffd6e5);color:#b0436c;box-shadow:0 4px 0 #f5b6cc;transition:transform .1s,box-shadow .1s}
+.bt-pill:active{transform:translateY(3px);box-shadow:0 1px 0 #f5b6cc}
+.bt-pill.on{background:linear-gradient(180deg,#bfe7ff,#7fcbf7);color:#0b4a73;box-shadow:0 4px 0 #4fa7dc}
+.bt-bar .bt-pill{padding:10px 10px;white-space:nowrap;min-width:0}.bt-bar{gap:6px}
+.bt-pill.g{flex:none;background:#eef2f6;color:#3a4656;box-shadow:0 4px 0 #d3dbe3}
+.bt-pad{position:relative;flex:none;height:46%;margin:10px 12px 0;border-radius:22px;background:#fffdf6;border:2px dashed #ffc2d6;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.bt-pad canvas{position:absolute;inset:0;width:100%;height:100%}
+.bt-tools{position:absolute;left:8px;right:8px;top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;z-index:4}
+.bt-tools button{border:0;border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;font-weight:700;background:#fff;color:#3a4656;box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer}
+.bt-tools button.on{background:#ff8fb8;color:#fff}
+.bt-tools .dot{width:24px;height:24px;padding:0;border:2px solid #fff}.bt-tools .dot.on{transform:scale(1.15);box-shadow:0 0 0 2px #3a4656}
+.bt-hint{position:absolute;inset:0;margin:0;display:grid;place-items:center;text-align:center;padding:0 24px;font-size:13px;color:#d1608a;pointer-events:none;transition:opacity .3s}.bt-hint.off{opacity:0}
+.bt-th{position:absolute;width:62px;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;animation:btpop .25s ease-out;z-index:3}
+.bt-th svg{width:62px;height:76px;filter:drop-shadow(0 3px 4px rgba(0,40,90,.2))}
+.bt-th small{font-size:10px;background:rgba(255,255,255,.9);border-radius:6px;padding:1px 6px;margin-top:-4px;color:#1d2430;white-space:nowrap}
+@keyframes btpop{from{transform:translate(-50%,-50%) scale(.4);opacity:0}}
+.bt-kiss{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:5}
+.bt-kiss b{display:block;font-size:34px;color:#ff3d7f;text-shadow:0 2px 0 #fff,0 0 14px #fff;animation:btk 1.3s ease-out forwards;white-space:nowrap}
+.bt-kiss i{position:absolute;left:50%;top:50%;font-style:normal;color:#ff4f8b;font-size:calc(18px * var(--s));animation:bth 1.2s ease-out forwards}
+@keyframes btk{0%{transform:scale(.3)}25%{transform:scale(1.25)}45%{transform:scale(1)}100%{transform:translateY(-30px);opacity:0}}
+@keyframes bth{from{transform:translate(-50%,-50%) rotate(var(--a)) translateY(0);opacity:1}to{transform:translate(-50%,-50%) rotate(var(--a)) translateY(calc(-1 * var(--d)));opacity:0}}
+.bt.shake{animation:btshake .5s}
+@keyframes btshake{10%,50%,90%{transform:translateX(-6px) rotate(-.6deg)}30%,70%{transform:translateX(6px) rotate(.6deg)}}
+.bt-flash{position:absolute;inset:0;background:#ff8fb8;opacity:0;pointer-events:none;z-index:9}
+.bt-flash.on{animation:btfl .9s ease-out}
+@keyframes btfl{0%{opacity:0}20%{opacity:.55}100%{opacity:0}}
+.bt-on.hush{background:#f3eefe;color:#7a4fd0}
+.bt-hushnote{flex:none;margin:0;padding:8px 12px 12px;font-size:11px;color:#7a4fd0;text-align:center;border-top:1px solid #eef2f6}
+.bt-real{font-style:normal;color:#7a4fd0;background:#f3eefe;border-radius:6px;padding:0 5px}
+.bt-sys{align-self:center;margin:6px 0;font-size:11px;color:#7a8596;background:#f1f4f7;border-radius:999px;padding:3px 10px}
+.bt-chat{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.bt-empty{margin:auto;font-size:13px;color:#9aa4b2}
+.bt-nm{font-size:11px;color:#7a8596;margin:6px 0 1px 10px}
+.bt-msg{display:flex}.bt-msg span{max-width:75%;padding:8px 13px;border-radius:18px;font-size:15px;line-height:1.35;background:#e9e9eb;color:#111;word-break:break-word;border-bottom-left-radius:6px}
+.bt-msg.bt-mine{justify-content:flex-end}.bt-msg.bt-mine span{background:#8fd3ff;color:#06263d;border-bottom-left-radius:18px;border-bottom-right-radius:6px}
+.bt-in{flex:none;display:flex;gap:8px;padding:8px 10px 10px;border-top:1px solid #e6edf3;background:#fff}
+.bt-in input{flex:1;min-width:0;border:1px solid #d5dde5;border-radius:999px;padding:9px 14px;font:inherit;font-size:15px;background:#fff;color:#111}
+.bt-in button{flex:none;width:38px;height:38px;border-radius:50%;border:0;background:#2e9be0;color:#fff;font-size:18px;font-weight:700;cursor:pointer}
+.bt-sheet{position:absolute;inset:0;z-index:20;background:rgba(10,30,50,.45);display:flex;align-items:flex-end}
+.bt-sheet>div{width:100%;max-height:85%;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:14px 14px 22px}
+.bt-sheet h3{margin:0 0 8px;font-size:17px;display:flex;justify-content:space-between;align-items:center}
+.bt-sheet h3 button{border:0;background:#eef2f6;border-radius:50%;width:28px;height:28px;cursor:pointer}
+.bt-sheet h4{margin:14px 0 6px;font-size:13px;color:#5a6576}
+.bt-tabs{display:flex;gap:6px}.bt-tabs button{flex:1;border:1px solid #d5dde5;background:#fff;border-radius:10px;padding:7px;font:inherit;font-size:13px;cursor:pointer;color:#1d2430}.bt-tabs button.on{background:#2e9be0;color:#fff;border-color:transparent}
+.bt-rq{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #eef2f6;font-size:14px}
+.bt-rq .mini{width:30px;height:30px;border-radius:50%;border:0}
+.bt-rq small{flex:1;min-width:0;font-size:11px;color:#7a8596}
+.bt-rq button,.bt-pick button{border:0;background:#2e9be0;color:#fff;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer}
+.bt-rq button.g{background:#eef2f6;color:#3a4656}
+.bt-pick{display:flex;flex-wrap:wrap;gap:6px}.bt-pick button{background:#e3f1fb;color:#1f6fa8}
+.bt-e{margin:0;font-size:12px;color:#9aa4b2}
+.bt-log{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.bt-log>div{display:grid;grid-template-columns:auto 1fr;gap:1px 8px;font-size:13px;padding:6px 8px;border-radius:10px;background:#f5f8fb}
+.bt-log small{grid-row:span 2;font-size:10px;color:#9aa4b2;padding-top:2px;font-variant-numeric:tabular-nums}
+.bt-log b{font-size:12px}.bt-log em{font-style:normal;font-weight:400;color:#2e9be0}
+.bt-log .kiss{background:#fff0f5}.bt-log .in,.bt-log .out{background:#eef7fd;color:#5a6576}
 .tt-stage{display:flex;justify-content:center}
 .tt-wrap{position:relative;display:flex;gap:8px;align-items:flex-start}
 .tt-wrap #tt-cv{border-radius:8px;touch-action:none;display:block}
@@ -1010,8 +1094,8 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').cat
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, t.length > 25 ? 4000 : 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
-function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'sketch' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop() } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
+function go(screen, extra = {}) { if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop() } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -1032,7 +1116,7 @@ async function loadMe(u) {
   const snap = await getDoc(doc(db, 'users', u.uid)).catch(() => null);
   if (!snap || !snap.exists()) { await signOut(auth); return }
   S.me = { uid: u.uid, nick: snap.data().nick }; S.loginErr = '';
-  S.isAdmin = false; getDoc(doc(db, 'admins', u.uid)).then(d => { S.isAdmin = d.exists(); refresh() }).catch(() => { });
+  S.isAdmin = false; getDoc(doc(db, 'admins', u.uid)).then(d => { S.isAdmin = d.exists(); refresh(); watchAlerts() }).catch(() => { });
   subs.users = onSnapshot(collection(db, 'users'), q => { S.users = {}; S.photos = {}; S.crops = {}; q.forEach(d => { const u = d.data(); S.users[d.id] = u.nick; if (u.photo) S.photos[d.id] = u.photo; if (u.crop) S.crops[d.id] = u.crop }); refresh() });
   (function subWall() { subs.wall = onSnapshot(doc(db, 'walls', u.uid), d => { S.wall = d.exists() ? d.data().img : null; if (S.screen === 'home') applyWall() }, retrySub('wall', subWall)) })();
   subs.mine = onSnapshot(query(collection(db, 'messages'), where('to', '==', u.uid)), q => {
@@ -1071,7 +1155,7 @@ async function loadMe(u) {
   measureClock(false);
 }
 let mineSeen = null;
-function cleanup() { try { SKETCH.stop() } catch { } mineSeen = null; S.sent = null; S.itab = null; F.list = []; F.loaded = false; F.stories = []; F.notifs = []; F.nLoaded = false; F.extra = {}; F.cmts = []; F.cmtTw = null; S.draftTw = null; $('.st-view')?.remove(); AN.toMe = {}; AN.mine = {}; AN.mineIdx = {}; AN.msgs = []; AN.msgTid = null; AN.loaded = false; P.list = {}; P.pics = {}; P.dmIn = []; P.dmOut = []; P.dmLoaded = false; S.admDm = null; P.taps = []; P.tapsLoaded = false; P.lastAct = ''; P.lastW = 0; $('#nw-sheet')?.remove(); G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
+function cleanup() { try { SKETCH.stop(); BOAT.stop() } catch { } G.myBoat = undefined; G.boatReqs = null; G.skIn = null; mineSeen = null; S.sent = null; S.itab = null; F.list = []; F.loaded = false; F.stories = []; F.notifs = []; F.nLoaded = false; F.extra = {}; F.cmts = []; F.cmtTw = null; S.draftTw = null; $('.st-view')?.remove(); AN.toMe = {}; AN.mine = {}; AN.mineIdx = {}; AN.msgs = []; AN.msgTid = null; AN.loaded = false; P.list = {}; P.pics = {}; P.dmIn = []; P.dmOut = []; P.dmLoaded = false; S.admDm = null; P.taps = []; P.tapsLoaded = false; P.lastAct = ''; P.lastW = 0; $('#nw-sheet')?.remove(); G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 // 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
 const anonChk = {}, privSub = {};
@@ -1149,6 +1233,7 @@ function render() {
         ${tile('feed', 'p3 c-friends', ico('friends'), '친구들', newNotifs())}
         ${tile('now', 'p3 c-now', `<img class="vi jic" src="${JICON}" alt="">`, 'NOW', newTaps() + unreadDm())}
         ${tile('sketch', 'p3 c-sketch', ico('sketch'), '낙서장')}
+        ${tile('boat', 'p3 c-boat', ico('boat'), '나룻배')}
       </div>
       ${S.isAdmin ? `<div class="hs-adm"><span></span><span></span>${tile('admin', 'p3 c-admin', ico('gear'), '관리자')}</div>` : ''}
       <div class="hs-dock">
@@ -1755,6 +1840,7 @@ function render() {
   }
 
   if (S.screen === 'sketch') { back('낙서장'); SKETCH.mount(v); return }
+  if (S.screen === 'boat') { back('울렁울렁 나룻배'); BOAT.mount(v); return }
 
   if (S.screen === 'game') {
     const gt = S.gtab, cur = GAMES.find(g => g.id === gt);
@@ -2062,6 +2148,7 @@ const VICON = {
   chat: '<path d="M12 3.8c-4.9 0-8.8 3.2-8.8 7.2 0 2.2 1.2 4.2 3.1 5.5l-.9 3.9 4.3-2.1c.7.2 1.5.3 2.3.3 4.9 0 8.8-3.2 8.8-7.2S16.9 3.8 12 3.8z" fill="currentColor"/>',
   pad: '<path d="M7.4 6.8h9.2a5 5 0 0 1 4.9 5.9l-.7 3.7a2.7 2.7 0 0 1-4.7 1.3L14.4 15.2H9.6l-1.7 2.5a2.7 2.7 0 0 1-4.7-1.3l-.7-3.7a5 5 0 0 1 4.9-5.9z" fill="currentColor"/><path d="M7.6 9.4v4.2M5.5 11.5h4.2" style="stroke:var(--d,#fff)" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.6" cy="10.4" r="1.15" style="fill:var(--d,#fff)"/><circle cx="17.8" cy="12.6" r="1.15" style="fill:var(--d,#fff)"/>',
   gear: '<path d="M12.00 4.60 L13.87 2.58 L15.67 3.13 L16.11 5.85 L17.23 6.77 L19.98 6.67 L20.87 8.33 L19.26 10.56 L19.40 12.00 L21.42 13.87 L20.87 15.67 L18.15 16.11 L17.23 17.23 L17.33 19.98 L15.67 20.87 L13.44 19.26 L12.00 19.40 L10.13 21.42 L8.33 20.87 L7.89 18.15 L6.77 17.23 L4.02 17.33 L3.13 15.67 L4.74 13.44 L4.60 12.00 L2.58 10.13 L3.13 8.33 L5.85 7.89 L6.77 6.77 L6.67 4.02 L8.33 3.13 L10.56 4.74Z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.1" style="fill:var(--d,#fff)"/>',
+  boat: '<path d="M2.5 13.5h19l-3 5.8H5.5z" fill="currentColor"/><path d="M11.4 2.6v10.4" stroke="currentColor" stroke-width="1.4"/><path d="M12.4 3.6l6.4 8.4h-6.4z" fill="currentColor"/><path d="M10.4 5.6L6 12h4.4z" fill="currentColor" opacity=".75"/><path d="M2 21.2c1.6-1.2 3.2-1.2 4.8 0s3.2 1.2 4.8 0 3.2-1.2 4.8 0 3.2 1.2 4.8 0" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M16.2 6.6c.5-1 2-1 2 .2 0 1-2 2-2 2s-2-1-2-2c0-1.2 1.5-1.2 2-.2z" style="fill:var(--d,#fff)"/>',
   sketch: '<rect x="4" y="4.6" width="16" height="17" rx="2.2" fill="currentColor"/><path d="M7 2.6v4.2M10.3 2.6v4.2M13.7 2.6v4.2M17 2.6v4.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7.2 15.6c1.4-2.6 2.6-2.8 3.4-1.2s1.9 1.6 3.4-1.6" fill="none" style="stroke:var(--d,#fff)" stroke-width="1.6" stroke-linecap="round"/><path d="M15.4 18.6l.4-2 3.6-3.6 1.6 1.6-3.6 3.6z" style="fill:var(--d,#fff)"/>',
   pen: '<path d="M4 20l.9-4.6L15.6 4.7a2.2 2.2 0 0 1 3.1 3.1L8 18.6z" fill="currentColor"/><path d="M13.8 6.5l3.1 3.1" style="stroke:var(--d,#fff)" stroke-width="1.2"/>'
 };
@@ -3214,9 +3301,283 @@ const SKETCH = (() => {
     lc.addEventListener('pointerup', up); lc.addEventListener('pointercancel', up);
     ro = new ResizeObserver(() => fit()); ro.observe($q('#sk-book'));
     watch(); fit();
+    if (Date.now() - (G.skInAt || 0) > 60000) { G.skInAt = Date.now(); setDoc(doc(db, 'sketchin', me()), { at: serverTimestamp() }).catch(() => { }) }
   }
   return { mount, stop };
 })();
+
+/* ===== 울렁울렁 나룻배 (선장 허가제 · 10분 · 엄지 뽀뽀 + 대화) ===== */
+// boatreq/{uid} = { status: wait|ok|no|done, start, at } — 탑승 신청·허가 (본인과 관리자만 읽기)
+// boatmsgs/{id} = { tok, name, c, text, at } — 배 안 대화 (탄 사람만 · 진짜 누구인지는 안 남김)
+// boatlog/{id} = { by, anon, name, text, kind, at } — 관리자 로그 (관리자만 읽기)
+// boatlive/{tok} = { name, c, x, y, down, at } — 지금 탄 사람과 엄지 위치
+const BOAT = (() => {
+  const LIMIT = 10 * 60 * 1000, ANIMALS = ['물고기', '오리', '개구리', '해달', '펭귄', '고래', '꽃게', '수달'], COLS = ['#ff7ab8', '#2f86ff', '#ff9a1a', '#3fbf4a', '#8b3ff0', '#e8283c', '#12a3a3'];
+  let req = null, reqs = {}, live = {}, msgs = [], timerT = null, beatT = null, sendT = null, lastSend = 0, down = false, pos = [0.5, 0.5], kissCool = 0, alias = '', col = '', logged = false, sheetTab = 'req';
+  let anon = false, tok = '';
+  try { anon = localStorage.getItem('wb_boatanon') === '1'; tok = localStorage.getItem('wb_boattok') || '' } catch { }
+  if (!tok) { tok = Math.random().toString(36).slice(2, 12); try { localStorage.setItem('wb_boattok', tok) } catch { } }
+  const $q = s => document.querySelector(s), me = () => S.me.uid;
+  const startMs = () => req?.start ? ms(req.start) : 0;
+  const left = () => S.isAdmin && !req?.start ? Infinity : startMs() + LIMIT - Date.now();
+  const riding = () => S.isAdmin || (req?.status === 'ok' && req.start && left() > 0);
+  const myName = () => anon ? alias : S.me.nick;
+  // ---------- 진동 (안드로이드는 진동, 아이폰은 iOS 18 이상에서 '톡' 하는 햅틱을 시도) ----------
+  let hapEl = null;
+  function haptic(strong) {
+    try { navigator.vibrate?.(strong ? [90, 50, 160] : 25) } catch { }
+    try { if (!hapEl) { hapEl = document.createElement('label'); hapEl.style.cssText = 'position:fixed;left:-99px;top:0;opacity:0;pointer-events:none'; hapEl.innerHTML = '<input type="checkbox" switch>'; document.body.appendChild(hapEl) } hapEl.click(); if (strong) setTimeout(() => hapEl.click(), 120) } catch { }
+  }
+  // ---------- 화면 ----------
+  function mount(v) {
+    stop(true);
+    if (!alias) { alias = '익명'; col = COLS[Math.random() * COLS.length | 0] }
+    if (riding()) room(v); else dock(v);
+  }
+  function dock(v) { // 선착장: 신청 · 대기 · 허가
+    const st = req?.status, expired = st === 'ok' && req.start && left() <= 0, ok = st === 'ok' && !req.start;
+    v.innerHTML = `<div class="bt bt-dock"><div class="bt-sky"><div class="bt-boat">${BOAT_SVG}</div><div class="bt-waves"><i></i><i></i></div></div>
+      <div class="bt-card"><h2>울렁울렁 나룻배</h2>
+      <p>선장 <b>${esc(S.users[captain()] || '밤티')}</b>님이 허락한 사람만 탈 수 있어요.<br>한 번 타면 <b>10분</b> 동안 엄지 뽀뽀도 하고 이야기도 나눠요.</p>
+      ${ok ? `<div class="bt-okmsg">🎉 탑승 허가가 났어요!</div>
+        <label class="bt-anon"><input type="checkbox" id="bt-anon" ${anon ? 'checked' : ''}> 익명으로 탈래요 <small>(${anon ? '익명' : '닉네임'}으로 보여요)</small></label>
+        <button class="bt-btn" id="bt-board">🚣 배에 타기 <small>10:00</small></button>`
+      : st === 'wait' ? `<div class="bt-wait">⛵ 선장님 허가를 기다리는 중…<small>허가가 나면 알림으로 알려 줄게요</small></div>`
+      : `${st === 'no' ? '<div class="bt-note">이번엔 탑승이 거절됐어요. 다음에 다시 신청해 봐요</div>' : expired || st === 'done' ? '<div class="bt-note">🏝️ 선착장에 도착했어요. 또 타고 싶으면 다시 신청해요</div>' : ''}
+        <button class="bt-btn" id="bt-req">⛵ 탑승 신청하기</button>`}
+      <small class="bt-foot">배 안에서 나눈 대화는 선장님 로그에 남아요</small></div></div>`;
+    if ($q('#bt-anon')) $q('#bt-anon').onchange = e => { anon = e.target.checked; try { localStorage.setItem('wb_boatanon', anon ? '1' : '0') } catch { } dock(v) };
+    if ($q('#bt-req')) $q('#bt-req').onclick = async () => {
+      try { await setDoc(doc(db, 'boatreq', me()), { status: 'wait', start: null, at: serverTimestamp() }); toast('탑승 신청을 보냈어요 ⛵') } catch (e) { toast('신청하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    };
+    if ($q('#bt-board')) $q('#bt-board').onclick = async () => {
+      haptic();
+      try { await setDoc(doc(db, 'boatreq', me()), { status: 'ok', start: serverTimestamp(), at: serverTimestamp() }) } catch (e) { toast('타지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    };
+  }
+  // ---------- 배 안: 대화 + (열고 닫는) 그림판 · 엄지 뽀뽀 ----------
+  // boatdraw/{id} = { tok, c, w, pts:[x,y…(0~1)], at } — 그림판 선 (탄 사람만)
+  let stealth = true, logs = [];
+  try { stealth = localStorage.getItem('wb_stealth') !== '0' } catch { }
+  const hush = () => S.isAdmin && stealth; // 관리자 몰래 보기: 탄 사람 수·엄지·알림에 안 잡힘
+  let padOpen = false, mode = 'thumb', pcol = '#ff4f8b', cur = null, strokes = [], firstMsgs = true;
+  const PCOLS = ['#ff4f8b', '#2f86ff', '#ff9a1a', '#3fbf4a', '#26262e'];
+  function room(v) {
+    v.innerHTML = `<div class="bt bt-room" id="bt"><div class="bt-top"><span class="bt-on${hush() ? ' hush' : ''}">${hush() ? '👀 몰래 보는 중' : '🚣 탑승 중'} <b id="bt-who"></b></span><span class="bt-time" id="bt-time"></span></div>
+      <div class="bt-bar"><button class="bt-pill${padOpen ? ' on' : ''}" id="bt-padb">${padOpen ? '💬 그림판 닫기' : '🎨 그림판 열기'}</button>${S.isAdmin ? `<button class="bt-pill g" id="bt-hush">${stealth ? '🙋 같이 타기' : '👀 몰래 보기'}</button><button class="bt-pill g" id="bt-cap">⚓</button>` : '<button class="bt-pill g" id="bt-out">내리기</button>'}</div>
+      ${padOpen ? `<div class="bt-pad" id="bt-pad"><canvas id="bt-cv"></canvas><canvas id="bt-lv"></canvas>
+        <div class="bt-tools"><button data-md="thumb" class="${mode === 'thumb' ? 'on' : ''}">👍 엄지</button><button data-md="draw" class="${mode === 'draw' ? 'on' : ''}">✏️ 그리기</button>${mode === 'draw' ? PCOLS.map(c => `<button data-pc="${c}" class="dot${pcol === c ? ' on' : ''}" style="background:${c}" aria-label="색"></button>`).join('') + '<button id="bt-clr">내 그림 지우기</button>' : ''}</div>
+        <p class="bt-hint">${mode === 'thumb' ? '꾹 눌러 엄지를 대 봐요 · 엄지끼리 닿으면 쪽♥' : '손가락으로 슥슥 그려요'}</p></div>` : ''}
+      <div class="bt-chat" id="bt-chat"></div>
+      ${hush() ? '<p class="bt-hushnote">몰래 보는 중이라 탄 사람들에게 안 보여요 · 진짜 닉네임도 같이 보여요</p>' : ''}<form class="bt-in" id="bt-in"${hush() ? ' hidden' : ''}><input id="bt-t" maxlength="200" placeholder="${anon && !S.isAdmin ? '익명으로 말하기' : '메시지'}" autocomplete="off"><button aria-label="보내기">↑</button></form>
+      <div class="bt-flash" id="bt-flash"></div></div>`;
+    if (S.isAdmin && !req?.start) anon = false;
+    if ($q('#bt-hush')) $q('#bt-hush').onclick = () => { stealth = !stealth; try { localStorage.setItem('wb_stealth', stealth ? '1' : '0') } catch { } if (stealth) { deleteDoc(doc(db, 'boatlive', tok)).catch(() => { }) } else { sendLive(true); if (!logged) { logged = true; log('in', '배에 탔어요') } } room(v) };
+    $q('#bt-padb').onclick = () => { padOpen = !padOpen; down = false; cur = null; if (!hush()) sysSay(padOpen ? '그림판으로 이동했어요 🎨' : '대화로 돌아왔어요 💬'); sendLive(true); room(v); drawChat() };
+    $q('#bt-in').onsubmit = e => { e.preventDefault(); const t = $q('#bt-t').value.trim(); if (!t) return; $q('#bt-t').value = ''; say(t) };
+    if ($q('#bt-out')) $q('#bt-out').onclick = async () => { await log('out', '스스로 내렸어요'); try { await setDoc(doc(db, 'boatreq', me()), { status: 'done', start: req.start, at: serverTimestamp() }) } catch { } };
+    if ($q('#bt-cap')) $q('#bt-cap').onclick = captainRoom;
+    if (padOpen) setupPad(v);
+    watch(); tick(); clearInterval(timerT); timerT = setInterval(tick, 1000); drawChat(); drawWho();
+    if (!logged && !hush()) { logged = true; G.btOutLogged = 0; log('in', '배에 탔어요') }
+  }
+  function setupPad(v) {
+    const pad = $q('#bt-pad'), cv = $q('#bt-cv'), lv = $q('#bt-lv');
+    const size = () => { const r = pad.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); [cv, lv].forEach(c => { c.width = Math.round(r.width * d); c.height = Math.round(r.height * d) }); paintAll(); paintLive() };
+    size(); new ResizeObserver(size).observe(pad);
+    pad.querySelectorAll('[data-md]').forEach(b => b.onclick = e => { e.stopPropagation(); mode = b.dataset.md; room(v) });
+    pad.querySelectorAll('[data-pc]').forEach(b => b.onclick = e => { e.stopPropagation(); pcol = b.dataset.pc; room(v) });
+    if ($q('#bt-clr')) $q('#bt-clr').onclick = async e => { e.stopPropagation(); const mine = strokes.filter(x => x.tok === tok); try { const b = writeBatch(db); mine.forEach(x => b.delete(doc(db, 'boatdraw', x.id))); await b.commit() } catch (err) { toast('지우지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) } };
+    const at = e => { const r = pad.getBoundingClientRect(); return [Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))].map(n => Math.round(n * 1000) / 1000) };
+    pad.addEventListener('pointerdown', e => { if (e.target.closest('.bt-tools') || hush()) return; e.preventDefault(); pad.setPointerCapture(e.pointerId); pos = at(e);
+      if (mode === 'thumb') { down = true; haptic(); drawThumbs(); checkKiss() } else { cur = { c: pcol, pts: pos.slice() }; paintLive() } sendLive(true) });
+    pad.addEventListener('pointermove', e => { if (!down && !cur) return; pos = at(e);
+      if (cur) { const n = cur.pts.length; if (Math.hypot(pos[0] - cur.pts[n - 2], pos[1] - cur.pts[n - 1]) < .004) return; cur.pts.push(pos[0], pos[1]); paintLive(); if (cur.pts.length > 1200) { const d = cur; cur = { c: d.c, pts: pos.slice() }; saveStroke(d) } }
+      else { drawThumbs(); checkKiss() } sendLive() });
+    const up = () => { if (down) { down = false; drawThumbs() } if (cur) { const d = cur; cur = null; saveStroke(d); paintLive() } sendLive(true) };
+    pad.addEventListener('pointerup', up); pad.addEventListener('pointercancel', up);
+    drawThumbs();
+  }
+  function line(c, pts, col, w, W, H) { if (pts.length < 2) return; c.save(); c.lineCap = c.lineJoin = 'round'; c.strokeStyle = col; c.lineWidth = w; c.beginPath(); c.moveTo(pts[0] * W, pts[1] * H); for (let i = 2; i + 1 < pts.length; i += 2) c.lineTo(pts[i] * W, pts[i + 1] * H); if (pts.length === 2) c.lineTo(pts[0] * W + .1, pts[1] * H); c.stroke(); c.restore() }
+  const lw = W => Math.max(3, W / 90);
+  function paintAll() { const cv = $q('#bt-cv'); if (!cv) return; const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height); strokes.forEach(s => line(g, s.pts, s.c, lw(cv.width), cv.width, cv.height)) }
+  function paintLive() { const lv = $q('#bt-lv'); if (!lv) return; const g = lv.getContext('2d'); g.clearRect(0, 0, lv.width, lv.height);
+    Object.values(live).forEach(x => { if (x.cur?.pts) line(g, x.cur.pts, x.cur.c, lw(lv.width), lv.width, lv.height) });
+    if (cur) line(g, cur.pts, cur.c, lw(lv.width), lv.width, lv.height) }
+  async function saveStroke(d) { if (d.pts.length < 2) return; strokes.push({ id: 'tmp' + Math.random(), tok, c: d.c, pts: d.pts }); paintAll();
+    try { await setDoc(doc(collection(db, 'boatdraw')), { tok, c: d.c, w: 1, pts: d.pts, at: serverTimestamp() }) } catch (e) { toast('그림을 저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } }
+  function tick() {
+    const el = $q('#bt-time'); if (!el) return;
+    if (left() === Infinity) { el.textContent = '⚓ 선장'; return }
+    const l = Math.max(0, left()), m = Math.floor(l / 60000), s = Math.floor(l / 1000) % 60;
+    el.textContent = `⏳ ${m}:${String(s).padStart(2, '0')}`; el.classList.toggle('low', l < 60000);
+    if (l <= 3000 && !G.btOutLogged) { G.btOutLogged = 1; log('out', '시간이 다 돼서 내렸어요') }
+    if (l <= 0) { stop(); toast('10분이 지나 선착장에 도착했어요 🏝️'); go('boat') }
+  }
+  // ---------- 서버 ----------
+  function watch() {
+    const since = new Date(S.isAdmin && !req?.start ? Date.now() - 3600000 : startMs());
+    if (!subs.btLive) subs.btLive = onSnapshot(collection(db, 'boatlive'), q => {
+      live = {}; q.forEach(d => { if (d.id !== tok) { const x = d.data({ serverTimestamps: 'estimate' }); if (Date.now() - ms(x.at) < 40000) live[d.id] = x } });
+      drawThumbs(); drawWho(); checkKiss(); paintLive();
+    }, () => unsub('btLive'));
+    if (!subs.btMsg) subs.btMsg = onSnapshot(query(collection(db, 'boatmsgs'), where('at', '>=', since)), q => {
+      const a = []; q.forEach(d => a.push({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
+      const old = new Set(msgs.map(x => x.id));
+      msgs = a.sort((x, y) => ms(x.at) - ms(y.at)); drawChat();
+      if (!firstMsgs) a.forEach(m => { if (!old.has(m.id) && m.sys && m.tok !== tok) toast(`${m.name}님이 ${m.text}`) });
+      firstMsgs = false;
+    }, () => unsub('btMsg'));
+    if (!subs.btDraw) subs.btDraw = onSnapshot(query(collection(db, 'boatdraw'), where('at', '>=', since)), q => {
+      const a = []; q.forEach(d => a.push({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
+      strokes = a.sort((x, y) => ms(x.at) - ms(y.at)); paintAll();
+    }, () => unsub('btDraw'));
+    if (S.isAdmin && !subs.btLog) subs.btLog = onSnapshot(query(collection(db, 'boatlog'), where('at', '>=', since)), q => {
+      const a = []; q.forEach(d => a.push({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }));
+      logs = a.sort((x, y) => ms(x.at) - ms(y.at)); if (hush()) drawChat();
+    }, () => unsub('btLog'));
+    sendLive(true); if (!beatT) beatT = setInterval(() => sendLive(true), 15000);
+  }
+  function sendLive(force) {
+    if (hush()) return;
+    const now = Date.now(); if (!force && now - lastSend < 150) { if (!sendT) sendT = setTimeout(() => { sendT = null; sendLive(true) }, 150 - (now - lastSend)); return }
+    lastSend = now;
+    setDoc(doc(db, 'boatlive', tok), { name: myName(), c: anon ? col : '#8fd3ff', x: pos[0], y: pos[1], down: padOpen && down, pad: padOpen, cur: cur ? { c: cur.c, pts: cur.pts.slice(-300) } : null, at: serverTimestamp() }).catch(() => { });
+  }
+  async function say(t) {
+    const b = writeBatch(db);
+    b.set(doc(collection(db, 'boatmsgs')), { tok, name: myName(), c: anon ? col : '', text: t, at: serverTimestamp() });
+    b.set(doc(collection(db, 'boatlog')), { by: me(), anon, name: myName(), text: t, kind: 'msg', at: serverTimestamp() });
+    try { await b.commit() } catch (e) { toast('보내지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+  }
+  function sysSay(t) { if (hush()) return; setDoc(doc(collection(db, 'boatmsgs')), { tok, name: myName(), c: anon ? col : '', text: t, sys: true, at: serverTimestamp() }).catch(() => { }) }
+  function log(kind, text) { if (hush()) return Promise.resolve(); return setDoc(doc(collection(db, 'boatlog')), { by: me(), anon, name: myName(), text, kind, at: serverTimestamp() }).catch(() => { }) }
+  function stop(keepLog) {
+    clearInterval(timerT); timerT = null; clearInterval(beatT); beatT = null; clearTimeout(sendT); sendT = null;
+    if (subs.btLive && S.me && !hush()) deleteDoc(doc(db, 'boatlive', tok)).catch(() => { });
+    unsub('btLive'); unsub('btMsg'); unsub('btDraw'); unsub('btLog'); logs = []; down = false; cur = null; live = {}; msgs = []; strokes = []; firstMsgs = true;
+    if (!keepLog) { logged = false; padOpen = false }
+  }
+  // ---------- 그리기 ----------
+  const thumbSVG = c => `<svg viewBox="0 0 60 74" aria-hidden="true"><ellipse cx="30" cy="37" rx="27" ry="34" fill="${c}" opacity=".25"/>${[6, 11, 16, 21, 26].map(r => `<path d="M${30 - r} ${44} C${30 - r} ${44 - r * 1.6} ${30 + r} ${44 - r * 1.6} ${30 + r} ${44}" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>`).join('')}<path d="M18 52 C22 60 38 60 42 52" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" opacity=".9"/></svg>`;
+  function drawThumbs() {
+    const pad = $q('#bt-pad'); if (!pad) return;
+    const want = { ...(down ? { [tok]: { x: pos[0], y: pos[1], c: anon ? col : '#2f86ff', name: '나', down: true } } : {}) };
+    Object.entries(live).forEach(([k, x]) => { if (x.down) want[k] = x });
+    pad.querySelectorAll('[data-th]').forEach(el => { if (!want[el.dataset.th]) el.remove() });
+    Object.entries(want).forEach(([k, x]) => {
+      let el = pad.querySelector(`[data-th="${k}"]`);
+      if (!el) { el = document.createElement('div'); el.className = 'bt-th' + (k === tok ? ' mine' : ''); el.dataset.th = k; el.innerHTML = thumbSVG(x.c || '#ff7ab8') + `<small>${esc(x.name || '')}</small>`; pad.appendChild(el) }
+      el.style.left = x.x * 100 + '%'; el.style.top = x.y * 100 + '%';
+    });
+    pad.querySelector('.bt-hint')?.classList.toggle('off', Object.keys(want).length > 0 || strokes.length > 0 || !!cur);
+  }
+  function drawWho() {
+    const el = $q('#bt-who'); if (!el) return;
+    const n = Object.keys(live).length + (hush() ? 0 : 1), inPad = Object.values(live).filter(x => x.pad).length + (padOpen && !hush() ? 1 : 0);
+    el.textContent = `· ${hush() ? '탄 사람 ' : ''}${n}명${inPad ? ` (그림판 ${inPad})` : ''}`;
+  }
+  function drawChat() {
+    const el = $q('#bt-chat'); if (!el) return;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    if (hush()) { // 관리자 몰래 보기: 진짜 닉네임이 같이 보이는 로그
+      el.innerHTML = logs.length ? logs.map(x => x.kind === 'msg'
+        ? `<small class="bt-nm">${esc(x.name)}${x.anon ? ` <em class="bt-real">${esc(S.users[x.by] || '?')}</em>` : ''}</small><div class="bt-msg"><span>${esc(x.text)}</span></div>`
+        : `<div class="bt-sys">${x.kind === 'kiss' ? '💋' : x.kind === 'in' ? '🚣' : '🏝️'} ${esc(S.users[x.by] || '?')}${x.anon ? '(익명)' : ''} · ${esc(x.text)}</div>`).join('') : '<div class="bt-empty">최근 1시간 동안 조용했어요</div>';
+      if (near) el.scrollTop = el.scrollHeight; return;
+    }
+    let prev = '';
+    el.innerHTML = msgs.length ? msgs.map(m => {
+      if (m.sys) { prev = ''; return `<div class="bt-sys">${m.tok === tok ? '내가' : esc(m.name) + '님이'} ${esc(m.text)}</div>` }
+      const mine = m.tok === tok, who = !mine && m.tok !== prev ? `<small class="bt-nm" style="${m.c ? `color:${m.c}` : ''}">${esc(m.name)}</small>` : ''; prev = m.tok;
+      return `${who}<div class="bt-msg${mine ? ' bt-mine' : ''}"><span>${esc(m.text)}</span></div>` }).join('') : '<div class="bt-empty">아직 조용해요. 먼저 말을 걸어 봐요 💬</div>';
+    if (near || msgs[msgs.length - 1]?.tok === tok) el.scrollTop = el.scrollHeight;
+  }
+  // ---------- 엄지 뽀뽀 ----------
+  function checkKiss() {
+    if (!down || Date.now() < kissCool) return;
+    const pad = $q('#bt-pad'); if (!pad) return; const r = pad.getBoundingClientRect();
+    const hit = Object.values(live).find(x => x.down && Math.hypot((x.x - pos[0]) * r.width, (x.y - pos[1]) * r.height) < 46);
+    if (!hit) return;
+    kissCool = Date.now() + 2500; kiss(hit);
+  }
+  function kiss(other) {
+    haptic(true);
+    const bt = $q('#bt'), pad = $q('#bt-pad'), fl = $q('#bt-flash'); if (!bt || !pad) return;
+    bt.classList.remove('shake'); void bt.offsetWidth; bt.classList.add('shake');
+    fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
+    const x = (pos[0] + other.x) / 2 * 100, y = (pos[1] + other.y) / 2 * 100;
+    const k = document.createElement('div'); k.className = 'bt-kiss'; k.style.left = x + '%'; k.style.top = y + '%'; k.innerHTML = '<b>쪽♥</b>' + Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg;--d:${50 + Math.random() * 50}px;--s:${.7 + Math.random() * .8}">♥</i>`).join('');
+    pad.appendChild(k); setTimeout(() => k.remove(), 1400);
+    log('kiss', `${other.name || '누군가'}와(과) 엄지 뽀뽀 ♥`);
+  }
+  // ---------- 선장실 (관리자) ----------
+  function captainRoom() {
+    const old = $q('#bt-sheet'); if (old) old.remove();
+    const bt = $q('#bt'); if (!bt) return;
+    bt.insertAdjacentHTML('beforeend', `<div class="bt-sheet" id="bt-sheet"><div><h3>⚓ 선장실 <button data-x aria-label="닫기">✕</button></h3>
+      <div class="bt-tabs"><button data-st="req" class="${sheetTab === 'req' ? 'on' : ''}">승객 관리</button><button data-st="log" class="${sheetTab === 'log' ? 'on' : ''}">대화 로그</button></div><div id="bt-sb"></div></div></div>`);
+    const s = $q('#bt-sheet');
+    s.onclick = e => { if (e.target === s || e.target.closest('[data-x]')) s.remove() };
+    s.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { sheetTab = b.dataset.st; captainRoom() });
+    if (sheetTab === 'req') drawReqs(); else drawLog();
+  }
+  function drawReqs() {
+    const el = $q('#bt-sb'); if (!el) return;
+    const all = Object.entries(reqs).filter(([u]) => S.users[u]), nm = u => esc(S.users[u]);
+    const wait = all.filter(([, x]) => x.status === 'wait'), on = all.filter(([, x]) => x.status === 'ok' && x.start && ms(x.start) + LIMIT > Date.now()), ready = all.filter(([, x]) => x.status === 'ok' && !x.start);
+    const row = (u, extra, btns) => `<div class="bt-rq"><span class="mini">${avatar(u)}</span><b>${nm(u)}</b><small>${extra}</small>${btns}</div>`;
+    el.innerHTML = `<h4>탑승 신청 ${wait.length}</h4>` + (wait.length ? wait.map(([u, x]) => row(u, relT(x.at), `<button data-ok="${u}">허가</button><button data-no="${u}" class="g">거절</button>`)).join('') : '<p class="bt-e">기다리는 사람이 없어요</p>')
+      + `<h4>지금 탄 사람 ${on.length}</h4>` + (on.length ? on.map(([u, x]) => { const l = ms(x.start) + LIMIT - Date.now(); return row(u, `${Math.floor(l / 60000)}분 ${Math.floor(l / 1000) % 60}초 남음`, `<button data-kick="${u}" class="g">내리게 하기</button>`) }).join('') : '<p class="bt-e">아무도 안 탔어요</p>')
+      + `<h4>허가했지만 아직 안 탄 사람 ${ready.length}</h4>` + (ready.length ? ready.map(([u]) => row(u, '배에 타기를 누르면 10분이 시작돼요', `<button data-kick="${u}" class="g">허가 취소</button>`)).join('') : '<p class="bt-e">없어요</p>')
+      + `<h4>바로 허가하기</h4><div class="bt-pick">${Object.entries(S.users).filter(([u]) => u !== me() && !(reqs[u]?.status === 'ok')).map(([u, n]) => `<button data-ok="${u}">${esc(n)}</button>`).join('')}</div>`;
+    const set = async (u, d, msg) => { try { await setDoc(doc(db, 'boatreq', u), { ...d, at: serverTimestamp() }); toast(msg) } catch (e) { toast('바꾸지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } };
+    el.querySelectorAll('[data-ok]').forEach(b => b.onclick = () => set(b.dataset.ok, { status: 'ok', start: null }, `${S.users[b.dataset.ok]}님 탑승을 허가했어요`));
+    el.querySelectorAll('[data-no]').forEach(b => b.onclick = () => set(b.dataset.no, { status: 'no', start: null }, '거절했어요'));
+    el.querySelectorAll('[data-kick]').forEach(b => b.onclick = () => set(b.dataset.kick, { status: 'done', start: reqs[b.dataset.kick]?.start || null }, '내리게 했어요'));
+  }
+  async function drawLog() {
+    const el = $q('#bt-sb'); if (!el) return; el.innerHTML = '<p class="bt-e">불러오는 중…</p>';
+    try {
+      const q = await getDocs(query(collection(db, 'boatlog'), orderBy('at', 'desc'), limit(300))), a = []; q.forEach(d => a.push(d.data()));
+      const t = x => { const d = x.at?.toDate ? x.at.toDate() : new Date(); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` };
+      el.innerHTML = a.length ? `<div class="bt-log">${a.map(x => `<div class="${x.kind}"><small>${t(x)}</small><b>${esc(S.users[x.by] || '(탈퇴)')}${x.anon ? ` <em>${esc(x.name)}</em>` : ''}</b><span>${x.kind === 'msg' ? '' : x.kind === 'kiss' ? '💋 ' : x.kind === 'in' ? '🚣 ' : '🏝️ '}${esc(x.text)}</span></div>`).join('')}</div>` : '<p class="bt-e">아직 기록이 없어요</p>';
+    } catch (e) { el.innerHTML = `<p class="bt-e">불러오지 못했어요 (${e?.code || ''})</p>` }
+  }
+  const captain = () => Object.keys(S.users).find(u => S.users[u] === '밤티') || '';
+  return {
+    mount, stop, haptic,
+    setReq(x) { const before = riding(); req = x; if (S.screen === 'boat' && (before !== riding() || !$q('#bt'))) render() },
+    setReqs(x) { reqs = x; if ($q('#bt-sb') && sheetTab === 'req') drawReqs() }
+  };
+})();
+const BOAT_SVG = '<svg viewBox="0 0 120 70" aria-hidden="true"><path d="M8 38h104l-14 22H22z" fill="#c98a3a"/><path d="M8 38h104l-3 5H11z" fill="#e0a95a"/><path d="M58 6v32" stroke="#6b4a22" stroke-width="3"/><path d="M61 9l30 24H61z" fill="#fff"/><path d="M55 12L30 33h25z" fill="#ffd6e2"/><circle cx="44" cy="49" r="3" fill="#7a4a14"/><circle cx="76" cy="49" r="3" fill="#7a4a14"/><path d="M84 18c2-4 8-4 8 1 0 4-8 8-8 8s-8-4-8-8c0-5 6-5 8-1z" fill="#ff4f8b"/></svg>';
+
+// 관리자 알림 (낙서장 입장 · 나룻배 신청)과 내 탑승 허가 알림 — 어느 화면에 있든 받음
+function watchAlerts() {
+  if (!S.me) return;
+  if (!subs.myBoat) subs.myBoat = onSnapshot(doc(db, 'boatreq', S.me.uid), d => {
+    const x = d.exists() ? d.data({ serverTimestamps: 'estimate' }) : null, was = G.myBoat;
+    if (was !== undefined && was?.status === 'wait' && x?.status === 'ok' && !x.start) ping({ who: null, title: '나룻배 탑승 허가! ⛵', body: '지금 들어와서 배에 타기를 누르면 10분이 시작돼요', open: () => go('boat') });
+    if (was !== undefined && was?.status === 'wait' && x?.status === 'no') ping({ who: null, title: '이번엔 나룻배 탑승이 거절됐어요', body: '', open: () => go('boat') });
+    G.myBoat = x; BOAT.setReq(x);
+  }, retrySub('myBoat', watchAlerts));
+  if (!S.isAdmin) return;
+  if (!subs.boatAll) subs.boatAll = onSnapshot(collection(db, 'boatreq'), q => {
+    const m = {}; q.forEach(d => m[d.id] = d.data({ serverTimestamps: 'estimate' }));
+    const was = G.boatReqs;
+    if (was) Object.entries(m).forEach(([u, x]) => { const p = was[u];
+      if (x.status === 'wait' && p?.status !== 'wait') ping({ who: u, title: `${S.users[u] || '누군가'}님이 나룻배 탑승을 신청했어요 ⛵`, body: '눌러서 허가해 주세요', open: () => go('boat') });
+      if (x.status === 'ok' && x.start && !p?.start && u !== S.me.uid) ping({ who: u, title: `${S.users[u] || '누군가'}님이 나룻배에 탔어요 🚣`, body: '', open: () => go('boat') }) });
+    G.boatReqs = m; BOAT.setReqs(m);
+  }, retrySub('boatAll', watchAlerts));
+  if (!subs.skIn) subs.skIn = onSnapshot(collection(db, 'sketchin'), q => {
+    const m = {}; q.forEach(d => m[d.id] = ms(d.data({ serverTimestamps: 'estimate' }).at));
+    const was = G.skIn;
+    if (was) Object.entries(m).forEach(([u, t]) => { if (u !== S.me.uid && t !== was[u] && Date.now() - t < 60000) ping({ who: u, title: `${S.users[u] || '누군가'}님이 낙서장에 들어왔어요 ✏️`, body: '', open: () => go('sketch') }) });
+    G.skIn = m;
+  }, retrySub('skIn', watchAlerts));
+}
 
 /* ===== 관리자: 코인 보내기 ===== */
 async function loadAdminCoins() {
