@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1830">
+<meta name="build" content="20261111-1850">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -3517,12 +3517,13 @@ const SUTDA = (() => {
       if (act === 'raise') pay -= bet; // 따블은 판돈을 한 번 더 냄
     }
     try { await coinWrite({ c: Math.max(0, coins() + pay) }); last = Date.now() } catch (e) { toast('코인을 정산하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    if (res !== 'tie') statWrite('s', res === 'win'); // 비긴 판은 승률에 안 넣음 · 다이는 진 판
     st.mode = 'end'; st.res = res; st.resText = text; st.line = (res === 'win' ? WINL : res === 'lose' ? LOSEL : DEAL)[Math.random() * 3 | 0];
     busy = false; view();
   }
   function mount(v) {
     busy = false; if (st.mode === 'pick' && !st.my) st = { mode: 'bet' };
-    v.insertAdjacentHTML('beforeend', `<div id="sd"></div><div class="sect">코인 부자 RANKING · 가진 코인</div><div class="rank" id="sd-rank"><div class="empty">불러오는 중…</div></div>`);
+    v.insertAdjacentHTML('beforeend', `<div id="sd"></div><div class="sect">섯다 승률 RANKING · 3판 이상</div><div class="rank" id="sd-rank"><div class="empty">불러오는 중…</div></div>`);
     view(); coinEnsure();
   }
   return { mount, refresh: () => { if ($q('#sd') && !busy) view(); coinEnsure() } };
@@ -3706,12 +3707,12 @@ const RACE = (() => {
     if (!st || st.mode !== 'run' || st.paid) return; st.paid = true; cancelAnimationFrame(raf);
     const win = st.rank[0] === st.pick, T = st.teams, pay = win ? Math.floor(st.bet * T[st.pick].odds) : 0;
     st.mode = 'end'; st.resText = win ? `적중! ${T[st.pick].n} 1등 · +${pay - st.bet}코인` : `${T[st.rank[0]].n} 우승! ${T[st.pick].n}은 ${st.rank.indexOf(st.pick) + 1}등… -${st.bet}코인`;
-    view();
+    view(); statWrite('r', win);
     if (pay) { await gap(); try { await coinWrite({ c: coins() + pay }); last = Date.now() } catch (e) { toast('코인을 정산하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } view() }
   }
   function mount(v) {
     busy = false;
-    v.insertAdjacentHTML('beforeend', `<div id="rc"></div><div class="sect">코인 부자 RANKING · 가진 코인</div><div class="rank" id="sd-rank"><div class="empty">불러오는 중…</div></div>`);
+    v.insertAdjacentHTML('beforeend', `<div id="rc"></div><div class="sect">달리기 적중률 RANKING · 3판 이상</div><div class="rank" id="rc-rank"><div class="empty">불러오는 중…</div></div>`);
     if (st && st.mode === 'run') { view(); loop() } else view();
     coinEnsure();
   }
@@ -3749,7 +3750,7 @@ function gameFolder(v) {
 
 /* ===== 두더지 순위 ===== */
 // scores/{uid} = { best, at } — 각자 최고 점수 하나만 저장, 게임 화면에 있을 때만 불러옴
-const G = { scores: {}, bscores: {}, tscores: {}, sscores: {}, sloaded: false, cscores: {}, kloaded: false, coins: {}, loaded: false, bloaded: false, tloaded: false, cloaded: false };
+const G = { scores: {}, bscores: {}, tscores: {}, sscores: {}, sloaded: false, cscores: {}, kloaded: false, gstats: {}, gloaded: false, coins: {}, loaded: false, bloaded: false, tloaded: false, cloaded: false };
 function watchScores() {
   const on = S.me && S.screen === 'game';
   if (on && !subs.scores) subs.scores = onSnapshot(collection(db, 'scores'), q => {
@@ -3777,9 +3778,32 @@ function watchScores() {
     G.cscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.cscores[d.id] = b }); G.kloaded = true;
     if (S.screen === 'game') { drawRank(); CATRUN.setBest() }
   }, () => { G.kloaded = true; unsub('cscores') });
-  if (!on) ['scores', 'bscores', 'tscores', 'coins', 'sscores', 'cscores'].forEach(k => subs[k] && unsub(k));
+  if (on && !subs.gstats) subs.gstats = onSnapshot(collection(db, 'gstats'), q => {
+    G.gstats = {}; q.forEach(d => { const x = d.data(); G.gstats[d.id] = { sg: x.sg || 0, sw: x.sw || 0, rg: x.rg || 0, rw: x.rw || 0 } }); G.gloaded = true;
+    if (S.screen === 'game') drawRank();
+  }, () => { G.gloaded = true; unsub('gstats'); if (S.screen === 'game') drawRank() });
+  if (!on) ['scores', 'bscores', 'tscores', 'coins', 'sscores', 'cscores', 'gstats'].forEach(k => subs[k] && unsub(k));
+}
+// gstats/{uid} = { sg, sw, rg, rw, at } — 섯다(s)·달리기(r)의 판 수(g)와 이긴 판 수(w)
+async function statWrite(kind, win) {
+  const u = S.me?.uid; if (!u) return;
+  const d = { sg: 0, sw: 0, rg: 0, rw: 0, ...(G.gstats[u] || {}) };
+  d[kind + 'g']++; if (win) d[kind + 'w']++;
+  const was = G.gstats[u]; G.gstats[u] = d; drawRank();
+  try { await setDoc(doc(db, 'gstats', u), { ...d, at: serverTimestamp() }) }
+  catch (e) { if (was) G.gstats[u] = was; else delete G.gstats[u]; drawRank(); if (!G.statWarned) { G.statWarned = 1; toast('승률을 저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } }
+}
+function drawWinRank(el, gk, wk) { // 승률 순위: 3판 이상 한 사람만
+  if (!G.gloaded) return;
+  const me = S.me.uid, MIN = 3, arr = Object.entries(G.gstats).filter(([u, x]) => S.users[u] && x[gk] >= MIN).map(([u, x]) => ({ u, g: x[gk], w: x[wk], r: x[wk] / x[gk] })).sort((a, b) => b.r - a.r || b.g - a.g);
+  let rank = 0, prev = null; arr.forEach((r, i) => { if (r.r !== prev) { rank = i + 1; prev = r.r } r.rank = rank });
+  const mine = G.gstats[me]?.[gk] || 0;
+  el.innerHTML = (arr.length ? arr.slice(0, 20).map(r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${Math.round(r.r * 100)}%</b><small class="rk-w">${r.w}승 · ${r.g}판</small></div>`).join('') : '<div class="empty">아직 기록이 없어요.<br>3판 이상 하면 순위에 올라요</div>')
+    + (mine < MIN ? `<div class="rk-gap" style="font-size:11px;padding:8px 0">나는 지금 ${mine}판 · ${MIN}판부터 순위에 올라요</div>` : '');
 }
 function drawRank() {
+  const wr = $('#sd-rank') ? [$('#sd-rank'), 'sg', 'sw'] : $('#rc-rank') ? [$('#rc-rank'), 'rg', 'rw'] : null;
+  if (wr) return drawWinRank(...wr);
   const kind = $('#ct-rank') ? 'k' : $('#sd-rank') ? 'c' : $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : $('#rm-rank') ? 'r' : $('#ft-rank') ? 'f' : $('#sh-rank') ? 's' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank') || $('#rm-rank') || $('#ft-rank') || $('#sh-rank') || $('#ct-rank') || $('#sd-rank'); if (!el) return;
   const isB = kind === 'b', unit = kind === 'r' || kind === 'c' ? '코인' : kind === 'f' ? '승' : '점';
   const map = kind === 'k' ? G.cscores : kind === 'c' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.c || 0])) : kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, rmOf(x)])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 'k' ? 'cscores' : kind === 'c' ? 'coins' : kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
