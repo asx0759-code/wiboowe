@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-2010">
+<meta name="build" content="20261111-2050">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -219,9 +219,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .mg-tabs{display:flex;gap:6px;padding:10px 12px 2px}
 .mg-tabs button{flex:1;border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:12px;padding:7px 0;cursor:pointer}
 .mg-tabs button.on{background:var(--ink);color:#fff;font-weight:700;border-color:transparent}
-.gf{min-height:100%;background:#17161c center/cover no-repeat;display:flex}
-.gf-in{flex:1;display:flex;flex-direction:column;align-items:center;padding:34px 18px 30px;background:rgba(14,13,20,.55);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
-.gf-hd{width:100%;max-width:360px;display:flex;align-items:center;justify-content:space-between;margin:0 0 18px;padding:0 4px 0 14px}
+/* 스크롤 막대는 어디서도 안 보이게 (내용이 길면 스크롤은 그대로 됨) */
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none;width:0;height:0}
+.gf{height:100%;min-height:100%;background:#17161c center/cover no-repeat;display:flex;overflow:hidden}
+.gf-in{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 16px 12px;background:rgba(14,13,20,.55);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.gf-hd{width:100%;max-width:360px;display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;padding:0 4px 0 14px}
 .gf h2{margin:0;color:#fff;font-size:28px;font-weight:600;letter-spacing:-.01em}
 .gf-coin{display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:5px 6px 5px 12px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);color:#fff;font:inherit;cursor:pointer}
 .gf-cn{font-size:13px}.gf-cn b{font-variant-numeric:tabular-nums}
@@ -229,13 +231,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .gf-cb small{font-size:9px;font-weight:400;opacity:.85}
 .gf-coin.ok .gf-cb{background:linear-gradient(165deg,#ffe14a,#ff9a1a);color:#3a2200;box-shadow:0 2px 6px rgba(255,160,30,.5)}
 .gf p small{font-size:11px;opacity:.85}
-.gf-box{width:100%;max-width:360px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px 14px;padding:26px 20px;border-radius:34px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.gf-box{width:100%;max-width:360px;display:grid;grid-template-columns:repeat(3,1fr);gap:min(18px,2.2vh) 14px;padding:min(22px,2.8vh) 18px;border-radius:30px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 .gf-box button{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font:inherit;-webkit-tap-highlight-color:transparent}
 .gf-box button:active .gf-ic{transform:scale(.92);filter:brightness(.88)}
-.gf-ic{width:100%;max-width:78px;aspect-ratio:1;border-radius:23%;display:grid;place-items:center;box-shadow:inset 0 3px 2px rgba(255,255,255,.5),inset 0 -6px 9px rgba(0,0,0,.22),0 6px 10px rgba(0,0,0,.4);transition:transform .12s}
+.gf-ic{width:100%;max-width:min(78px,10vh);aspect-ratio:1;border-radius:23%;display:grid;place-items:center;box-shadow:inset 0 3px 2px rgba(255,255,255,.5),inset 0 -6px 9px rgba(0,0,0,.22),0 6px 10px rgba(0,0,0,.4);transition:transform .12s}
 .gf-ic svg{width:66%;height:66%;filter:drop-shadow(0 2px 1px rgba(0,0,0,.25))}
 .gf-box small{color:#fff;font-size:12px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.gf p{margin:16px 0 0;color:rgba(255,255,255,.55);font-size:12px;text-align:center;line-height:1.6}
+.gf p{margin:10px 0 0;color:rgba(255,255,255,.55);font-size:12px;text-align:center;line-height:1.6}
 .sd-table{margin:4px 10px 0;padding:18px 12px 20px;border-radius:18px;background:radial-gradient(ellipse at 50% 30%,#2f9a5f,#0d5230 75%);box-shadow:inset 0 0 0 5px #5a3414,inset 0 0 0 7px #8a5a2a,inset 0 0 40px rgba(0,0,0,.35);color:#fff;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
 .sd-title{font-family:var(--pixel);font-size:18px;color:#ffe9a8;margin-top:6px}
 .sd-rule{margin:0;font-size:12.5px;line-height:1.7;color:#d7f2de}.sd-rule b{color:#ffe14a}.sd-rule small{color:#a9d6b6}
@@ -2053,7 +2055,7 @@ const MOLE = (() => {
     return `<div class="mg-bar"><span>SCORE <b id="mo-s">0</b></span><span>TIME <b id="mo-t">30</b></span><span>BEST <b id="mo-b">${bestGet()}</b></span></div>
       <div class="mg-stage">
         <div class="holes" id="holes">${Array.from({ length: 9 }, (_, i) => `<button class="hole" aria-label="구멍 ${i + 1}"><span class="mole"><span class="mface"></span><span class="crown">${CROWN}</span><span class="tear l">${TEAR}</span><span class="tear r">${TEAR}</span></span></button>`).join('')}</div>
-        <div class="mg-over" id="mo-o"><big>뿅망치 두더지</big><span>30초 동안 튀어나온 친구를 때려요</span><button class="btn mg-btn" id="mo-go">START</button></div>
+        <div class="mg-over" id="mo-o"><big>뿅망치 두더지</big><span>30초 동안 튀어나온 친구를 때려요</span><button class="btn mg-btn" id="mo-go">START · 50코인</button></div>
       </div>
       <div class="mg-legend" id="mo-legend">
         <span><i class="lg n"></i>친구 +1</span>
@@ -2091,7 +2093,7 @@ const MOLE = (() => {
     stop(true); bestSet(st.score); opt?.onEnd?.(st.score);
     const o = $q('#mo-o'); if (!o) return;
     $q('#mo-b').textContent = bestGet();
-    o.innerHTML = `<big>TIME UP</big><span>${st.score}점</span><button class="btn mg-btn" id="mo-go">AGAIN</button>`; o.hidden = false; $q('#mo-go').onclick = start;
+    o.innerHTML = `<big>TIME UP</big><span>${st.score}점</span><button class="btn mg-btn" id="mo-go">AGAIN · 50코인</button>`; o.hidden = false; $q('#mo-go').onclick = () => payPlay(start);
   }
   function stop(quiet) {
     clearInterval(st.tick); clearInterval(st.pop); st.playing = false;
@@ -2105,7 +2107,7 @@ const MOLE = (() => {
     holes.addEventListener('pointerdown', e => { swing(e.clientX, e.clientY); const h = e.target.closest('.hole'); if (h) hit(h) });
     holes.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { hammer.hidden = false; hammer.style.left = e.clientX + 'px'; hammer.style.top = e.clientY + 'px' } });
     holes.addEventListener('pointerleave', () => hammer.hidden = true);
-    $q('#mo-go').onclick = start;
+    $q('#mo-go').onclick = () => payPlay(start);
   }
   return { mount, stop: () => stop(false), playing: () => st.playing, setBest: () => { const b = $q('#mo-b'); if (b) b.textContent = bestGet() } };
 })();
@@ -2635,15 +2637,15 @@ const BUBBLE = (() => {
   function end() {
     st.playing = false; shot = null; bestSet(st.score);
     const o = $q('#bb-o'); if (!o) return;
-    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="bb-go">다시 하기</button>`; o.hidden = false;
-    $q('#bb-go').onclick = start; $q('#bb-b').textContent = bestGet();
+    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="bb-go">다시 하기 · 50코인</button>`; o.hidden = false;
+    $q('#bb-go').onclick = () => payPlay(start); $q('#bb-b').textContent = bestGet();
     opt?.onEnd?.(st.score);
   }
   function mount(v, o) {
     opt = o; stop();
     v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="bb-s">0</b></span><span>BEST <b id="bb-b">${bestGet()}</b></span></div>
       <div class="mg-stage bb-stage"><canvas id="bb-cv"></canvas><div class="bb-msg" id="bb-msg"></div>
-        <div class="mg-over" id="bb-o"><big>버블 슈터</big><span>같은 색 3개 이상 맞추면 펑!<br>끌어서 조준하고 손을 떼면 발사</span><button class="btn mg-btn" id="bb-go">START</button></div></div>
+        <div class="mg-over" id="bb-o"><big>버블 슈터</big><span>같은 색 3개 이상 맞추면 펑!<br>끌어서 조준하고 손을 떼면 발사</span><button class="btn mg-btn" id="bb-go">START · 50코인</button></div></div>
       <div class="mg-legend"><span>펑 +10</span><span>떨어뜨리기 +20</span><span>3번 못 맞히거나 몇 번 쏠 때마다 한 줄씩 내려와요</span></div>
       <div class="sect">RANKING</div><div class="rank" id="bb-rank"><div class="empty">불러오는 중…</div></div>`);
     cv = $q('#bb-cv'); const box = cv.parentElement, dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -2653,7 +2655,7 @@ const BUBBLE = (() => {
     ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     stars = Array.from({ length: 40 }, () => [Math.random() * W, Math.random() * H, Math.random() * 1.2 + .3]);
     fill(6); cur = pickColor(); nxt = pickColor(); aim = null; dots = null; shot = null;
-    $q('#bb-go').onclick = start;
+    $q('#bb-go').onclick = () => payPlay(start);
     const down = e => { if (!st.playing) return; e.preventDefault(); setAim(e) };
     cv.addEventListener('touchstart', down, { passive: false });
     cv.addEventListener('touchmove', down, { passive: false });
@@ -2742,8 +2744,8 @@ const BLOCKS = (() => {
   function end() {
     st.playing = false; bestSet(st.score);
     const o = $q('#tt-o'); if (!o) return;
-    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점 · ${st.lines}줄${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="tt-go">다시 하기</button>`; o.hidden = false;
-    $q('#tt-go').onclick = start; $q('#tt-b').textContent = bestGet();
+    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점 · ${st.lines}줄${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="tt-go">다시 하기 · 50코인</button>`; o.hidden = false;
+    $q('#tt-go').onclick = () => payPlay(start); $q('#tt-b').textContent = bestGet();
     opt?.onEnd?.(st.score);
   }
   const act = a => { if (!st.playing || !cur) return; ({ l: () => move(-1), r: () => move(1), rot: () => rotate(1), d: soft, drop: hard })[a]() };
@@ -2751,7 +2753,7 @@ const BLOCKS = (() => {
     opt = o; stop();
     v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="tt-s">0</b></span><span>LV <b id="tt-l">1</b></span><span>BEST <b id="tt-b">${bestGet()}</b></span></div>
       <div class="mg-stage tt-stage"><div class="tt-wrap"><canvas id="tt-cv"></canvas><div class="tt-side"><small>NEXT</small><canvas id="tt-nx"></canvas></div><div class="bb-msg" id="tt-msg"></div>
-        <div class="mg-over" id="tt-o"><big>블록 쌓기</big><span>한 줄을 꽉 채우면 사라져요<br>한 번에 여러 줄 지우면 점수 UP</span><button class="btn mg-btn" id="tt-go">START</button></div></div></div>
+        <div class="mg-over" id="tt-o"><big>블록 쌓기</big><span>한 줄을 꽉 채우면 사라져요<br>한 번에 여러 줄 지우면 점수 UP</span><button class="btn mg-btn" id="tt-go">START · 50코인</button></div></div></div>
       <div class="tt-pad"><button data-a="l" aria-label="왼쪽">◀</button><button data-a="rot" aria-label="돌리기">⟳</button><button data-a="r" aria-label="오른쪽">▶</button><button data-a="d" aria-label="한 칸 내리기">▼</button><button data-a="drop" class="hot" aria-label="바로 떨어뜨리기">⤓</button></div>
       <div class="mg-legend"><span>1줄 100 · 2줄 300 · 3줄 500 · 4줄 800 (× 레벨)</span><span>5줄마다 레벨 UP · 가끔 바닥에서 구멍 난 줄이 올라와요</span></div>
       <div class="sect">RANKING</div><div class="rank" id="tt-rank"><div class="empty">불러오는 중…</div></div>`);
@@ -2763,7 +2765,7 @@ const BLOCKS = (() => {
     nv.width = 4 * S2 * dpr; nv.height = 2.4 * S2 * dpr; nv.style.width = 4 * S2 + 'px'; nv.style.height = 2.4 * S2 + 'px';
     ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); nctx = nv.getContext('2d'); nctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     board = Array.from({ length: CH }, () => Array(CW).fill(null)); cur = null; nxt = null;
-    $q('#tt-go').onclick = start;
+    $q('#tt-go').onclick = () => payPlay(start);
     // 버튼: 누르고 있으면 반복
     v.querySelectorAll('.tt-pad [data-a]').forEach(b => {
       let t1, t2; const a = b.dataset.a, stopR = () => { clearTimeout(t1); clearInterval(t2) };
@@ -2786,11 +2788,11 @@ const BLOCKS = (() => {
 /* ===== 썸 타기 (확률 연애 시뮬레이션 · 게임 코인) ===== */
 // coins/{uid} = { c: 코인, w: 커플 성공 횟수, at } — 진짜 돈이 아닌 게임 코인
 const ROMANCE = (() => {
-  const STAKE = 10, START_COINS = 100, BONUS = 100;
+  const STAKE = 50, START_COINS = 100;
   // 고르는 선택지: p = 성공 확률, m = 성공 시 코인 배수
   const SAFE = { p: .75, m: 1.3, tag: '안전' }, MID = { p: .55, m: 1.8, tag: '도전' }, RISK = { p: .35, m: 2.8, tag: '모험' }, LOTTO = { p: .14, m: 6.5, tag: '로또', j: .04 };
   // 걸린 코인이 많을수록 성공 확률이 깎임 (20코인까지는 그대로, 2배가 될 때마다 -10%, 최대 -60%)
-  const potPen = pot => { const r = pot * 10 / (st?.stake || 10); return r <= 20 ? 1 : Math.max(.4, 1 - .1 * Math.log2(r / 20)) }; // 처음 건 판돈의 몇 배로 불었는지로 따짐
+  const potPen = pot => { const r = pot * 10 / (st?.stake || STAKE); return r <= 20 ? 1 : Math.max(.4, 1 - .1 * Math.log2(r / 20)) }; // 처음 건 판돈의 몇 배로 불었는지로 따짐
   // 밤티: 위연시 오리지널 캐릭터 — 야행성, 군밤 덕후, 노래 흥얼거리기, 수줍지만 장난기 많음
   const STAGES = [
     { name: '첫 만남', scenes: [
@@ -2844,11 +2846,10 @@ const ROMANCE = (() => {
         <p>야행성 군밤 덕후 <b>밤티</b>와 썸을 타요! 선택지마다 성공 확률이 달라요.<br>성공할수록 코인이 불어나고, 실패하면 다 잃어요.<br>중간에 그만두면 모은 코인을 챙길 수 있어요.</p>
         <div class="rm-odds"><span><b>안전</b> 약 65~85%</span><span><b>도전</b> 약 45~65%</span><span><b>모험</b> 약 25~45%</span><span><b>로또</b> 약 10~18% · ×6↑</span></div><small class="rm-note">선택지는 4개! 어떤 게 안전·로또인지와 확률은 판마다 바뀌어요</small><small class="rm-note">💰 걸린 코인이 많아질수록 성공 확률이 뚝뚝 떨어져요 (최대 -60%)</small>
         ${stakeHTML(stake, c)}<button class="btn mg-btn" id="rm-go" ${can && !busy ? '' : 'disabled'}>${stake}코인 내고 시작</button>
-        ${c !== null && c < STAKE ? `<button class="rm-bonus" id="rm-bonus">${bonusLeft() ? `💸 용돈 받기 +${BONUS}` : '용돈은 하루 한 번! 내일 또 받아요'}</button>` : ''}
+        ${c !== null && c < STAKE ? `<small class="rm-note">코인이 부족해요. 게임 폴더 오른쪽 위에서 충전할 수 있어요</small>` : ''}
         ${c === null ? '<small class="rm-note">코인 불러오는 중…</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
       if ($q('#rm-go')) $q('#rm-go').onclick = start;
       stakeBind(box, c, v => { stake = v; const b = $q('#rm-go'); if (b) { b.textContent = `${v}코인 내고 시작`; b.disabled = !(can && !busy && c >= v) } });
-      if ($q('#rm-bonus')) $q('#rm-bonus').onclick = bonus;
       return;
     }
     const s = STAGES[st.i], sc = st.scene;
@@ -2883,11 +2884,7 @@ const ROMANCE = (() => {
   };
   const today = () => new Date().toISOString().slice(0, 10);
   function bonusLeft() { try { return localStorage.getItem('wb_rmbonus_' + me()) !== today() } catch { return true } }
-  async function bonus() {
-    if (!bonusLeft() || busy) return; busy = true;
-    try { await write((coins() || 0) + BONUS, G.coins[me()]?.w || 0); try { localStorage.setItem('wb_rmbonus_' + me(), today()) } catch { } toast(`용돈 ${BONUS}코인을 받았어요!`) } catch (e) { toast('받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
-    busy = false; view();
-  }
+
   async function start() {
     stake = stakeFix(stake, coins()); if (busy || coins() < stake) return; busy = true;
     try { await write(coins() - stake, G.coins[me()]?.w || 0, -stake); st = { mode: 'ask', i: 0, pot: stake, stake, hidAt: 2 }; st.scene = pick(0) }
@@ -2956,8 +2953,21 @@ function bindAdminCoins() {
 }
 
 /* ===== 게임 코인 공용 ===== */
-// 판돈 입력: 최소 10코인, 가진 코인까지(최대 MAXBET) 원하는 만큼
-const MINBET = 10, MAXBET = 10000;
+// 코인을 안 거는 게임(두더지·버블·블록·슈팅·간식 냥이)도 한 판에 50코인
+const PLAY_FEE = 50;
+async function payPlay(fn) {
+  if (G.paying) return;
+  const c = G.coins[S.me.uid]?.c;
+  if (c === undefined) { toast('코인을 불러오는 중이에요. 잠시 뒤 다시 눌러 주세요'); coinEnsure(); return }
+  if (c < PLAY_FEE) { toast(`코인이 부족해요 (한 판 ${PLAY_FEE}코인) · 게임 폴더에서 충전할 수 있어요`); return }
+  G.paying = 1;
+  try { await coinWrite({ c: c - PLAY_FEE }); fn() }
+  catch (e) { toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '') + ' 잠시 뒤 다시 눌러 주세요') }
+  G.paying = 0;
+}
+
+// 판돈 입력: 최소 50코인, 가진 코인까지(최대 MAXBET) 원하는 만큼
+const MINBET = 50, MAXBET = 10000;
 const stakeFix = (v, c) => Math.max(MINBET, Math.min(MAXBET, Math.floor(+v || 0), Math.max(MINBET, c ?? MINBET)));
 const stakeHTML = (v, c) => `<div class="stk"><label>판돈 <input id="stk-in" type="number" inputmode="numeric" min="${MINBET}" max="${MAXBET}" step="10" value="${stakeFix(v, c)}" ${c !== null && c >= MINBET ? '' : 'disabled'}> 코인</label>
   <div>${[['최소', 'r'], ['+10', '10'], ['+100', '100'], ['+1000', '1000'], ['절반', 'h'], ['올인', 'a']].map(([t, k]) => `<button type="button" data-stk="${k}">${t}</button>`).join('')}</div></div>`;
@@ -2992,7 +3002,7 @@ async function coinEnsure() { if (G.cloaded && !G.coins[S.me.uid] && !G.coinMaki
 
 /* ===== 주먹왕 (확률 대전 격투 · 상대는 랜덤 회원) ===== */
 const FIGHT = (() => {
-  const STAKE = 10, WIN = 30, PERFECT = 20;
+  const STAKE = 50, WIN = 30, PERFECT = 20;
   const MOVES = [
     { n: '잽잽', p: .82, d: [7, 11], e: '👊' }, { n: '로우킥', p: .72, d: [9, 14], e: '🦵' }, { n: '어퍼컷', p: .56, d: [15, 22], e: '💥' },
     { n: '플라잉 니킥', p: .42, d: [22, 30], e: '🦘' }, { n: '박치기', p: .5, d: [17, 25], e: '🐏' }, { n: '필살 회오리 펀치', p: .26, d: [34, 44], e: '🌪️' },
@@ -3170,7 +3180,7 @@ const FIGHT = (() => {
         <p>랜덤으로 뽑힌 회원과 한 판 붙어요!<br>턴마다 기술 3개가 나오고, 성공 확률과 데미지는 매번 달라요.<br>상대는 체력이 더 많고, 체력이 줄면 🔥분노해요.<br>승률 순위가 높을수록 더 센 상대가 나와요 (지금 내 상대 Lv.${fightLv(me()) + 1}${winRate(G.coins[me()]) !== null ? ` · 내 승률 ${Math.round(winRate(G.coins[me()]) * 100)}%` : ''})</p>
         <div class="rm-odds" id="ft-odds"></div>
         ${stakeHTML(stake, c)}<button class="btn mg-btn" id="ft-go" ${c !== null && c >= STAKE && !busy ? '' : 'disabled'}>${stake}코인 내고 상대 뽑기</button>
-        ${c !== null && c < STAKE ? '<small class="rm-note">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
+        ${c !== null && c < STAKE ? '<small class="rm-note">코인이 부족해요. 게임 폴더 오른쪽 위에서 충전할 수 있어요</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
       if ($q('#ft-go')) $q('#ft-go').onclick = start;
       stakeBind(box, c, v => { stake = v; $q('#ft-odds').innerHTML = `<span>참가 ${v}코인</span><span>승리 +${v * 3}</span><span>체력 50↑ 퍼펙트 +${v * 2} 더</span>`; const b = $q('#ft-go'); b.textContent = `${v}코인 내고 상대 뽑기`; b.disabled = !(c !== null && c >= v && !busy) });
       return;
@@ -3499,15 +3509,15 @@ const SHOOT = (() => {
   function end() {
     st.playing = false; bestSet(st.score); hud();
     const o = $q('#sh-o'); if (!o) return;
-    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점 · ${st.round}라운드${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="sh-go">다시 하기</button>`; o.hidden = false;
-    $q('#sh-go').onclick = start; $q('#sh-b').textContent = bestGet();
+    o.innerHTML = `<big>GAME OVER</big><span>${st.score}점 · ${st.round}라운드${st.score >= bestGet() && st.score > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="sh-go">다시 하기 · 50코인</button>`; o.hidden = false;
+    $q('#sh-go').onclick = () => payPlay(start); $q('#sh-b').textContent = bestGet();
     opt?.onEnd?.(st.score);
   }
   function mount(v, o) {
     opt = o; stop();
     v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="sh-s">0</b></span><span>R <b id="sh-r">1</b></span><span><b id="sh-l" style="color:#ff4f8b">♥♥♥</b></span><span>P <b id="sh-p">1</b></span><span>BEST <b id="sh-b">${bestGet()}</b></span></div>
       <div class="mg-stage bb-stage"><canvas id="sh-cv"></canvas><div class="bb-msg" id="sh-msg"></div>
-        <div class="mg-over" id="sh-o"><big>보스 슈팅</big><span>손가락으로 비행기를 움직여요. 총은 자동 발사!<br>라운드마다 회원 중 한 명이 보스로 등장해요</span><button class="btn mg-btn" id="sh-go">START</button></div></div>
+        <div class="mg-over" id="sh-o"><big>보스 슈팅</big><span>손가락으로 비행기를 움직여요. 총은 자동 발사!<br>라운드마다 회원 중 한 명이 보스로 등장해요</span><button class="btn mg-btn" id="sh-go">START · 50코인</button></div></div>
       <div class="mg-legend"><span>졸개 +10</span><span>보스 격파 +300×라운드</span><span>P = 파워 UP (최대 10단계)</span><span>약점은 얼굴!</span></div>
       <div class="sect">RANKING</div><div class="rank" id="sh-rank"><div class="empty">불러오는 중…</div></div>`);
     cv = $q('#sh-cv'); const box = cv.parentElement, dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -3515,7 +3525,7 @@ const SHOOT = (() => {
     cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
     ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = true;
     st = { playing: false, t: 0, stars: Array.from({ length: 50 }, () => [Math.random() * W, Math.random() * H, Math.random() * 1.5 + .5]), foes: [], eb: [], bullets: [], fx: [], items: [] };
-    $q('#sh-go').onclick = start;
+    $q('#sh-go').onclick = () => payPlay(start);
     // 터치: 손가락이 움직인 만큼 비행기도 이동 (손가락에 가리지 않게)
     let px, py;
     const pos = e => { const r = cv.getBoundingClientRect(), p = e.touches ? e.touches[0] : e; return [(p.clientX - r.left) * W / r.width, (p.clientY - r.top) * H / r.height] };
@@ -3561,7 +3571,7 @@ const SUTDA = (() => {
     if (st.mode === 'bet') {
       box.innerHTML = top + `<div class="sd-table"><div class="sd-title">섯다 한 판</div><p class="sd-rule">화투 두 장으로 승부!<br><b>땡</b>(같은 숫자) &gt; <b>끗</b>(두 장 합의 끝자리)<br>내 패 2장과 딜러 패 1장을 보고 결정해요<br><small>이기면 하우스가 고리 20%를 떼 가요 · <b>따블</b>을 외치면 딜러가 밑장을 뺄 수도…</small></p>
         ${stakeHTML(bet, c)}<button class="btn mg-btn" id="sd-deal" ${c !== null && c >= MINBET && !busy ? '' : 'disabled'}>패 받기</button>
-        ${c !== null && c < 10 ? '<small class="rm-note" style="color:#ffd9a0">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note" style="color:#bfe3c8">게임 코인은 진짜 돈이 아니에요</small></div>`;
+        ${c !== null && c < MINBET ? '<small class="rm-note" style="color:#ffd9a0">코인이 부족해요. 게임 폴더 오른쪽 위에서 충전할 수 있어요</small>' : ''}<small class="rm-note" style="color:#bfe3c8">게임 코인은 진짜 돈이 아니에요</small></div>`;
       $q('#sd-deal').onclick = () => deal(stakeFix(bet, coins()));
       stakeBind(box, c, v => { bet = v; const b = $q('#sd-deal'); b.textContent = `${v}코인 걸고 패 받기`; b.disabled = !(c !== null && c >= v && !busy) });
       return;
@@ -3668,14 +3678,14 @@ const CATRUN = (() => {
   function end() {
     st.playing = false; const sc = score(); bestSet(sc); hud();
     const o = $q('#ct-o'); if (!o) return;
-    o.innerHTML = `<big>냥…! 부딪혔다</big><span>${sc}점${sc >= bestGet() && sc > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="ct-go">다시 하기</button>`; o.hidden = false;
-    $q('#ct-go').onclick = e => { e.stopPropagation(); start() }; $q('#ct-b').textContent = bestGet(); opt?.onEnd?.(sc);
+    o.innerHTML = `<big>냥…! 부딪혔다</big><span>${sc}점${sc >= bestGet() && sc > 0 ? ' · 최고 기록!' : ''}</span><button class="btn mg-btn" id="ct-go">다시 하기 · 50코인</button>`; o.hidden = false;
+    $q('#ct-go').onclick = e => { e.stopPropagation(); payPlay(start) }; $q('#ct-b').textContent = bestGet(); opt?.onEnd?.(sc);
   }
   function mount(v, o) {
     opt = o; stop();
     v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="ct-s">0</b></span><span>BEST <b id="ct-b">${bestGet()}</b></span></div>
       <div class="mg-stage bb-stage"><canvas id="ct-cv"></canvas>
-        <div class="mg-over" id="ct-o"><big>간식 냥이</big><span>화면을 누르면 점프! (공중에서 한 번 더 가능)<br>장애물은 피하고 간식을 먹어요</span><button class="btn mg-btn" id="ct-go">START</button></div></div>
+        <div class="mg-over" id="ct-o"><big>간식 냥이</big><span>화면을 누르면 점프! (공중에서 한 번 더 가능)<br>장애물은 피하고 간식을 먹어요</span><button class="btn mg-btn" id="ct-go">START · 50코인</button></div></div>
       <div class="mg-legend"><span>🐟 생선 +10</span><span>츄르 +30</span><span>🥛 우유 +50</span><span>갈수록 빨라져요</span></div>
       <div class="sect">RANKING</div><div class="rank" id="ct-rank"><div class="empty">불러오는 중…</div></div>`);
     cv = $q('#ct-cv'); const box = cv.parentElement, dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -3683,7 +3693,7 @@ const CATRUN = (() => {
     cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
     ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false;
     st = { playing: false, t: 0, y: 0 };
-    $q('#ct-go').onclick = e => { e.stopPropagation(); start() };
+    $q('#ct-go').onclick = e => { e.stopPropagation(); payPlay(start) };
     cv.addEventListener('touchstart', e => { e.preventDefault(); jump() }, { passive: false }); cv.addEventListener('mousedown', jump);
     keyH = e => { if (S.screen === 'game' && st.playing && (e.key === ' ' || e.key === 'ArrowUp')) { e.preventDefault(); jump() } };
     document.addEventListener('keydown', keyH);
@@ -3742,7 +3752,7 @@ const RACE = (() => {
           ${t.m.map((r, j) => `<span class="rc-mem"><i>${j + 1}</i><span class="mini">${avatar(r.u)}</span><span class="rc-nm"><b>${esc(S.users[r.u])}${r.u === me() ? ' (나)' : ''}</b><small>${r.cond}</small></span></span>`).join('')}</button>`).join('')}</div>
         <div class="rc-foot">${stakeHTML(bet, c)}
         <button class="btn mg-btn" id="rc-go" ${can ? '' : 'disabled'}>1등 할 것 같은 팀을 골라요</button>
-        ${c !== null && c < 10 ? '<small class="rm-note">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note">이어달리기 · 1번 → 2번 → 3번 순서로 달려요 · 게임 코인은 진짜 돈이 아니에요</small></div>`;
+        ${c !== null && c < MINBET ? '<small class="rm-note">코인이 부족해요. 게임 폴더 오른쪽 위에서 충전할 수 있어요</small>' : ''}<small class="rm-note">이어달리기 · 1번 → 2번 → 3번 순서로 달려요 · 게임 코인은 진짜 돈이 아니에요</small></div>`;
       box.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { sel = +b.dataset.t; view() });
       stakeBind(box, c, v => { bet = v; const b = $q('#rc-go'); b.disabled = !(c !== null && sel !== null && c >= v && !busy); if (sel !== null) b.textContent = `${T[sel].n}에 ${v}코인 걸기 · 맞히면 +${Math.floor(v * T[sel].odds) - v}` });
       $q('#rc-go').onclick = start;
