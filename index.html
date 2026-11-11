@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-2300">
+<meta name="build" content="20261111-2320">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -345,7 +345,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 @keyframes gfup{from{transform:translateY(40%)}}@keyframes gffade{from{opacity:0}}
 .dot.sketch{background:#ff8fa8;box-shadow:0 0 6px #ff8fa8}
 .c-sketch{--l:#ffc2cf;--b:#ff5c80}
-.sk{position:relative;height:100%;display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;background:#0f0e13;color:#f3f1f7;overflow:hidden}
+.sk{position:relative;height:100%;display:flex;flex-direction:column;gap:6px;padding:6px 8px 8px;background:#0f0e13;color:#f3f1f7;overflow:hidden}
 .sk-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none}
 .sk-who{display:flex;align-items:center;padding-left:8px;min-width:0}
 .sk-who .mini{width:28px;height:28px;border-radius:50%;margin-left:-8px;border:2px solid #0f0e13;overflow:visible}
@@ -354,7 +354,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 @keyframes skbob{to{transform:translateY(-2px)}}
 .sk-who em{font-style:normal;font-size:11px;color:#9a96a8;margin-left:8px;white-space:nowrap}
 .sk-top>button{flex:none;border:1px solid #2c2a36;background:none;color:#f3f1f7;border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;cursor:pointer}
-.sk-book{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;padding-top:12px}
+.sk-book{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;padding-top:11px}
 .sk-paper{position:relative;border-radius:6px 6px 14px 14px;box-shadow:0 10px 26px rgba(0,0,0,.5)}
 .sk-paper canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:6px 6px 14px 14px;display:block}
 .sk-lc{touch-action:none;cursor:crosshair}
@@ -368,7 +368,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .sk-row button{border:1px solid #2c2a36;background:none;color:#f3f1f7;border-radius:10px;padding:5px 9px;font:inherit;font-size:12px;cursor:pointer}
 .sk-row button.on{background:#f3f1f7;color:#0f0e13;border-color:transparent}
 .sk-cols{gap:7px}.sk-cols button{width:24px;height:24px;border-radius:50%;padding:0;border:2px solid transparent}.sk-cols button.on{border-color:#f3f1f7;transform:scale(1.12)}
-.sk-sp{justify-content:space-between}.sk-sp>span{display:flex;gap:6px;flex-wrap:wrap}
+.sk-sp{justify-content:space-between}
+.sk-tools.sk-min{padding:7px 8px;border-radius:14px}
+.sk-row .sk-tg{width:32px;padding:5px 0;border-radius:50%;font-size:11px}
+.sk-curb{display:flex;align-items:center;gap:6px}.sk-curb i{width:14px;height:14px;border-radius:50%;border:1.5px solid #f3f1f7;box-sizing:border-box}.sk-sp>span{display:flex;gap:6px;flex-wrap:wrap}
 .sk-sz{display:flex;align-items:center;gap:6px;font-size:11px;color:#9a96a8}.sk-sz input{width:84px;accent-color:#ffd23f}
 .sk-row .sk-send{background:#ff4f8b;border-color:transparent;color:#fff}
 .sk-clear{border:0;background:none;color:#ff8fa8;font:inherit;font-size:11px;text-decoration:underline;cursor:pointer}
@@ -380,7 +383,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .sk-go{display:flex;flex-direction:column;gap:8px}.sk-go button{border:0;background:#2a2833;color:#fff;border-radius:12px;padding:13px;font:inherit;font-size:14px;cursor:pointer;text-align:left}
 .sk-alb{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .sk-alb button{border:0;background:none;color:#9a96a8;padding:0;font:inherit;font-size:11px;display:flex;flex-direction:column;gap:3px;align-items:flex-start;cursor:pointer}
-.sk-alb canvas{width:100%;aspect-ratio:3/4;border-radius:6px;background:#fffdf6}
+.sk-alb canvas{width:100%;aspect-ratio:3/5;border-radius:6px;background:#fffdf6}
 .sk-alb b{color:#f3f1f7;font-weight:400;font-size:12px}
 .sk-alb .empty{grid-column:1/-1;color:#9a96a8}
 .sk-big{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;cursor:pointer}
@@ -2994,13 +2997,13 @@ const ROMANCE = (() => {
 // sketchlive/{uid} = { on, d, x, y, day, cur, at } — 지금 보는 중·그리는 중 + 그리고 있는 선 (0.2초마다)
 // sketchdays/{날짜} = { at, w:[그린 사람들] } — 앨범 목록
 const SKETCH = (() => {
-  const W = 600, H = 800, MAXP = 700;
+  const W = 600, H = 1000, MAXP = 700; // 종이 비율 3:5 (휴대폰 화면에 꽉 차게)
   const COLORS = ['#26262e', '#e8283c', '#ff7ab8', '#ff9a1a', '#ffd23f', '#3fbf4a', '#2f86ff', '#8b3ff0', '#8b5a2b', '#ffffff'];
   const PENS = [['crayon', '크레파스'], ['pen', '사인펜'], ['hi', '형광펜'], ['glit', '반짝이']];
   const PAPERS = [['sketch', '스케치북'], ['note', '줄노트'], ['grid', '모눈'], ['board', '칠판']];
   let day = '', list = [], drawn = [], live = {}, pen = 'crayon', color = COLORS[1], size = 7, erasing = false, paper = 'sketch';
-  let pc, ic, lc, pctx, ictx, lctx, k = 1, cur = null, lastSend = 0, sendT = null, beatT = null, dayMarked = '', clearAsk = false, liveRaf = 0, ro = null;
-  try { paper = localStorage.getItem('wb_paper') || 'sketch' } catch { }
+  let open = false, pc, ic, lc, pctx, ictx, lctx, k = 1, cur = null, lastSend = 0, sendT = null, beatT = null, dayMarked = '', clearAsk = false, liveRaf = 0, ro = null;
+  try { paper = localStorage.getItem('wb_paper') || 'sketch'; open = localStorage.getItem('wb_sktools') === '1' } catch { }
   const $q = s => document.querySelector(s), me = () => S.me.uid;
   const rnd = seed => { let s = seed % 2147483647 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647 };
   const pairs = a => { const o = []; for (let i = 0; i + 1 < a.length; i += 2) o.push([a[i], a[i + 1]]); return o };
@@ -3051,7 +3054,7 @@ const SKETCH = (() => {
   const askLive = () => { if (!liveRaf) liveRaf = requestAnimationFrame(paintLive) };
   function fit() {
     const book = $q('#sk-book'), box = $q('#sk-paper'); if (!book || !box) return;
-    const h = book.clientHeight - 14, w = book.clientWidth, ph = Math.max(120, Math.min(h, w * 4 / 3)), pw = ph * 3 / 4;
+    const h = book.clientHeight - 12, w = book.clientWidth, ph = Math.max(120, Math.min(h, w * H / W)), pw = ph * W / H;
     box.style.height = ph + 'px'; box.style.width = pw + 'px';
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     [pc, ic, lc].forEach(c => { c.width = Math.round(pw * dpr); c.height = Math.round(ph * dpr) });
@@ -3100,15 +3103,22 @@ const SKETCH = (() => {
   // ---------- 화면 ----------
   function tools() {
     const t = $q('#sk-tools'); if (!t) return;
-    t.innerHTML = `<div class="sk-row">${PENS.map(([p, n]) => `<button data-pen="${p}" class="${!erasing && pen === p ? 'on' : ''}">${n}</button>`).join('')}</div>
+    const penName = Object.fromEntries(PENS)[pen], toggle = `<button class="sk-tg" id="sk-tg" aria-label="${open ? '도구 접기' : '도구 펼치기'}">${open ? '▼' : '▲'}</button>`;
+    t.classList.toggle('sk-min', !open);
+    t.innerHTML = !open
+      ? `<div class="sk-row sk-sp"><span><button id="sk-cur" class="sk-curb"><i style="background:${erasing ? 'transparent' : color}"></i>${erasing ? '지우개' : penName}</button><button id="sk-undo">↶ 취소</button><button id="sk-er" class="${erasing ? 'on' : ''}">지우개</button></span><span><button class="sk-send" id="sk-send">보내기</button>${toggle}</span></div>`
+      : `<div class="sk-row sk-sp"><span>${PENS.map(([p, n]) => `<button data-pen="${p}" class="${!erasing && pen === p ? 'on' : ''}">${n}</button>`).join('')}</span>${toggle}</div>
       <div class="sk-row sk-cols">${COLORS.map(c => `<button data-col="${c}" class="${!erasing && color === c ? 'on' : ''}" style="background:${c}" aria-label="색"></button>`).join('')}</div>
       <div class="sk-row sk-sp"><span><button id="sk-undo">↶ 내 선 취소</button><button id="sk-er" class="${erasing ? 'on' : ''}">지우개</button></span><label class="sk-sz">굵기 <input id="sk-size" type="range" min="2" max="28" value="${size}"></label></div>
       <div class="sk-row sk-sp"><span>${PAPERS.map(([p, n]) => `<button data-paper="${p}" class="${paper === p ? 'on' : ''}">${n}</button>`).join('')}</span><button class="sk-send" id="sk-send">보내기</button></div>
       ${S.isAdmin ? `<button class="sk-clear" id="sk-clear">${clearAsk ? '정말 오늘 종이를 비울까요? 한 번 더 누르면 지워져요' : '관리자 · 오늘 종이 비우기'}</button>` : ''}`;
+    const setOpen = v => { open = v; try { localStorage.setItem('wb_sktools', v ? '1' : '0') } catch { } tools() };
+    $q('#sk-tg').onclick = () => setOpen(!open);
+    if ($q('#sk-cur')) $q('#sk-cur').onclick = () => setOpen(true);
     t.querySelectorAll('[data-pen]').forEach(b => b.onclick = () => { pen = b.dataset.pen; erasing = false; tools() });
     t.querySelectorAll('[data-col]').forEach(b => b.onclick = () => { color = b.dataset.col; erasing = false; tools() });
     t.querySelectorAll('[data-paper]').forEach(b => b.onclick = () => { paper = b.dataset.paper; try { localStorage.setItem('wb_paper', paper) } catch { } tools(); drawPaper(pctx, pc.width, pc.height, k); paintInk(true) });
-    $q('#sk-size').oninput = e => size = +e.target.value;
+    if ($q('#sk-size')) $q('#sk-size').oninput = e => size = +e.target.value;
     $q('#sk-er').onclick = () => { erasing = !erasing; tools() };
     $q('#sk-undo').onclick = async () => { const mine = list.filter(x => x.by === me()); const last = mine[mine.length - 1]; if (!last) { toast('지울 내 선이 없어요'); return } try { await deleteDoc(doc(db, 'sketch', day, 'strokes', last.id)) } catch (e) { toast('지우지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } };
     $q('#sk-send').onclick = sendSheet;
@@ -3138,13 +3148,13 @@ const SKETCH = (() => {
     days = days.filter(x => x.id !== day).sort((a, b) => a.id < b.id ? 1 : -1).slice(0, 30);
     const box = s.querySelector('#sk-alb'); if (!box) return;
     if (!days.length) { box.innerHTML = '<div class="empty">아직 지난 낙서가 없어요.<br>오늘 그린 건 내일부터 여기 보여요</div>'; return }
-    box.innerHTML = days.map(x => `<button data-day="${x.id}"><canvas width="150" height="200"></canvas><b>${+x.id.slice(5, 7)}월 ${+x.id.slice(8)}일</b><small>${x.w.length}명이 그렸어요</small></button>`).join('');
+    box.innerHTML = days.map(x => `<button data-day="${x.id}"><canvas width="150" height="250"></canvas><b>${+x.id.slice(5, 7)}월 ${+x.id.slice(8)}일</b><small>${x.w.length}명이 그렸어요</small></button>`).join('');
     const cache = {};
     const load = async id => { if (!cache[id]) { const q = await getDocs(collection(db, 'sketch', id, 'strokes')), a = []; q.forEach(d => a.push(d.data())); cache[id] = a.sort((x, y) => ms(x.at) - ms(y.at)) } return cache[id] };
     const render1 = (c, a, w) => { const g = c.getContext('2d'), sc = w / W; drawPaper(g, c.width, c.height, sc, 'sketch'); const ink = document.createElement('canvas'); ink.width = c.width; ink.height = c.height; const ig = ink.getContext('2d'); a.forEach(st => drawStroke(ig, { ...st, p: null }, sc, false)); g.drawImage(ink, 0, 0) };
     box.querySelectorAll('[data-day]').forEach(async b => {
       try { render1(b.querySelector('canvas'), await load(b.dataset.day), 150) } catch { }
-      b.onclick = async () => { const a = await load(b.dataset.day).catch(() => []); const v = document.createElement('div'); v.className = 'sk-big'; v.innerHTML = `<canvas width="600" height="800"></canvas><p>${b.querySelector('b').textContent} · 누르면 닫혀요</p>`; render1(v.querySelector('canvas'), a, 600); v.onclick = () => v.remove(); $q('.sk').appendChild(v) };
+      b.onclick = async () => { const a = await load(b.dataset.day).catch(() => []); const v = document.createElement('div'); v.className = 'sk-big'; v.innerHTML = `<canvas width="600" height="1000"></canvas><p>${b.querySelector('b').textContent} · 누르면 닫혀요</p>`; render1(v.querySelector('canvas'), a, 600); v.onclick = () => v.remove(); $q('.sk').appendChild(v) };
     });
   }
   function mount(v) {
