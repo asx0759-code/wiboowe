@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1430">
+<meta name="build" content="20261111-1440">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2800,7 +2800,7 @@ const ROMANCE = (() => {
 
 /* ===== 게임 코인 공용 ===== */
 // 예전 기록(순수익 칸이 없던 때)은 '가진 코인 - 처음 100코인'을 위연시 기록으로 봄
-const rmOf = x => x ? (Number.isFinite(x.rm) ? x.rm : Math.max(0, (x.c || 0) - 100)) : 0;
+const rmOf = x => x ? (Number.isFinite(x.rm) ? x.rm : (x.c || 0) - 100) : 0;
 async function coinWrite({ c, w, k, rm }) {
   const u = S.me.uid, cur = G.coins[u] || { c: 0, w: 0, k: 0, rm: 0 };
   const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0, rm: rm ?? rmOf(cur) };
@@ -3380,13 +3380,15 @@ function drawRank() {
   const isB = kind === 'b', unit = kind === 'r' ? '코인' : kind === 'f' ? '승' : '점';
   const map = kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, rmOf(x)])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
   if (!(kind === 's' ? G.sloaded : kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : (kind === 'r' || kind === 'f') ? G.cloaded : G.loaded)) return;
-  const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
-  if (!arr.length) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
+  // 위연시는 한 번이라도 해 본 사람은 모두 보여 줌 (0이나 마이너스도)
+  const played = u => { const x = G.coins[u]; return x && (Number.isFinite(x.rm) || x.c !== 100 || x.w > 0) };
+  const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && (kind === 'r' ? played(u) : b > 0)).sort((a, b) => b[1] - a[1]);
+  if (!arr.length && !(S.isAdmin && (kind === 'r' || kind === 'f'))) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
   let rank = 0, prev = null;
   const rows = arr.map(([u, b], i) => { if (b !== prev) { rank = i + 1; prev = b } return { u, b, rank } });
   const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${S.isAdmin && kind !== 'r' && kind !== 'f' ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
-  const top = rows.slice(0, 10), mine = rows.find(r => r.u === me);
-  el.innerHTML = top.map(line).join('') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
+  const top = rows.slice(0, kind === 'r' || kind === 'f' ? 20 : 10), mine = rows.find(r => r.u === me);
+  el.innerHTML = (arr.length ? top.map(line).join('') : '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
   if (S.isAdmin && (kind === 'r' || kind === 'f')) { // 관리자: 회원 코인·기록 직접 고치기
     const opts = Object.entries(S.users).sort((a, b) => a[1].localeCompare(b[1])).map(([u, n]) => `<option value="${u}">${esc(n)}</option>`).join('');
     el.insertAdjacentHTML('beforeend', `<details class="cfix"><summary>관리자 · 기록 고치기</summary><div class="cfix-b"><select id="cf-u">${opts}</select>
