@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1415">
+<meta name="build" content="20261111-1430">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -272,6 +272,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .rm-card.hid{background:linear-gradient(160deg,rgba(255,210,63,.22),rgba(180,120,255,.2));border-color:#f2c94c;animation:rmhid 1.6s ease-in-out infinite alternate}
 @keyframes rmhid{to{box-shadow:0 0 18px rgba(255,210,63,.55)}}
 .rm-hid{font-weight:700;font-size:13px;letter-spacing:.08em;color:#b8860b;animation:rmb .8s ease-in-out infinite}
+.rm-ch .t-로또{background:#e6e0ff;color:#5b2fd6}.rm-ch .t-전설{background:linear-gradient(90deg,#ffe14a,#ff9cbf,#9fd8ff);color:#5a1d00;font-weight:700}
+.rm-pen{font-size:11px;color:#d81e4f;background:#ffe9ee;border-radius:8px;padding:2px 8px}
 .rm-ch .t-대박{background:#fff1d9;color:#b96b00}.rm-ch .t-초대박{background:linear-gradient(90deg,#ffe0f0,#efe0ff);color:#8b3ff0}
 .rm-pick{font-size:11px;color:var(--muted);background:rgba(0,0,0,.04);border-radius:8px;padding:3px 8px}
 .mg-tabs{flex-wrap:wrap}.mg-tabs button{min-width:30%}
@@ -2663,40 +2665,43 @@ const BLOCKS = (() => {
 const ROMANCE = (() => {
   const STAKE = 10, START_COINS = 100, BONUS = 100;
   // 고르는 선택지: p = 성공 확률, m = 성공 시 코인 배수
-  const SAFE = { p: .75, m: 1.3, tag: '안전' }, MID = { p: .55, m: 1.8, tag: '도전' }, RISK = { p: .35, m: 2.8, tag: '모험' };
+  const SAFE = { p: .75, m: 1.3, tag: '안전' }, MID = { p: .55, m: 1.8, tag: '도전' }, RISK = { p: .35, m: 2.8, tag: '모험' }, LOTTO = { p: .14, m: 6.5, tag: '로또', j: .04 };
+  // 걸린 코인이 많을수록 성공 확률이 깎임 (20코인까지는 그대로, 2배가 될 때마다 -10%, 최대 -60%)
+  const potPen = pot => pot <= 20 ? 1 : Math.max(.4, 1 - .1 * Math.log2(pot / 20));
   // 밤티: 위연시 오리지널 캐릭터 — 야행성, 군밤 덕후, 노래 흥얼거리기, 수줍지만 장난기 많음
   const STAGES = [
     { name: '첫 만남', scenes: [
-      { q: '밤 12시 편의점. 군밤 마지막 한 봉지를 밤티와 동시에 집었다!', a: [['“먼저 드세요”라며 양보한다', SAFE, '밤티가 반을 나눠 줬다. “같이 먹어요 ㅎㅎ”', '밤티가 “감사합니다” 하고 진짜로 가져갔다. 뒤도 안 돌아봤다.'], ['“가위바위보로 정할까요?”', MID, '밤티가 져 놓고 더 신나 했다 ✌️', '밤티가 보 냈는데 나는 주먹이었다. 밤티가 군밤을 흔들며 춤추며 퇴장했다 💃'], ['군밤 맛집을 안다고 말을 건다', RISK, '밤티 눈이 반짝! “거기 어디예요?”', '“거기 저희 엄마 가게인데요?” 그리고 나는 출입 금지당했다']] },
-      { q: '새벽 산책길, 밤티가 이어폰 없이 노래를 흥얼거리고 있다.', a: [['모른 척 지나간다', SAFE, '밤티가 먼저 “혹시 시끄러웠어요?” 말을 걸었다', '지나치다가 전봇대에 박았다. 밤티가 119를 불러 줬다. 그게 마지막 만남이었다'], ['“그 노래 좋아요”라고 말한다', MID, '밤티가 부끄러워하며 노래 제목을 알려 줬다 🎧', '밤티가 “으아악 누구세요” 하고 전력 질주했다. 100m 11초대였다'], ['다음 소절을 따라 부른다', RISK, '즉석 듀엣 성공! 밤티가 박수를 쳤다 👏', '음이탈이 동네에 울려 퍼졌다. 강아지 다섯 마리가 같이 울었다 🐕🐕🐕']] },
+      { q: '밤 12시 편의점. 군밤 마지막 한 봉지를 밤티와 동시에 집었다!', a: [['“먼저 드세요”라며 양보한다', SAFE, '밤티가 반을 나눠 줬다. “같이 먹어요 ㅎㅎ”', '밤티가 “감사합니다” 하고 진짜로 가져갔다. 뒤도 안 돌아봤다.'], ['“가위바위보로 정할까요?”', MID, '밤티가 져 놓고 더 신나 했다 ✌️', '밤티가 보 냈는데 나는 주먹이었다. 밤티가 군밤을 흔들며 춤추며 퇴장했다 💃'], ['군밤 맛집을 안다고 말을 건다', RISK, '밤티 눈이 반짝! “거기 어디예요?”', '“거기 저희 엄마 가게인데요?” 그리고 나는 출입 금지당했다'], ['군밤을 반으로 쪼개 하트 모양으로 내민다', RISK, '밤티가 빵 터졌다. “이게 뭐예요 ㅋㅋㅋ” 그러고는 받았다', '쪼개다가 군밤이 바닥에 떨어졌다. 둘 다 3초간 말이 없었다']] },
+      { q: '새벽 산책길, 밤티가 이어폰 없이 노래를 흥얼거리고 있다.', a: [['모른 척 지나간다', SAFE, '밤티가 먼저 “혹시 시끄러웠어요?” 말을 걸었다', '지나치다가 전봇대에 박았다. 밤티가 119를 불러 줬다. 그게 마지막 만남이었다'], ['“그 노래 좋아요”라고 말한다', MID, '밤티가 부끄러워하며 노래 제목을 알려 줬다 🎧', '밤티가 “으아악 누구세요” 하고 전력 질주했다. 100m 11초대였다'], ['다음 소절을 따라 부른다', RISK, '즉석 듀엣 성공! 밤티가 박수를 쳤다 👏', '음이탈이 동네에 울려 퍼졌다. 강아지 다섯 마리가 같이 울었다 🐕🐕🐕'], ['옆에서 비트박스를 깔아 준다', RISK, '밤티가 리듬을 타기 시작했다. 새벽 길거리 공연 성사 🎶', '침이 튀었다. 밤티가 말없이 우산을 폈다 ☂️']] },
     ] },
     { name: '연락처', scenes: [
-      { q: '헤어지기 전, 밤티가 머뭇거린다.', a: [['“또 봐요!” 하고 손을 흔든다', SAFE, '밤티가 쪼르르 와서 번호를 줬다 📱', '밤티가 번호 대신 군밤 껍질을 손에 쥐여 주고 갔다'], ['“밤에 또 산책해요?”', MID, '“저 밤에만 살아요 ㅋㅋ” 연락처 교환 성공', '“저 이제 아침형 인간 됐어요” 밤티 정체성 붕괴. 대화도 붕괴'], ['폰을 내밀며 “번호 찍어 줘요”', RISK, '밤티가 이름을 “🌰밤티”로 저장해 줬다', '밤티가 번호를 찍어 줬다. 걸어 보니 군밤 트럭 사장님이었다 🌰🚚']] },
-      { q: '새벽 2시, 밤티에게 첫 메시지를 보낸다면?', a: [['“아직 안 자요?”', SAFE, '1초 만에 답장. “당연하죠 지금이 낮인데”', '“누구세요?” 저장을 안 해 놨었다'], ['군밤 짤을 보낸다', MID, '밤티: “ㅋㅋㅋㅋ 이거 저예요?”', '밤티: “지금 새벽 2시에 이걸 보내요? 배고파서 잠 다 깼잖아요” 차단'], ['“지금 나올래요?”', RISK, '5분 뒤, 슬리퍼 신은 밤티가 나타났다 🩴', '밤티 엄마가 대신 답장했다. “우리 애 지금 자요.”']] },
+      { q: '헤어지기 전, 밤티가 머뭇거린다.', a: [['“또 봐요!” 하고 손을 흔든다', SAFE, '밤티가 쪼르르 와서 번호를 줬다 📱', '밤티가 번호 대신 군밤 껍질을 손에 쥐여 주고 갔다'], ['“밤에 또 산책해요?”', MID, '“저 밤에만 살아요 ㅋㅋ” 연락처 교환 성공', '“저 이제 아침형 인간 됐어요” 밤티 정체성 붕괴. 대화도 붕괴'], ['폰을 내밀며 “번호 찍어 줘요”', RISK, '밤티가 이름을 “🌰밤티”로 저장해 줬다', '밤티가 번호를 찍어 줬다. 걸어 보니 군밤 트럭 사장님이었다 🌰🚚'], ['“밤티 씨, 혹시 군밤 좋아하세요?” 뜬금 질문', RISK, '“…어떻게 알았어요?” 운명을 느낀 밤티가 번호를 줬다', '“저 방금 군밤 사다가 만났잖아요…” 기억력을 의심받았다']] },
+      { q: '새벽 2시, 밤티에게 첫 메시지를 보낸다면?', a: [['“아직 안 자요?”', SAFE, '1초 만에 답장. “당연하죠 지금이 낮인데”', '“누구세요?” 저장을 안 해 놨었다'], ['군밤 짤을 보낸다', MID, '밤티: “ㅋㅋㅋㅋ 이거 저예요?”', '밤티: “지금 새벽 2시에 이걸 보내요? 배고파서 잠 다 깼잖아요” 차단'], ['“지금 나올래요?”', RISK, '5분 뒤, 슬리퍼 신은 밤티가 나타났다 🩴', '밤티 엄마가 대신 답장했다. “우리 애 지금 자요.”'], ['“자니…?”', RISK, '“안 자요 ㅋㅋ 왜요?” 새벽 감성이 통했다', '밤티: “전 애인이세요?” 단톡방에 캡처가 올라갔다']] },
     ] },
     { name: '첫 데이트', scenes: [
-      { q: '첫 데이트 장소는?', a: [['한강 야경 산책', SAFE, '밤티가 별자리를 하나씩 알려 줬다 ✨', '바람에 밤티 가발이… 아니 모자가 날아갔다. 그 뒤로 연락이 없다'], ['코인 노래방', MID, '밤티가 마이크를 놓지 않았다 🎤', '내가 3시간 동안 혼자 발라드만 불렀다. 밤티가 자고 있었다 😴'], ['군밤 장인 찾아 지방 원정', RISK, '인생 군밤을 찾았다. 밤티가 감동했다 🌰', '4시간 달려 도착했더니 가게 앞에 쪽지 한 장. “추워서 집에 갑니다 -사장-” 🥶'] ]},
-      { q: '데이트 중 밤티가 장난으로 내 모자를 뺏어 갔다!', a: [['웃으면서 기다린다', SAFE, '밤티가 모자를 씌워 주며 “잘 어울려요”', '밤티가 모자를 쓰고 그대로 집에 갔다. 모자도 밤티도 돌아오지 않았다'], ['쫓아가서 잡는다', MID, '잡았다! 둘 다 숨이 차서 웃음이 터졌다', '넘어지면서 밤티 바지를 잡았다. 더는 말하지 않겠다'], ['나도 밤티 목도리를 뺏는다', RISK, '장난 전쟁 시작! 밤티가 제일 신나 보였다 😆', '목도리 실이 풀려서 밤티가 뜨개질 원상태로 돌아갔다. 할머니 작품이었다']] },
+      { q: '첫 데이트 장소는?', a: [['한강 야경 산책', SAFE, '밤티가 별자리를 하나씩 알려 줬다 ✨', '바람에 밤티 가발이… 아니 모자가 날아갔다. 그 뒤로 연락이 없다'], ['코인 노래방', MID, '밤티가 마이크를 놓지 않았다 🎤', '내가 3시간 동안 혼자 발라드만 불렀다. 밤티가 자고 있었다 😴'], ['군밤 장인 찾아 지방 원정', RISK, '인생 군밤을 찾았다. 밤티가 감동했다 🌰', '4시간 달려 도착했더니 가게 앞에 쪽지 한 장. “추워서 집에 갑니다 -사장-” 🥶'], ['24시 찜질방', RISK, '양머리 수건을 쓴 밤티가 식혜를 건넸다. 이게 사랑이다 🥚', '밤티가 수면실에서 7시간을 잤다. 나 혼자 계란 12개를 먹었다'] ]},
+      { q: '데이트 중 밤티가 장난으로 내 모자를 뺏어 갔다!', a: [['웃으면서 기다린다', SAFE, '밤티가 모자를 씌워 주며 “잘 어울려요”', '밤티가 모자를 쓰고 그대로 집에 갔다. 모자도 밤티도 돌아오지 않았다'], ['쫓아가서 잡는다', MID, '잡았다! 둘 다 숨이 차서 웃음이 터졌다', '넘어지면서 밤티 바지를 잡았다. 더는 말하지 않겠다'], ['나도 밤티 목도리를 뺏는다', RISK, '장난 전쟁 시작! 밤티가 제일 신나 보였다 😆', '목도리 실이 풀려서 밤티가 뜨개질 원상태로 돌아갔다. 할머니 작품이었다'], ['“그 모자 너 가져” 쿨하게 선물한다', RISK, '밤티가 그날부터 매일 그 모자만 쓰고 다닌다 🧢', '밤티: “이거 저한테 너무 큰데요?” 내 머리가 큰 거였다']] },
     ] },
     { name: '고백', scenes: [
-      { q: '새벽 4시, 해 뜨기 직전. 고백 타이밍이다…!', a: [['“나 너 좋아해”', SAFE, '밤티가 작게 말했다. “…나도요”', '고백하는 순간 해가 떴다. 밤티가 “앗 뜨거” 하더니 사라졌다 (야행성)'], ['군밤 봉투에 편지를 넣어 준다', MID, '편지를 읽은 밤티 귀가 새빨개졌다 💌', '밤티가 편지째로 군밤인 줄 알고 먹었다. 맛있다고 했다'], ['같이 부르던 노래 가사로 고백', RISK, '밤티가 다음 소절로 대답했다 🎶', '가사를 까먹어서 “라라라~ 너를~ 라라라~” 하다가 군대 간 친구 노래가 나왔다']] },
-      { q: '밤티가 먼저 “할 말 있어요”라고 한다.', a: [['조용히 들어 준다', SAFE, '“저… 좋아해요” 밤티가 먼저 고백했다', '“저 사실… 내일 이사 가요. 제주도로.” 끝'], ['“나도 할 말 있는데!”', MID, '“하나 둘 셋!” 동시에 “좋아해!” 💕', '“아 그럼 먼저 하세요” “아니 먼저 하세요” 30분째 양보하다가 막차가 끊겼다'], ['대답 대신 꼭 안아 준다', RISK, '밤티가 더 꼭 안았다 🫂', '안았는데 밤티가 아니라 밤티 닮은 마네킹이었다. 진짜 밤티는 옆에서 보고 있었다']] },
+      { q: '새벽 4시, 해 뜨기 직전. 고백 타이밍이다…!', a: [['“나 너 좋아해”', SAFE, '밤티가 작게 말했다. “…나도요”', '고백하는 순간 해가 떴다. 밤티가 “앗 뜨거” 하더니 사라졌다 (야행성)'], ['군밤 봉투에 편지를 넣어 준다', MID, '편지를 읽은 밤티 귀가 새빨개졌다 💌', '밤티가 편지째로 군밤인 줄 알고 먹었다. 맛있다고 했다'], ['같이 부르던 노래 가사로 고백', RISK, '밤티가 다음 소절로 대답했다 🎶', '가사를 까먹어서 “라라라~ 너를~ 라라라~” 하다가 군대 간 친구 노래가 나왔다'], ['무릎 꿇고 군밤 반지를 내민다', RISK, '밤티: “이거 먹어도 돼요?” “…응” “그럼 좋아요” 💍🌰', '무릎에서 뚝 소리가 났다. 고백보다 정형외과가 먼저였다']] },
+      { q: '밤티가 먼저 “할 말 있어요”라고 한다.', a: [['조용히 들어 준다', SAFE, '“저… 좋아해요” 밤티가 먼저 고백했다', '“저 사실… 내일 이사 가요. 제주도로.” 끝'], ['“나도 할 말 있는데!”', MID, '“하나 둘 셋!” 동시에 “좋아해!” 💕', '“아 그럼 먼저 하세요” “아니 먼저 하세요” 30분째 양보하다가 막차가 끊겼다'], ['대답 대신 꼭 안아 준다', RISK, '밤티가 더 꼭 안았다 🫂', '안았는데 밤티가 아니라 밤티 닮은 마네킹이었다. 진짜 밤티는 옆에서 보고 있었다'], ['“잠깐, 내가 맞혀 볼게”', RISK, '“나 좋아하지?” “…헐 어떻게 알았어요” 독심술 성공 🔮', '“군밤 값 빌려 달라고?” 밤티가 정색했다']] },
     ] },
     { name: '커플 성공', scenes: [
-      { q: '사귄 지 100일! 밤티를 위한 선물은?', a: [['커플 잠옷', SAFE, '“이거 입고 밤새 놀아요!” 💤', '잠옷이 4XL이었다. 밤티가 그 안에서 실종됐다'], ['직접 구운 군밤 한 박스', MID, '밤티가 울면서 먹었다 🌰', '다 탔다. 화재경보기가 울렸다. 소방관 아저씨가 군밤 맛있게 드셨다 🚒'], ['새벽 별 보러 가는 캠핑', RISK, '쏟아지는 별 아래서 밤티가 말했다. “평생 같이 밤 새요” 🌌', '폭우에 텐트가 날아갔다. 밤티가 “우리 사이도 날아간 것 같아요” 명언을 남겼다']] },
+      { q: '사귄 지 100일! 밤티를 위한 선물은?', a: [['커플 잠옷', SAFE, '“이거 입고 밤새 놀아요!” 💤', '잠옷이 4XL이었다. 밤티가 그 안에서 실종됐다'], ['직접 구운 군밤 한 박스', MID, '밤티가 울면서 먹었다 🌰', '다 탔다. 화재경보기가 울렸다. 소방관 아저씨가 군밤 맛있게 드셨다 🚒'], ['새벽 별 보러 가는 캠핑', RISK, '쏟아지는 별 아래서 밤티가 말했다. “평생 같이 밤 새요” 🌌', '폭우에 텐트가 날아갔다. 밤티가 “우리 사이도 날아간 것 같아요” 명언을 남겼다'], ['내가 직접 부른 노래 CD', RISK, '밤티가 매일 밤 그 노래를 틀어 놓고 잠든다 🎧', '밤티가 친구들이랑 듣다가 다 같이 웃참 챌린지를 했다']] },
     ] },
   ];
   const NAME = '밤티';
   // 돌발 미션: 첫 데이트를 성공하면 고백 전에 꼭 나옴 (확률 낮은 대신 배수 큼)
-  const H_SAFE = { p: .85, m: 1.2, tag: '안전' }, H_BIG = { p: .4, m: 3, tag: '대박' }, H_JACK = { p: .15, m: 7, tag: '초대박' };
+  const H_SAFE = { p: .85, m: 1.2, tag: '안전' }, H_BIG = { p: .4, m: 3, tag: '대박' }, H_JACK = { p: .15, m: 7, tag: '초대박' }, H_ULTRA = { p: .05, m: 15, tag: '전설' };
   const HIDDEN = [
     { q: '데이트 중, 밤티가 지나가던 시온과 눈이 마주쳤다. “잘생겼당…” 밤티가 넋을 놓았다!', a: [
       ['“나도 오늘 머리 감았는데…” 조용히 어필', H_SAFE, '밤티: “어? 진짜네 ㅋㅋ 샴푸 냄새 좋다” 정신 차림 완료', '밤티: “응…” 대답은 하는데 눈은 아직 시온 쪽이다'],
       ['시온보다 잘생긴 척 머리를 쓸어 넘긴다', H_BIG, '그 순간 바람이 딱 맞춰 불었다. 밤티: “…헐 너도 잘생겼네?” 💘', '머리 넘기다 눈을 찔렀다. 밤티가 시온한테 휴지를 빌려 왔다'],
       ['시온에게 가서 “제 사람한테 눈빛 쏘지 마세요”', H_JACK, '시온: “앗 죄송합니다…” 감동한 밤티가 팔짱을 꼈다 🤝', '시온: “저 밤티 사촌인데요?” 다음 주 밤티네 가족 모임에 끌려가게 됐다'],
+      ['나도 같이 “잘생겼당…” 하며 시온을 구경한다', H_ULTRA, '둘이서 시온 팬클럽을 만들었다. 취향이 같아서 더 가까워졌다 🤝✨', '밤티: “그치? 나 번호 물어보고 올게” 그리고 돌아오지 않았다'],
     ] },
   ];
-  const pickHidden = () => { const sc = HIDDEN[Math.random() * HIDDEN.length | 0]; return { q: sc.q, hidden: 1, a: shuffle(sc.a.map(x => [x[0], { ...x[1], p: Math.min(.95, Math.max(.08, x[1].p + (Math.random() * .1 - .05))) }, x[2], x[3]])) } };
+  const pickHidden = () => { const sc = HIDDEN[Math.random() * HIDDEN.length | 0]; return { q: sc.q, hidden: 1, a: shuffle(sc.a.map(x => [x[0], { ...x[1], p: Math.min(.95, Math.max(.03, x[1].p + (Math.random() * .1 - .05) * (x[1].p < .1 ? .4 : 1))) * potPen(st.pot || 0) }, x[2], x[3]])) } };
   let opt, st = { mode: 'idle' }, busy = false;
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
@@ -2714,7 +2719,7 @@ const ROMANCE = (() => {
       const can = c !== null && c >= STAKE;
       box.innerHTML = top + `<div class="rm-card"><div class="rm-hero">${bamUid() ? `<span class="mini rm-heroav">${bamFace()}</span>` : '🌰'}</div><big>위연시</big>
         <p>야행성 군밤 덕후 <b>밤티</b>와 썸을 타요! 선택지마다 성공 확률이 달라요.<br>성공할수록 코인이 불어나고, 실패하면 다 잃어요.<br>중간에 그만두면 모은 코인을 챙길 수 있어요.</p>
-        <div class="rm-odds"><span><b>안전</b> 약 65~85%</span><span><b>도전</b> 약 45~65%</span><span><b>모험</b> 약 25~45%</span></div><small class="rm-note">어떤 선택지가 안전·모험인지와 확률은 판마다 바뀌어요</small>
+        <div class="rm-odds"><span><b>안전</b> 약 65~85%</span><span><b>도전</b> 약 45~65%</span><span><b>모험</b> 약 25~45%</span><span><b>로또</b> 약 10~18% · ×6↑</span></div><small class="rm-note">선택지는 4개! 어떤 게 안전·로또인지와 확률은 판마다 바뀌어요</small><small class="rm-note">💰 걸린 코인이 많아질수록 성공 확률이 뚝뚝 떨어져요 (최대 -60%)</small>
         <button class="btn mg-btn" id="rm-go" ${can && !busy ? '' : 'disabled'}>${STAKE}코인 내고 시작</button>
         ${c !== null && c < STAKE ? `<button class="rm-bonus" id="rm-bonus">${bonusLeft() ? `💸 용돈 받기 +${BONUS}` : '용돈은 하루 한 번! 내일 또 받아요'}</button>` : ''}
         ${c === null ? '<small class="rm-note">코인 불러오는 중…</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
@@ -2725,8 +2730,8 @@ const ROMANCE = (() => {
     const s = STAGES[st.i], sc = st.scene;
     const face = `<div class="rm-face"><span class="mini">${bamFace()}</span><b>${NAME}</b></div>`;
     if (st.mode === 'ask') {
-      box.innerHTML = top + hearts(st.i) + `<div class="rm-card ${sc.hidden ? 'hid' : ''}">${sc.hidden ? '<div class="rm-hid">🚨 돌발 미션 🚨</div>' : ''}${face}<div class="rm-pot">걸린 코인 <b>${st.pot}</b></div><p class="rm-q">${fill(sc.q)}</p>
-        <div class="rm-ch">${sc.a.map((x, k) => `<button data-k="${k}"><span>${fill(x[0])}</span><em class="t-${x[1].tag}">${x[1].tag} ${Math.round(x[1].p * 100)}% · ×${x[1].m}</em></button>`).join('')}</div></div>`;
+      box.innerHTML = top + hearts(st.i) + `<div class="rm-card ${sc.hidden ? 'hid' : ''}">${sc.hidden ? '<div class="rm-hid">🚨 돌발 미션 🚨</div>' : ''}${face}<div class="rm-pot">걸린 코인 <b>${st.pot}</b></div>${potPen(st.pot) < 1 ? `<small class="rm-pen">💰 판돈이 커서 성공 확률 -${Math.round((1 - potPen(st.pot)) * 100)}%</small>` : ''}<p class="rm-q">${fill(sc.q)}</p>
+        <div class="rm-ch">${sc.a.map((x, k) => `<button data-k="${k}"><span>${fill(x[0])}</span><em class="t-${x[1].tag}">${x[1].tag} ${Math.max(1, Math.round(x[1].p * 100))}% · ×${x[1].m}</em></button>`).join('')}</div></div>`;
       box.querySelectorAll('[data-k]').forEach(b => b.onclick = () => choose(+b.dataset.k));
     } else if (st.mode === 'wait') {
       box.innerHTML = top + hearts(st.i) + `<div class="rm-card">${face}<div class="rm-doki">두근두근…</div><p class="rm-q">${fill(sc.a[st.k][0])}</p></div>`;
@@ -2747,9 +2752,9 @@ const ROMANCE = (() => {
   }
   // 판마다 확률이 바뀜: 어떤 선택지가 안전/도전/모험인지 무작위, 확률도 ±10% 흔들림, 순서도 섞임
   const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]] } return a };
-  const roll = t => { const p = Math.min(.9, Math.max(.15, t.p + (Math.random() * .2 - .1))); return { tag: t.tag, p, m: Math.max(1.1, Math.round(.97 / p * 10) / 10) } };
+  const roll = t => { const j = t.j ?? .1, base = Math.min(.9, Math.max(.08, t.p + (Math.random() * 2 * j - j))); return { tag: t.tag, p: base * potPen(st.pot || 0), m: Math.max(1.1, Math.round(.97 / base * 10) / 10) } }; // 배수는 원래 확률 기준 → 판돈이 클수록 손해
   const pick = i => {
-    const sc = STAGES[i].scenes[Math.random() * STAGES[i].scenes.length | 0], tiers = shuffle([SAFE, MID, RISK]).map(roll);
+    const sc = STAGES[i].scenes[Math.random() * STAGES[i].scenes.length | 0], tiers = shuffle([SAFE, MID, RISK, LOTTO]).map(roll);
     return { q: sc.q, a: shuffle(sc.a.map((x, k) => [x[0], tiers[k], x[2], x[3]])) };
   };
   const today = () => new Date().toISOString().slice(0, 10);
