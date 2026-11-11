@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-2110">
+<meta name="build" content="20261111-2130">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -325,6 +325,23 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .acn-ck{flex:none;width:20px;height:20px;border:1.5px solid var(--muted);border-radius:6px;display:grid;place-items:center;font-size:13px;font-weight:700;margin:0 8px 0 2px}
 .acn-row.on .acn-ck{background:#ff4f8b;border-color:#ff4f8b;color:#fff}
 .acn-row .mini{width:28px;height:28px;border-radius:50%;margin-right:8px}
+.gf{position:relative}
+.gf-r{display:flex;align-items:center;gap:6px}
+.gf-all{flex:none;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);display:grid;place-items:center;cursor:pointer;padding:0}
+.gf-all svg{width:20px;height:20px}
+.gf-sheet{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;animation:gffade .15s}
+.gf-sh{width:100%;max-height:80%;display:flex;flex-direction:column;background:#1d1c24;color:#fff;border-radius:22px 22px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.4);animation:gfup .2s ease-out}
+.gf-sh-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px;font-size:16px}
+.gf-sh-hd button{border:0;background:rgba(255,255,255,.12);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px}
+.gf-sh-b{overflow-y:auto;padding:0 12px 18px}
+.gf-tot{font-size:12px;color:rgba(255,255,255,.6);padding:0 4px 8px}.gf-tot b{color:#ffd23f}
+.gf-rw{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+.gf-rw.gf-me{background:rgba(255,210,63,.12);border-radius:10px}
+.gf-rk{width:22px;text-align:center;font-family:var(--pixel);color:rgba(255,255,255,.5)}.gf-rk.r1{color:#ffd23f;font-weight:700}.gf-rk.r2{color:#c0c6d4;font-weight:700}.gf-rk.r3{color:#e0905a;font-weight:700}
+.gf-rw .mini{width:30px;height:30px;border-radius:50%;border:0}
+.gf-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gf-rw b{font-variant-numeric:tabular-nums;color:#ffd23f}.gf-rw b small{color:rgba(255,255,255,.4);font-weight:400;font-size:11px}
+@keyframes gfup{from{transform:translateY(40%)}}@keyframes gffade{from{opacity:0}}
 .tt-stage{display:flex;justify-content:center}
 .tt-wrap{position:relative;display:flex;gap:8px;align-items:flex-start}
 .tt-wrap #tt-cv{border-radius:8px;touch-action:none;display:block}
@@ -3853,6 +3870,7 @@ async function loadCharge() {
   gfCoin();
 }
 function gfCoin() { // 폴더 오른쪽 위 코인 · 충전 버튼
+  drawCoinBoard();
   const el = $('#gf-coin'); if (!el) return;
   const c = G.coins[S.me.uid]?.c, left = chargeLeft(), ok = c !== undefined && c <= CHARGE.under && left > 0;
   el.className = 'gf-coin' + (ok ? ' ok' : '');
@@ -3874,12 +3892,30 @@ async function doCharge() {
   } catch (e) { toast('충전하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
   G.chargeBusy = 0; gfCoin();
 }
+// 전체 코인 보유 현황 (누르면 뜨는 창)
+const GF_BOARD = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="5" height="8" rx="1.2" fill="#c0c6d4"/><rect x="9.5" y="6" width="5" height="15" rx="1.2" fill="#ffd23f"/><rect x="16" y="10" width="5" height="11" rx="1.2" fill="#e0905a"/><circle cx="12" cy="3.4" r="1.6" fill="#ffd23f"/></svg>';
+function openCoinBoard() {
+  const g = $('.gf'); if (!g || $('#gf-sheet')) return;
+  g.insertAdjacentHTML('beforeend', `<div class="gf-sheet" id="gf-sheet"><div class="gf-sh"><div class="gf-sh-hd"><b>전체 코인 현황</b><button id="gf-x" aria-label="닫기">✕</button></div><div class="gf-sh-b" id="gf-sh-b"></div></div></div>`);
+  $('#gf-sheet').onclick = e => { if (e.target.id === 'gf-sheet' || e.target.id === 'gf-x') $('#gf-sheet').remove() };
+  drawCoinBoard();
+}
+function drawCoinBoard() {
+  const el = $('#gf-sh-b'); if (!el) return;
+  if (!G.cloaded) { el.innerHTML = '<div class="empty">불러오는 중…</div>'; return }
+  const me = S.me.uid, arr = Object.keys(S.users).map(u => ({ u, c: G.coins[u]?.c ?? null })).sort((a, b) => (b.c ?? -1) - (a.c ?? -1) || S.users[a.u].localeCompare(S.users[b.u]));
+  const total = arr.reduce((t, x) => t + (x.c || 0), 0), n = v => v.toLocaleString('ko-KR');
+  let rank = 0, prev = null;
+  el.innerHTML = `<div class="gf-tot">전체 <b>${n(total)}</b> 코인 · ${arr.filter(x => x.c !== null).length}명</div>` + arr.map((x, i) => { if (x.c !== prev) { rank = i + 1; prev = x.c }
+    return `<div class="gf-rw${x.u === me ? ' gf-me' : ''}"><span class="gf-rk r${x.c !== null && rank <= 3 ? rank : ''}">${x.c === null ? '-' : rank}</span><span class="mini">${avatar(x.u)}</span><span class="gf-nm">${esc(S.users[x.u])}${x.u === me ? ' (나)' : ''}</span><b>${x.c === null ? '<small>아직 안 함</small>' : n(x.c)}</b></div>` }).join('');
+}
 function gameFolder(v) {
-  v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><div class="gf-hd"><h2>게임</h2><button id="gf-coin" class="gf-coin"></button></div>
+  v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><div class="gf-hd"><h2>게임</h2><div class="gf-r"><button id="gf-all" class="gf-all" aria-label="전체 코인 현황">${GF_BOARD}</button><button id="gf-coin" class="gf-coin"></button></div></div>
     <div class="gf-box">${GAMES.map(g => `<button data-gt="${g.id}" aria-label="${g.name}">${gameIcon(g)}<small>${g.name}</small></button>`).join('')}</div>
     <p>하고 싶은 게임을 골라요<br><small>코인이 ${CHARGE.under}개 이하면 하루 ${CHARGE.max}번 ${CHARGE.amt}코인을 충전할 수 있어요</small></p></div></div>`;
   v.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => go('game', { gtab: b.dataset.gt }));
   $('#gf-coin').onclick = doCharge;
+  $('#gf-all').onclick = openCoinBoard;
   gfCoin(); loadCharge(); coinEnsure();
 }
 
