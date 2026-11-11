@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1750">
+<meta name="build" content="20261111-1830">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -264,10 +264,36 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .rc-foot .mg-btn:disabled{opacity:.45}
 .rc-say{margin:2px 10px 6px;padding:9px 12px;border-radius:12px;background:#1a191c;color:#ffe14a;font-family:var(--pixel);font-size:13px;text-align:center;min-height:38px}
 .rc-track{position:relative;margin:0 10px;border-radius:12px;overflow:hidden;background:#c97b4a;box-shadow:inset 0 0 0 3px #7ac74f}
-.rc-lane{position:relative;height:58px;border-bottom:2px solid rgba(255,255,255,.55)}.rc-lane:last-of-type{border-bottom:0}.rc-lane.my{background:rgba(255,225,74,.3)}
+.rc-lane{position:relative;height:74px;border-bottom:2px solid rgba(255,255,255,.55)}.rc-lane:last-of-type{border-bottom:0}.rc-lane.my{background:rgba(255,225,74,.3)}
 .rc-lane em{position:absolute;left:6px;top:3px;font-style:normal;font-family:var(--pixel);font-size:10px;color:#fff;background:var(--tc);padding:1px 5px;border-radius:6px;z-index:4}
-.rc-r{position:absolute;top:17px;left:0;width:34px;height:34px;border-radius:50%;border:3px solid var(--tc);margin-left:4px;transition:opacity .2s,transform .2s}
-.rc-r.wait{transform:scale(.72);opacity:.75}.rc-r.doneR{opacity:.35}
+.rc-r{position:absolute;top:14px;left:0;width:34px;margin-left:4px;display:flex;flex-direction:column;align-items:center;transition:opacity .2s}
+.rc-r .mini{width:30px;height:30px;border-radius:50%;border:3px solid var(--tc);z-index:1}
+.rc-r svg{width:27px;height:24px;margin-top:-4px}
+.rc-r .f0,.rc-r .f1{display:none}
+.rc-r:not(.wait) .fs{display:none}
+.rc-r:not(.wait) .f0{display:block;animation:rcA .26s steps(1) infinite}
+.rc-r:not(.wait) .f1{display:block;animation:rcB .26s steps(1) infinite}
+.rc-r:not(.wait) .mini{animation:rcbob .26s infinite}
+@keyframes rcA{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes rcB{0%,49.9%{opacity:0}50%,100%{opacity:1}}
+@keyframes rcbob{50%{transform:translateY(-2px) rotate(4deg)}}
+.rc-r.wait{transform:scale(.8);opacity:.85}.rc-r.doneR{opacity:.4}
+.rc-in{display:flex;flex-direction:column;align-items:center;transition:transform .15s;transform-origin:50% 85%}
+.rc-bub{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:-6px;white-space:nowrap;background:#fff;color:#1a191c;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;box-shadow:0 1px 0 rgba(0,0,0,.25);z-index:5}.rc-bub:empty{display:none}
+.rc-r.ev .fs{display:block}.rc-r.ev .f0,.rc-r.ev .f1{display:none}.rc-r.ev .mini{animation:none}
+.rc-r.ev-fall .rc-in{transform:rotate(88deg) translateX(6px)}
+.rc-r.ev-nap .rc-in{transform:rotate(-90deg) translateX(-6px)}
+.rc-r.ev-lace .rc-in svg{transform:scaleY(.55);transform-origin:50% 100%}.rc-r.ev-lace .mini{transform:translate(5px,11px) rotate(25deg)}
+.rc-r.ev-yawn .mini{animation:rcyawn 1s ease-in-out infinite}
+.rc-r.ev-wave .rc-in{animation:rcwave .3s ease-in-out infinite alternate}
+.rc-r.ev-flip .rc-in{transform:scaleX(-1)}
+.rc-r.ev-hop .rc-in{animation:rchop .22s ease-out infinite alternate}
+.rc-r.ev-spin .rc-in{animation:rcspin .5s linear infinite;transform-origin:50% 55%}
+@keyframes rcyawn{50%{transform:scale(1.18) rotate(-10deg)}}
+@keyframes rcwave{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes rchop{to{transform:translateY(-9px)}}
+@keyframes rcspin{to{transform:rotate(360deg)}}
+
 .rc-zone{position:absolute;top:0;bottom:0;width:2px;background:repeating-linear-gradient(#fff 0 5px,transparent 5px 10px);opacity:.6}
 .rc-fin{position:absolute;top:0;bottom:0;right:6px;width:8px;background:repeating-conic-gradient(#fff 0 25%,#1a191c 0 50%) 0 0/8px 8px}
 .rc-podium{display:flex;justify-content:center;gap:16px;padding:12px 10px 4px;font-size:13px}.rc-podium span{display:flex;align-items:center;gap:5px}.rc-podium b{font-family:var(--pixel);color:#e0a800}.rc-podium i{width:10px;height:10px;border-radius:50%}
@@ -3584,9 +3610,20 @@ const RACE = (() => {
     ['컨디션 그냥저냥', '커피 한 잔 하고 옴', '스트레칭은 했음', '의욕은 있음', '어제 계단 좀 걸음', '평소대로'],
     ['어제 야식으로 치킨 먹음', '슬리퍼 신고 옴', '방금 일어남', '신발끈이 자꾸 풀림', '밥 먹고 바로 옴', '달리기 싫다고 함', '출발선에서 하품함']
   ];
-  const GAG = ['{n}, 신발끈 묶는 중!', '{n}, 관중석에 손 흔드는 중!', '{n}, 바통을 떨어뜨릴 뻔!', '{n}, 숨이 턱까지 찼다!', '{n}, 방향을 잠깐 헷갈림!', '{n}, 갑자기 전력 질주!', '{n}, 응원 소리에 힘이 난다!'];
+  const EVS = [ // 달리다 말고 벌어지는 황당한 일: c = 동작, b = 말풍선, say = 중계
+    { c: 'fall', b: '꽈당!', say: '{n}, 넘어졌다!' }, { c: 'fall', b: '철푸덕', say: '{n}, 자기 발에 걸렸다!' },
+    { c: 'lace', b: '신발끈…', say: '{n}, 신발끈 묶는 중!' }, { c: 'lace', b: '500원이다', say: '{n}, 바닥에서 동전 주웠다!' },
+    { c: 'yawn', b: '하~암', say: '{n}, 갑자기 멈춰서 하품!' }, { c: 'yawn', b: '배고파…', say: '{n}, 멈춰서 간식 생각 중!' }, { c: 'yawn', b: '카톡!', say: '{n}, 갑자기 폰 확인!' },
+    { c: 'wave', b: '안녕~', say: '{n}, 관중석에 손 흔드는 중!' }, { c: 'wave', b: '찰칵!', say: '{n}, 달리다 말고 셀카!' },
+    { c: 'flip', b: '어? 반대인가', say: '{n}, 방향을 헷갈렸다!' }, { c: 'flip', b: '뭐 두고 왔나', say: '{n}, 뒤돌아봤다가 다시 뛴다!' },
+    { c: 'hop', b: '쥐 났어!', say: '{n}, 다리에 쥐가 났다!' }, { c: 'hop', b: '벌이다!!', say: '{n}, 벌 보고 깜짝 놀랐다!' },
+    { c: 'spin', b: '빙글빙글', say: '{n}, 갑자기 제자리에서 돈다!' }, { c: 'nap', b: 'zzZ', say: '{n}, 트랙에 누워 버렸다!' }
+  ];
   const LEAD = ['{t} 선두!', '{t} 치고 나간다!', '{t} 앞서갑니다!', '지금 1등은 {t}!'];
   let st = null, busy = false, raf = null, last = 0, sel = null, bet = 10;
+  // 달리는 몸 (픽셀): 달리기 두 동작(f0·f1)과 서 있는 동작(fs)
+  const BODY = { f0: ['..tttt..', '.sttttss', 's.tttt..', '..kkkk..', '.kk..kk.', 'ww....k.', '......ww'], f1: ['..tttt..', 'ssttttt.', '..tttts.', '..kkkk..', '..kkk...', '..k.k...', '.ww.ww..'], fs: ['..tttt..', '.sttts..', '.sttts..', '..kkkk..', '..k.k...', '..k.k...', '..ww.ww.'] };
+  const body = c => `<svg viewBox="0 0 8 7" shape-rendering="crispEdges" aria-hidden="true">${Object.entries(BODY).map(([f, rows]) => `<g class="${f}">${rows.map((r, y) => [...r].map((ch, x) => ch !== '.' ? `<rect x="${x}" y="${y}" width="1.03" height="1.03" fill="${ch === 't' ? c : ch === 's' ? '#ffd2a8' : ch === 'k' ? '#26262e' : '#fff'}"/>` : '').join('')).join('')}</g>`).join('')}</svg>`;
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
   const gap = async () => { const w = 1150 - (Date.now() - last); if (w > 0) await new Promise(r => setTimeout(r, w)) };
@@ -3621,7 +3658,7 @@ const RACE = (() => {
     }
     const done = st.mode === 'end';
     box.innerHTML = top + `<div class="rc-say" id="rc-say">${done ? st.resText : '준비… 탕!'}</div>
-      <div class="rc-track">${T.map(t => `<div class="rc-lane${t.i === st.pick ? ' my' : ''}" style="--tc:${t.c}"><em>${t.n}</em>${t.m.map((r, j) => `<span class="mini rc-r" data-r="${t.i}-${j}">${avatar(r.u)}</span>`).join('')}</div>`).join('')}<i class="rc-zone" style="left:33.3%"></i><i class="rc-zone" style="left:66.6%"></i><i class="rc-fin"></i></div>
+      <div class="rc-track">${T.map(t => `<div class="rc-lane${t.i === st.pick ? ' my' : ''}" style="--tc:${t.c}"><em>${t.n}</em>${t.m.map((r, j) => `<span class="rc-r wait" data-r="${t.i}-${j}"><b class="rc-bub"></b><span class="rc-in"><span class="mini">${avatar(r.u)}</span>${body(t.c)}</span></span>`).join('')}</div>`).join('')}<i class="rc-zone" style="left:33.3%"></i><i class="rc-zone" style="left:66.6%"></i><i class="rc-fin"></i></div>
       ${done ? `<div class="rc-podium">${st.rank.map((i, k) => `<span><b>${k + 1}등</b><i style="background:${T[i].c}"></i>${T[i].n}</span>`).join('')}</div><button class="btn mg-btn rc-again" id="rc-again">다음 경기</button>` : ''}`;
     place(done ? 1e9 : 0);
     if (done) $q('#rc-again').onclick = () => { lineup(); view() };
@@ -3629,12 +3666,15 @@ const RACE = (() => {
   // 팀 t의 시간 t에서: 지금 뛰는 주자 번호와 전체 진행도(0~1)
   function prog(t, ms) {
     const n = t.m.length; let acc = 0;
-    for (let j = 0; j < n; j++) { const L = t.legs[j]; if (ms < acc + L || j === n - 1) { const u = Math.min(1, Math.max(0, (ms - acc) / L)), e = Math.min(1, Math.pow(u, t.k[j]) + t.a[j] * Math.sin(u * Math.PI * 2) * (1 - u) * u * 4); return { j, pos: (j + e) / n, fin: j === n - 1 && u >= 1 } } acc += L }
+    for (let j = 0; j < n; j++) { const L = t.legs[j]; if (ms < acc + L || j === n - 1) { const u0 = Math.min(1, Math.max(0, (ms - acc) / L)), E = t.ev?.[j]; let u = u0, on = null;
+        if (E) { if (u0 >= E.s && u0 < E.s + E.d) { u = E.s; on = E } else if (u0 >= E.s + E.d) u = u0 - E.d; u /= 1 - E.d } // 황당한 일이 벌어지는 동안은 제자리, 대신 나머지 구간을 더 빨리 뜀
+        const e = Math.min(1, Math.pow(u, t.k[j]) + t.a[j] * Math.sin(u * Math.PI * 2) * (1 - u) * u * 4); return { j, pos: (j + e) / n, fin: j === n - 1 && u0 >= 1, ev: on } } acc += L }
   }
   function place(ms) {
     st.teams.forEach(t => { if (!t.legs) return; const p = prog(t, ms), n = t.m.length;
       t.m.forEach((r, j) => { const el = document.querySelector(`[data-r="${t.i}-${j}"]`); if (!el) return; const x = j < p.j ? (j + 1) / n : j === p.j ? p.pos : j / n;
-        el.style.left = `calc(${x} * (100% - 44px))`; el.classList.toggle('wait', j !== p.j); el.classList.toggle('doneR', j < p.j); el.style.zIndex = j === p.j ? 3 : 1 }) });
+        el.style.left = `calc(${x} * (100% - 44px))`; el.classList.toggle('wait', j !== p.j || p.fin); el.classList.toggle('doneR', j < p.j); el.style.zIndex = j === p.j ? 3 : 1;
+        const ev = j === p.j && p.ev ? p.ev : null, key = ev ? ev.c : ''; if ((el.dataset.ev || '') !== key) { el.dataset.ev = key; el.className = 'rc-r' + (el.classList.contains('wait') ? ' wait' : '') + (el.classList.contains('doneR') ? ' doneR' : '') + (ev ? ' ev ev-' + ev.c : ''); el.querySelector('.rc-bub').textContent = ev ? ev.b : '' } }) });
   }
   async function start() {
     const c = coins(); if (busy || sel === null || c === null || c < bet) return; busy = true; view();
@@ -3645,7 +3685,8 @@ const RACE = (() => {
     while (pool.length) { let x = Math.random() * pool.reduce((a, t) => a + t.p, 0), i = 0; while (i < pool.length - 1 && (x -= pool[i].p) > 0) i++; rank.push(pool.splice(i, 1)[0]) }
     let T = 9000; rank.forEach(t => { t.T = T; T += 350 + Math.random() * 700;
       const sp = t.m.map(r => (1 / Math.pow(r.w, .35)) * (.8 + Math.random() * .4)), s = sp.reduce((a, b) => a + b, 0); // 잘 뛰는 주자 구간이 더 짧게 걸림
-      t.legs = sp.map(x => x / s * t.T); t.k = t.m.map(() => .8 + Math.random() * .5); t.a = t.m.map(() => (Math.random() - .5) * .3) });
+      t.legs = sp.map(x => x / s * t.T); t.k = t.m.map(() => .8 + Math.random() * .5); t.a = t.m.map(() => (Math.random() - .5) * .3);
+      t.ev = t.m.map((r, j) => Math.random() < .5 ? { ...pickOf(EVS), s: .18 + Math.random() * .4, d: Math.min(.4, (900 + Math.random() * 700) / t.legs[j]) } : null) });
     Object.assign(st, { mode: 'run', pick: sel, bet, rank: rank.map(t => t.i), t0: performance.now(), paid: false, say: 600 });
     busy = false; view(); loop();
   }
@@ -3653,8 +3694,9 @@ const RACE = (() => {
     cancelAnimationFrame(raf);
     const step = now => {
       if (!st || st.mode !== 'run') return; const ms = now - st.t0, Tw = st.teams[st.rank[0]].T; place(ms);
-      if (ms > st.say && ms < Tw) { st.say = ms + 900; const ps = st.teams.map(t => ({ t, p: prog(t, ms) })).sort((a, b) => b.p.pos - a.p.pos), say = $q('#rc-say'), g = pickOf(ps);
-        if (say) say.textContent = Math.random() < .35 ? pickOf(GAG).replace('{n}', S.users[g.t.m[g.p.j].u]) : pickOf(LEAD).replace('{t}', `${ps[0].t.n} ${S.users[ps[0].t.m[ps[0].p.j].u]}`) }
+      const ps = st.teams.map(t => ({ t, p: prog(t, ms) })).sort((a, b) => b.p.pos - a.p.pos), say = $q('#rc-say'), hit = ps.find(x => x.p.ev && !x.p.ev.said);
+      if (hit && say && ms < Tw) { hit.p.ev.said = 1; say.textContent = hit.p.ev.say.replace('{n}', S.users[hit.t.m[hit.p.j].u]); st.say = ms + 1500 }
+      else if (ms > st.say && ms < Tw && say) { st.say = ms + 900; say.textContent = pickOf(LEAD).replace('{t}', `${ps[0].t.n} ${S.users[ps[0].t.m[ps[0].p.j].u]}`) }
       if (ms >= Tw + 1600) return settle();
       raf = requestAnimationFrame(step);
     };
