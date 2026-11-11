@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1325">
+<meta name="build" content="20261111-1350">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -3066,7 +3066,7 @@ const SHOOT = (() => {
     st = { playing: true, score: 0, lives: 3, round: 1, t: 0, x: W / 2, y: H - 50, bullets: [], foes: [], eb: [], fx: [], items: [], power: 1, inv: 0, fire: 0, spawn: 0, kills: 0, boss: null, warn: 0, pool: null, stars: Array.from({ length: 50 }, () => [Math.random() * W, Math.random() * H, Math.random() * 1.5 + .5]) };
     $q('#sh-o').hidden = true; hud();
   }
-  function hud() { $q('#sh-s') && ($q('#sh-s').textContent = st.score); $q('#sh-r') && ($q('#sh-r').textContent = st.round); $q('#sh-l') && ($q('#sh-l').textContent = '♥'.repeat(Math.max(0, st.lives))) }
+  function hud() { $q('#sh-s') && ($q('#sh-s').textContent = st.score); $q('#sh-r') && ($q('#sh-r').textContent = st.round); $q('#sh-l') && ($q('#sh-l').textContent = '♥'.repeat(Math.max(0, st.lives))); $q('#sh-p') && ($q('#sh-p').textContent = st.power >= 10 ? 'MAX' : st.power) }
   function boom(x, y, col, n = 12) { for (let i = 0; i < n; i++) { const a = Math.random() * 7, v = Math.random() * 3 + 1; st.fx.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, col }) } }
   function hitMe() {
     if (st.inv > 0) return; st.lives--; st.inv = 120; st.power = Math.max(1, st.power - 1); boom(st.x, st.y, '#ffd23f', 20); hud();
@@ -3085,8 +3085,19 @@ const SHOOT = (() => {
     s.x = Math.max(12, Math.min(W - 12, s.x)); s.y = Math.max(H * .35, Math.min(H - 16, s.y));
     if (s.inv > 0) s.inv--;
     // 자동 발사
-    if (--s.fire <= 0) { s.fire = 7; const n = s.power; for (let i = 0; i < n; i++) { const off = (i - (n - 1) / 2); s.bullets.push({ x: s.x + off * 7, y: s.y - 14, vx: off * .6, vy: -9 }) } }
-    s.bullets.forEach(b => { b.x += b.vx; b.y += b.vy }); s.bullets = s.bullets.filter(b => b.y > -10 && b.x > -10 && b.x < W + 10);
+    if (--s.fire <= 0) { // 파워 1~5: 총알 줄 수 · 6~10: 연사 속도·공격력·유도탄 강화
+      const lv = Math.max(0, s.power - 5), n = Math.min(5, s.power), dmg = 1 + Math.floor(lv / 2);
+      s.fire = Math.max(3, 7 - lv); s.vol = (s.vol || 0) + 1;
+      for (let i = 0; i < n; i++) { const off = (i - (n - 1) / 2); s.bullets.push({ x: s.x + off * 7, y: s.y - 14, vx: off * .6, vy: -9 - lv * .4, dmg, lv }) }
+      if (lv >= 2 && s.vol % 2 === 0) [-1, 1].forEach(d => s.bullets.push({ x: s.x + d * 17, y: s.y + 2, vx: d * 1.5, vy: -6, dmg: dmg + 1, lv, homing: 1 }));
+    }
+    s.bullets.forEach(b => {
+      if (b.homing) { // 유도탄: 보스 얼굴이나 가장 가까운 졸개 쪽으로 휘어짐
+        const tg = s.boss?.fx ? { x: s.boss.fx, y: s.boss.fy } : s.foes.reduce((m, f) => !m || Math.hypot(f.x - b.x, f.y - b.y) < Math.hypot(m.x - b.x, m.y - b.y) ? f : m, null);
+        if (tg) { const a = Math.atan2(tg.y - b.y, tg.x - b.x), sp = 7; b.vx += (Math.cos(a) * sp - b.vx) * .12; b.vy += (Math.sin(a) * sp - b.vy) * .12 }
+      }
+      b.x += b.vx; b.y += b.vy;
+    }); s.bullets = s.bullets.filter(b => b.y > -10 && b.x > -10 && b.x < W + 10);
     // 졸개
     if (!s.boss && --s.spawn <= 0) {
       s.spawn = Math.max(14, 42 - s.round * 4);
@@ -3113,9 +3124,9 @@ const SHOOT = (() => {
     s.eb.forEach(b => { b.x += b.vx; b.y += b.vy }); s.eb = s.eb.filter(b => b.y < H + 10 && b.y > -20 && b.x > -20 && b.x < W + 20);
     // 충돌: 내 총알
     s.bullets.forEach(b => {
-      s.foes.forEach(f => { if (!b.dead && Math.abs(b.x - f.x) < 11 && Math.abs(b.y - f.y) < 9) { b.dead = 1; if (--f.hp <= 0) { f.dead = 1; s.score += 10; s.kills++; boom(f.x, f.y, f.col); if (Math.random() < .07) s.items.push({ x: f.x, y: f.y }) } } });
+      s.foes.forEach(f => { if (!b.dead && Math.abs(b.x - f.x) < 11 && Math.abs(b.y - f.y) < 9) { b.dead = 1; if ((f.hp -= b.dmg || 1) <= 0) { f.dead = 1; s.score += 10; s.kills++; boom(f.x, f.y, f.col); if (Math.random() < .07) s.items.push({ x: f.x, y: f.y }) } } });
       if (B && !b.dead) { // 유리 돔(얼굴)만 약점, 접시에 맞으면 튕겨 나감
-        if (B.fr && Math.hypot(b.x - B.fx, b.y - B.fy) < B.fr + 2) { b.dead = 1; B.hp--; B.hit = 4; s.score += 1 }
+        if (B.fr && Math.hypot(b.x - B.fx, b.y - B.fy) < B.fr + 2) { b.dead = 1; B.hp -= b.dmg || 1; B.hit = 4; s.score += 1 }
         else if (inBoss(B, b.x, b.y) && !(B.fr && Math.abs(b.x - B.fx) < B.fr && b.y > B.fy)) { b.dead = 1; s.fx.push({ x: b.x, y: b.y, vx: (Math.random() - .5) * 3, vy: 2, t: 10, col: '#c9cfee' }) }
       }
     });
@@ -3131,7 +3142,7 @@ const SHOOT = (() => {
     s.foes.forEach(f => { if (Math.abs(f.x - s.x) < 12 && Math.abs(f.y - s.y) < 12) { f.dead = 1; boom(f.x, f.y, f.col); hitMe() } });
     if (B && inBoss(B, s.x, s.y, 4)) hitMe();
     // 파워업
-    s.items.forEach(it => { it.y += 1.5; if (Math.abs(it.x - s.x) < 14 && Math.abs(it.y - s.y) < 14) { it.dead = 1; s.power = Math.min(5, s.power + 1); flash('파워 UP!') } });
+    s.items.forEach(it => { it.y += 1.5; if (Math.abs(it.x - s.x) < 14 && Math.abs(it.y - s.y) < 14) { it.dead = 1; if (s.power >= 10) { s.score += 100; flash('파워 MAX! +100') } else { s.power++; flash(s.power <= 5 ? '파워 UP!' : s.power === 7 ? '유도탄 장착!' : s.power === 10 ? '파워 MAX!!' : `무기 강화 Lv.${s.power - 5}!`) } hud() } });
     s.items = s.items.filter(it => !it.dead && it.y < H + 10);
     s.fx.forEach(p => { p.x += p.vx; p.y += p.vy; p.t++ }); s.fx = s.fx.filter(p => p.t < 26);
     if (s.t % 10 === 0) hud();
@@ -3152,7 +3163,17 @@ const SHOOT = (() => {
       if (s.warn > 0 && (s.warn >> 3) % 2) { ctx.fillStyle = 'rgba(255,40,60,.9)'; ctx.font = 'bold 26px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('WARNING!!', W / 2, H * .45); ctx.font = 'bold 14px sans-serif'; ctx.fillText(`${BOSSES[B.kind].n}${(BOSSES[B.kind].n.at(-1).charCodeAt(0) - 0xac00) % 28 ? '을' : '를'} 탄 ${S.users[B.u] || ''} 등장`, W / 2, H * .45 + 26) }
     }
     s.eb.forEach(b => { ctx.fillStyle = '#ff5c8a'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * .45, 0, 7); ctx.fill() });
-    ctx.fillStyle = '#9ff3ff'; s.bullets.forEach(b => ctx.fillRect(b.x - 1.5, b.y - 6, 3, 10));
+    // 내 탄: 빛나는 플라즈마/불꽃 (밝게 겹쳐 그리기)
+    ctx.globalCompositeOperation = 'lighter';
+    s.bullets.forEach(b => {
+      if (b.homing) { const o = orbSprite(); ctx.globalAlpha = .45; ctx.drawImage(o, b.x - b.vx * 1.6 - o.width / 4, b.y - b.vy * 1.6 - o.height / 4, o.width / 2, o.height / 2); ctx.globalAlpha = 1; ctx.drawImage(o, b.x - o.width / 2, b.y - o.height / 2); return }
+      const sp = shotSprite(b.lv || 0), ang = Math.atan2(b.vy, b.vx) + Math.PI / 2;
+      if (Math.abs(b.vx) < .05) ctx.drawImage(sp, b.x - sp.width / 2, b.y - sp.height * .3);
+      else { ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(ang); ctx.drawImage(sp, -sp.width / 2, -sp.height * .3); ctx.restore() }
+    });
+    if (s.playing && s.power >= 7) [-1, 1].forEach(d => { const o = orbSprite(), ox = s.x + d * 17, oy = s.y + 4 + Math.sin(s.t / 6 + d) * 3; ctx.drawImage(o, ox - o.width / 2, oy - o.height / 2) }); // 옵션 구슬
+    if (s.playing && s.fire >= Math.max(3, 7 - Math.max(0, s.power - 5)) - 1) { const m = glowSprite(); ctx.drawImage(m, s.x - m.width / 2, s.y - 16 - m.height / 2) } // 총구 불꽃
+    ctx.globalCompositeOperation = 'source-over';
     if (s.playing && !(s.inv > 0 && (s.inv >> 2) % 2)) sprite(SHIP, { w: '#f4f4ff', c: '#13b8d8', r: '#ff4f8b', o: s.t % 6 < 3 ? '#ffd23f' : '#ff8a1f' }, s.x - 13.5, s.y - 12, 3);
     s.fx.forEach(p => { ctx.globalAlpha = 1 - p.t / 26; ctx.fillStyle = p.col; ctx.fillRect(p.x, p.y, 3, 3) }); ctx.globalAlpha = 1;
   }
@@ -3234,6 +3255,31 @@ const SHOOT = (() => {
     B.fx = x0 + d.f[0] * PXS; B.fy = y0 + (d.f[1] + 3) * PXS; B.fr = fr * PXS; B.hw = w / 2; B.hh = h / 2; B.cy = y0 + h / 2;
   }
   const inBoss = (B, px, py, pad = 0) => { if (!B.hw) return false; const dx = (px - B.x) / (B.hw * .92 + pad), dy = (py - B.cy) / (B.hh * .85 + pad); return dx * dx + dy * dy < 1 };
+  // 탄 그림 미리 만들어 두기
+  const shotCache = {};
+  function shotSprite(lv) {
+    if (shotCache[lv]) return shotCache[lv];
+    const pal = lv < 2 ? ['#ffffff', '#b8f6ff', '#2fc8ff'] : lv < 4 ? ['#ffffff', '#e8ffb0', '#3dff6a'] : ['#ffffff', '#ffe08a', '#ff5a2a'];
+    const rx = 4 + lv * .7, ry = 9 + lv * 1.2, tail = 14 + lv * 3, w = Math.ceil(rx * 2 + 6), h = Math.ceil(ry * 2 + tail + 4), c = pc(w, h), g = c.getContext('2d'), cx = w / 2, cy = ry + 2;
+    let gr = g.createLinearGradient(0, cy, 0, cy + ry + tail); gr.addColorStop(0, pal[2] + 'cc'); gr.addColorStop(1, pal[2] + '00');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(cx - rx * .8, cy); g.quadraticCurveTo(cx, cy + ry + tail * 1.2, cx + rx * .8, cy); g.fill();
+    g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+    gr = g.createRadialGradient(0, -rx * .2, 0, 0, 0, rx); gr.addColorStop(0, pal[0]); gr.addColorStop(.35, pal[1]); gr.addColorStop(.75, pal[2]); gr.addColorStop(1, pal[2] + '00');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, 7); g.fill(); g.restore();
+    return (shotCache[lv] = c);
+  }
+  function orbSprite() {
+    if (shotCache.orb) return shotCache.orb;
+    const c = pc(22, 22), g = c.getContext('2d'), gr = g.createRadialGradient(11, 11, 0, 11, 11, 11);
+    gr.addColorStop(0, '#ffffff'); gr.addColorStop(.3, '#ffe14a'); gr.addColorStop(.6, '#ff8a1f'); gr.addColorStop(1, 'rgba(255,90,0,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 22, 22); return (shotCache.orb = c);
+  }
+  function glowSprite() {
+    if (shotCache.glow) return shotCache.glow;
+    const c = pc(18, 18), g = c.getContext('2d'), gr = g.createRadialGradient(9, 9, 0, 9, 9, 9);
+    gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.4, 'rgba(160,240,255,.6)'); gr.addColorStop(1, 'rgba(80,200,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 18, 18); return (shotCache.glow = c);
+  }
   function flash(t) { const el = $q('#sh-msg'); if (!el) return; el.textContent = t; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on') }
   function loop(t) { if (st.playing) { update(); } draw(); raf = requestAnimationFrame(loop) }
   function end() {
@@ -3245,10 +3291,10 @@ const SHOOT = (() => {
   }
   function mount(v, o) {
     opt = o; stop();
-    v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="sh-s">0</b></span><span>R <b id="sh-r">1</b></span><span><b id="sh-l" style="color:#ff4f8b">♥♥♥</b></span><span>BEST <b id="sh-b">${bestGet()}</b></span></div>
+    v.insertAdjacentHTML('beforeend', `<div class="mg-bar"><span>SCORE <b id="sh-s">0</b></span><span>R <b id="sh-r">1</b></span><span><b id="sh-l" style="color:#ff4f8b">♥♥♥</b></span><span>P <b id="sh-p">1</b></span><span>BEST <b id="sh-b">${bestGet()}</b></span></div>
       <div class="mg-stage bb-stage"><canvas id="sh-cv"></canvas><div class="bb-msg" id="sh-msg"></div>
         <div class="mg-over" id="sh-o"><big>보스 슈팅</big><span>손가락으로 비행기를 움직여요. 총은 자동 발사!<br>라운드마다 회원 중 한 명이 보스로 등장해요</span><button class="btn mg-btn" id="sh-go">START</button></div></div>
-      <div class="mg-legend"><span>졸개 +10</span><span>보스 격파 +300×라운드</span><span>P = 파워 UP</span><span>약점은 얼굴!</span></div>
+      <div class="mg-legend"><span>졸개 +10</span><span>보스 격파 +300×라운드</span><span>P = 파워 UP (최대 10단계)</span><span>약점은 얼굴!</span></div>
       <div class="sect">RANKING</div><div class="rank" id="sh-rank"><div class="empty">불러오는 중…</div></div>`);
     cv = $q('#sh-cv'); const box = cv.parentElement, dpr = Math.min(2, window.devicePixelRatio || 1);
     W = Math.max(240, Math.min(400, box.clientWidth)); H = Math.round(W * 1.4);
