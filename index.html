@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0110">
+<meta name="build" content="20261112-0120">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -5327,7 +5327,7 @@ const GACHA = (() => {
     ['tt300', '밤티의 명예 토모다치', 3, 'T'], ['tt301', '위시 부흥의 별', 3, 'T'], ['tt302', '위부위 큰손', 3, 'T'], ['tt303', '스터디 클럽 VIP', 3, 'T'], ['tt304', '돈가스 클럽 VIP', 3, 'T'], ['tt305', '위부위 VIP', 3, 'T'], ['tt306', '위부위 MVP', 3, 'T']
   ];
   const BY = Object.fromEntries(IT.map(x => [x[0], x]));
-  const PRICE = [[1, 100], [10, 900]];
+  const PRICE = [[1, 1000], [10, 9000]];
   let me = null, gifts = [], sub = null, tab = 'gc', busy = false, show = null, pick = null, gfOpen = null;
   const $q = s => document.querySelector(s);
   const art = (x, sz = 40) => x[3] === 'T' ? `<span class="gc-tt" style="--rc:${RAR[x[2]].fg}">${esc(x[1])}</span>`
