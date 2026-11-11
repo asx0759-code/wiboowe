@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-2050">
+<meta name="build" content="20261111-2110">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2967,9 +2967,9 @@ async function payPlay(fn) {
 }
 
 // 판돈 입력: 최소 50코인, 가진 코인까지(최대 MAXBET) 원하는 만큼
-const MINBET = 50, MAXBET = 10000;
+const MINBET = 50, MAXBET = 1e12; // 사실상 상한 없음 (가진 코인까지)
 const stakeFix = (v, c) => Math.max(MINBET, Math.min(MAXBET, Math.floor(+v || 0), Math.max(MINBET, c ?? MINBET)));
-const stakeHTML = (v, c) => `<div class="stk"><label>판돈 <input id="stk-in" type="number" inputmode="numeric" min="${MINBET}" max="${MAXBET}" step="10" value="${stakeFix(v, c)}" ${c !== null && c >= MINBET ? '' : 'disabled'}> 코인</label>
+const stakeHTML = (v, c) => `<div class="stk"><label>판돈 <input id="stk-in" type="number" inputmode="numeric" min="${MINBET}" step="10" value="${stakeFix(v, c)}" ${c !== null && c >= MINBET ? '' : 'disabled'}> 코인</label>
   <div>${[['최소', 'r'], ['+10', '10'], ['+100', '100'], ['+1000', '1000'], ['절반', 'h'], ['올인', 'a']].map(([t, k]) => `<button type="button" data-stk="${k}">${t}</button>`).join('')}</div></div>`;
 function stakeBind(root, c, onVal) { // 입력이 바뀔 때마다 onVal(판돈) — 화면을 다시 그리지 않고 버튼 글자만 바꿈
   const inp = root.querySelector('#stk-in'); if (!inp) return;
