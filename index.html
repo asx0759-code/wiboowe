@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0610">
+<meta name="build" content="20261112-0720">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -571,6 +571,44 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .tr-hist small{color:#a99cc8;font-size:11px;display:block}
 .tr .empty{color:#a99cc8}
 .tr-foot{margin:auto 0 0;text-align:center;font-size:10px;color:#7d70a0}
+.cc{min-height:100%;display:flex;flex-direction:column;gap:10px;padding:14px;background:linear-gradient(180deg,#bfe9ff 0%,#e8f6ff 55%,#ffe4ee 100%);color:#40243a;font-family:var(--pixel)}
+.body:has(> .cc){background:#ffe4ee}.body:has(> .bk){background:#1d1440}
+.cc-q{display:flex}.cc-q input{flex:1;min-width:0;border:2px solid #ffffffaa;background:#ffffffcc;color:#40243a;border-radius:999px;padding:10px 14px;font:inherit;font-size:14px}
+.bk .cc-q input{background:#2b2050;border-color:#3b2f63;color:#f4efff}
+.cc-stage{position:relative;height:440px;max-width:100%}
+.cc-shell{position:absolute;left:calc(50% - 120px);top:52px;width:240px;filter:drop-shadow(0 10px 12px rgba(160,60,100,.25));transform-origin:30% 80%;transform:rotate(calc(var(--tense,0) * -5deg))}
+.cc-str{position:absolute;left:calc(50% - 58px);top:208px;width:40px;height:260px;overflow:visible;pointer-events:none}
+.cc-str path{filter:drop-shadow(0 1px 0 #b98f6a)}
+.cc-ring{position:absolute;left:calc(50% - 38px);top:216px;width:46px;height:46px;border:0;background:none;padding:0;cursor:grab;touch-action:none;transform:translate(-50%,0)}
+.cc-ring:active{cursor:grabbing}.cc-ring svg{width:100%;height:100%;filter:drop-shadow(0 3px 3px rgba(0,0,0,.25));animation:ccwig 2.4s ease-in-out infinite}
+@keyframes ccwig{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-14deg)}90%{transform:rotate(12deg)}95%{transform:rotate(-6deg)}}
+.cc-bub{position:absolute;left:50%;top:0;transform:translateX(-50%);max-width:88%;background:#fff;border-radius:18px;padding:10px 18px;font-family:var(--pixel);font-size:20px;color:#40243a;box-shadow:0 6px 16px rgba(160,60,100,.2);white-space:nowrap;z-index:3}
+.cc-bub::after{content:"";position:absolute;left:46%;bottom:-9px;border:9px solid transparent;border-bottom:0;border-top-color:#fff}
+.cc-bub.pop{animation:ccpop .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes ccpop{from{transform:translateX(-50%) scale(.4);opacity:0}}
+.cc-hint{position:absolute;left:0;right:0;bottom:0;margin:0;text-align:center;font-size:12px;color:#8a5a78}
+.bk{min-height:100%;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px;background:radial-gradient(ellipse at 50% 30%,#3a2a6b,#140f24 75%);color:#f4efff;font-family:var(--pixel)}
+.bk .cc-q{width:100%}
+.bk-book{position:relative;width:300px;height:210px;margin:30px 0 20px;border:0;background:none;padding:0;perspective:1200px;cursor:pointer;transition:transform .6s ease;max-width:100%}
+.bk-book.closed{transform:translateX(-75px)}
+.bk-back{position:absolute;left:146px;top:-6px;width:158px;height:222px;border-radius:4px 12px 12px 4px;background:#3d2484;transition:left .6s,width .6s;box-shadow:0 14px 26px #0009}
+.bk-book.flip .bk-back,.bk-book.open .bk-back{left:-6px;width:312px;border-radius:12px}
+.bk-left,.bk-right{position:absolute;top:0;width:150px;height:100%;background:#f7f0dc;color:#4a3a2a;display:flex;align-items:center;justify-content:center;padding:18px 14px}
+.bk-left{left:0;border-radius:8px 0 0 8px;box-shadow:inset -12px 0 16px -10px rgba(0,0,0,.35);transition:opacity .3s .3s}
+.bk-right{left:150px;border-radius:0 8px 8px 0;box-shadow:inset 12px 0 16px -10px rgba(0,0,0,.3)}
+.bk-left small,.bk-right small{position:absolute;bottom:8px;font-size:9px;color:#a8977a}
+.bk-book.closed .bk-left{opacity:0;transition:none}
+.bk-right em{font-style:normal;font-family:var(--pixel);font-size:16px;line-height:1.5;text-align:center;word-break:keep-all}
+.bk-right em.ink{animation:bkink 1.2s ease-out}
+@keyframes bkink{from{opacity:0;filter:blur(4px);letter-spacing:.3em}}
+.bk-pages{position:absolute;left:150px;top:3px;width:147px;height:204px;transform-style:preserve-3d;pointer-events:none}
+.bk-pages i{position:absolute;inset:0;background:linear-gradient(90deg,#efe4c8,#fbf6e8 30%);border-radius:0 6px 6px 0;transform-origin:0 50%;opacity:0}
+.bk-book.flip .bk-pages i{animation:bkflip .42s ease-in-out forwards;animation-delay:calc(.55s + var(--i) * .12s)}
+@keyframes bkflip{0%{transform:rotateY(0);opacity:1}99%{opacity:1}100%{transform:rotateY(-178deg);opacity:0}}
+.bk-cover{position:absolute;left:150px;top:-4px;width:153px;height:218px;transform-origin:0 50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:3px 12px 12px 3px;background:linear-gradient(160deg,#7a4fe0,#4a2a9a 60%,#3d2484);box-shadow:inset 0 0 0 3px #ffd23f55,inset 8px 0 10px -6px #0006;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#ffd23f;transition:transform .7s cubic-bezier(.4,.1,.3,1);z-index:4}
+.bk-cover b{font-weight:400;font-size:16px;text-shadow:0 0 8px #ffd23f88}.bk-cover i{font-style:normal;font-size:34px;text-shadow:0 0 12px #ffd23f}.bk-cover small{font-size:8px;letter-spacing:.12em;opacity:.8}
+.bk-book.flip .bk-cover,.bk-book.open .bk-cover{transform:rotateY(-180deg)}
+.bk-book.closed:hover .bk-cover{transform:rotateY(-12deg)}
 .tt-stage{display:flex;justify-content:center}
 .tt-wrap{position:relative;display:flex;gap:8px;align-items:flex-start}
 .tt-wrap #tt-cv{border-radius:8px;touch-action:none;display:block}
@@ -1204,7 +1242,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop() } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function go(screen, extra = {}) { if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop() } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -1345,7 +1383,7 @@ function render() {
         ${tile('feed', 'p3 c-friends', ico('friends'), '친구들', newNotifs())}
         ${tile('now', 'p3 c-now', `<img class="vi jic" src="${JICON}" alt="">`, 'NOW', newTaps() + unreadDm())}
         ${tile('sketch', 'p3 c-sketch', ico('sketch'), '낙서장')}
-        ${tile('tarot', 'p3 c-tarot', ico('tarot'), '타로')}
+        ${tile('fortune', 'p3 c-tarot', ico('tarot'), '고민 상담소')}
       </div>
       ${S.isAdmin || boatPass() ? `<div class="hs-adm"><span></span>${tile('boat', 'p3 c-boat', ico('boat'), '나룻배')}${S.isAdmin ? tile('admin', 'p3 c-admin', ico('gear'), '관리자') : '<span></span>'}</div>` : ''}
       <div class="hs-dock">
@@ -1954,7 +1992,14 @@ function render() {
 
   if (S.screen === 'sketch') { back('낙서장'); SKETCH.mount(v); return }
   if (S.screen === 'boat') { back('울렁울렁 나룻배'); BOAT.mount(v); return }
-  if (S.screen === 'tarot') { back('타로'); TAROT.mount(v); return }
+  if (S.screen === 'tarot') { go('fortune', { ftab: 'tarot' }); return }
+  if (S.screen === 'fortune') {
+    const f = FORTS.find(x => x.id === S.ftab);
+    if (!f) { back('고민 상담소'); $('#back').onclick = () => go('home'); fortFolder(v); return }
+    back(esc(f.name)); $('#back').onclick = () => go('fortune', { ftab: null });
+    if (f.id === 'tarot') TAROT.mount(v); else if (f.id === 'conch') CONCH.mount(v); else BOOK.mount(v);
+    return;
+  }
 
   if (S.screen === 'game') {
     const gt = S.gtab, cur = GAMES.find(g => g.id === gt);
@@ -4881,6 +4926,118 @@ function gameFolder(v) {
   $('#gf-all').onclick = openCoinBoard;
   gfCoin(); loadCharge(); coinEnsure();
 }
+
+/* ===== 고민 상담소 폴더 (타로 · 마법의 소라 · 고민 해결의 책) ===== */
+const FORTS = [
+  { id: 'tarot', name: '타로', bg: ['#cdb0ff', '#4b2296'], pal: { g: '#ffd77a', w: '#fff6e0', p: '#2b2050', s: '#ffeab0' },
+    px: ['............', '...gggggg...', '...gppppg...', '...gpspspg..', '...gppppg...', '...gpsspg...', '...gpsspg...', '...gppppg...', '...gpspspg..', '...gppppg...', '...gggggg...', '............'] },
+  { id: 'conch', name: '마법의 소라', bg: ['#ffd6e0', '#ff7aa0'], pal: { o: '#fff2f5', r: '#ffb3c6', d: '#e86d93', w: '#ffffff', y: '#ffd23f' },
+    px: ['............', '.......oo...', '......oorr..', '.....oorrd..', '....oorrdd..', '...oorrddd..', '..oorrdddw..', '.oorrdddww..', '.orrddd.w...', '..dddd...w..', '.........yy.', '.........yy.'] },
+  { id: 'book', name: '고민 해결의 책', bg: ['#9fe3ff', '#2e7bd6'], pal: { c: '#6a3fd0', d: '#4a2a9a', g: '#ffd23f', w: '#fff', p: '#f3ead6' },
+    px: ['............', '..ccccccccp.', '..cdddddddp.', '..cdggdddcp.', '..cdggdddcp.', '..cddddddcp.', '..cdgggdddp.', '..cddddddcp.', '..cdddddddp.', '..cccccccc..', '...pppppppp.', '............'] }
+];
+function fortFolder(v) {
+  v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><div class="gf-hd"><h2>고민 상담소</h2></div>
+    <div class="gf-box">${FORTS.map(g => `<button data-ft="${g.id}" aria-label="${g.name}">${gameIcon(g)}<small>${g.name}</small></button>`).join('')}</div>
+    <p>고민이 있으면 골라 봐요<br><small>재미로 보는 거예요 🍀</small></p></div></div>`;
+  v.querySelectorAll('[data-ft]').forEach(b => b.onclick = () => go('fortune', { ftab: b.dataset.ft }));
+}
+// 같이 쓰는 공유 버튼
+function fortShare(text) { S.draftTw = { text, imgs: [] }; go('compose', { quote: null }) }
+
+/* ===== 마법의 소라 (끈을 잡아당기면 대답) ===== */
+const CONCH = (() => {
+  const ANS = ['그래.', '안 돼.', '다시 물어봐.', '지금 당장.', '절대로 안 돼.', '아마도.', '그건 좀….', '꿈 깨.', '해 봐, 그럼 알게 돼.', '내일 다시 와.',
+    '당연하지.', '생각도 하지 마.', '반반이야.', '이미 답을 알잖아.', '밥부터 먹어.', '일단 자.', '그냥 해.', '하지 마.', '응, 근데 조용히.', '지금은 말 못 해.'];
+  const MAX = 150;
+  let q = '', pull = 0, drag = null, last = null, anim = 0;
+  const $q = s => document.querySelector(s);
+  const SHELL = `<svg viewBox="0 0 200 170" class="cc-shell" aria-hidden="true">
+    <defs><linearGradient id="ccg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f6a3bd"/><stop offset=".5" stop-color="#ffd3df"/><stop offset="1" stop-color="#fff4f7"/></linearGradient>
+    <radialGradient id="ccm" cx=".55" cy=".45" r=".7"><stop offset="0" stop-color="#fff9ef"/><stop offset=".6" stop-color="#ffd9c8"/><stop offset="1" stop-color="#e99a86"/></radialGradient></defs>
+    <path d="M28 128 C10 98 26 62 66 50 L182 10 C176 34 168 58 152 84 C134 116 104 140 70 146 C52 149 38 142 28 128Z" fill="url(#ccg)" stroke="#d65f86" stroke-width="3" stroke-linejoin="round"/>
+    ${[[92, 40, 104, 118], [116, 32, 126, 104], [138, 24, 146, 88], [158, 17, 162, 66]].map(([x1, y1, x2, y2]) => `<path d="M${x1} ${y1} C${x1 + 14} ${y1 + 22} ${x2 + 6} ${y2 - 30} ${x2} ${y2}" fill="none" stroke="#e07c9e" stroke-width="2.6" stroke-linecap="round" opacity=".75"/>`).join('')}
+    ${[[96, 44], [120, 36], [142, 28], [161, 20]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="#fff" stroke="#e07c9e" stroke-width="1.5"/>`).join('')}
+    <path d="M30 96 C24 120 44 142 74 138 C90 136 98 124 94 110 C88 92 58 84 30 96Z" fill="url(#ccm)" stroke="#d65f86" stroke-width="3"/>
+    <path d="M38 104 C40 120 56 130 72 128" fill="none" stroke="#e9a08a" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="66" cy="112" r="7" fill="#fff" opacity=".95"/><circle cx="63.5" cy="109.5" r="2.2" fill="#fff"/>
+    <circle cx="60" cy="66" r="3" fill="#fff" opacity=".85"/><circle cx="72" cy="58" r="2" fill="#fff" opacity=".85"/></svg>`;
+  const STAR = `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#ffd23f" stroke="#e0a400" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="21" r="5" fill="#fff6c8"/></svg>`;
+  function mount(v) {
+    v.innerHTML = `<div class="cc"><form class="cc-q" id="cc-f"><input id="cc-i" maxlength="40" placeholder="소라에게 물어볼 고민 (예: 오늘 치킨 먹을까?)" value="${esc(q)}" autocomplete="off"></form>
+      <div class="cc-stage" id="cc-st"><div class="cc-bub" id="cc-bub"${last ? '' : ' hidden'}>${last ? esc(last) : ''}</div>${SHELL}
+        <svg class="cc-str" id="cc-str" viewBox="0 0 40 260" preserveAspectRatio="none" aria-hidden="true"><path id="cc-line" d="M20 0 L20 30" stroke="#f3e7d0" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+        <button class="cc-ring" id="cc-ring" aria-label="끈 잡아당기기">${STAR}</button>
+        <p class="cc-hint" id="cc-h">⭐ 별을 잡고 아래로 쭉 당겼다 놓아요</p></div>
+      ${last ? `<div class="tr-btns"><button class="tr-btn g" id="cc-sh">피드에 공유</button></div>` : ''}</div>`;
+    $q('#cc-i').oninput = e => q = e.target.value;
+    $q('#cc-f').onsubmit = e => { e.preventDefault(); $q('#cc-i').blur() };
+    if ($q('#cc-sh')) $q('#cc-sh').onclick = () => fortShare(`🐚 마법의 소라에게 물었다\nQ. ${q || '(비밀)'}\nA. ${last}`);
+    const ring = $q('#cc-ring');
+    ring.addEventListener('pointerdown', e => { e.preventDefault(); cancelAnimationFrame(anim); ring.setPointerCapture(e.pointerId); drag = { y0: e.clientY - pull } });
+    ring.addEventListener('pointermove', e => { if (!drag) return; pull = Math.max(0, Math.min(MAX, e.clientY - drag.y0)); place(); if (pull >= MAX) try { navigator.vibrate?.(8) } catch { } });
+    const up = () => { if (!drag) return; drag = null; release() };
+    ring.addEventListener('pointerup', up); ring.addEventListener('pointercancel', up);
+    place();
+  }
+  function place() {
+    const ring = $q('#cc-ring'), line = $q('#cc-line'); if (!ring) return;
+    ring.style.transform = `translate(-50%, ${pull}px)`;
+    line.setAttribute('d', `M20 0 L20 ${30 + pull}`);
+    $q('#cc-st').style.setProperty('--tense', pull / MAX);
+  }
+  function release() {
+    const full = pull > MAX * .8, from = pull, t0 = performance.now();
+    const step = t => { const k = Math.min(1, (t - t0) / 420); pull = from * (1 - k) * Math.cos(k * 6) ; if (pull < 0) pull = 0; place(); if (k < 1) anim = requestAnimationFrame(step); else { pull = 0; place(); answer(full) } };
+    anim = requestAnimationFrame(step);
+  }
+  function answer(full) {
+    const b = $q('#cc-bub'); if (!b) return;
+    if (!q.trim()) { b.hidden = false; b.textContent = '질문을 안 했잖아.'; return }
+    if (!full) { b.hidden = false; b.textContent = '끝까지 당겨.'; return }
+    let a; do { a = ANS[Math.random() * ANS.length | 0] } while (a === last && ANS.length > 1);
+    last = a; b.hidden = false; b.textContent = ''; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+    try { navigator.vibrate?.([20, 40, 20]) } catch { }
+    let i = 0; const typ = () => { b.textContent = a.slice(0, ++i); if (i < a.length) setTimeout(typ, 70); else if (!$q('#cc-sh')) mount(document.querySelector('.cc').parentElement) }; setTimeout(typ, 250);
+  }
+  return { mount, ANS };
+})();
+
+/* ===== 고민 해결의 책 (누르면 펼쳐지고 차르르 넘어감) ===== */
+const BOOK = (() => {
+  const ANS = ['지금은 기다릴 때예요.', '생각보다 쉬워요.', '마음이 시키는 쪽으로 가요.', '한 번 더 확인해 봐요.', '오늘 말고 내일.', '누군가에게 물어보면 답이 나와요.', '이미 잘하고 있어요.', '작게 시작하면 돼요.',
+    '지금 아니면 못 해요.', '그건 당신 몫이 아니에요.', '잠깐 멈추고 물 한 잔 마셔요.', '결과보다 과정이 남아요.', '고민한 시간만큼 좋아질 거예요.', '솔직하게 말하는 게 정답이에요.', '조금 더 욕심내도 괜찮아요.', '놓아주면 돌아와요.',
+    '웃으면서 하면 다 돼요.', '지금 떠오른 사람에게 연락해 봐요.', '돈보다 마음을 따라가요.', '계획은 반만 세워요.', '남의 말은 반만 들어요.', '오늘은 쉬어도 돼요.', '의외의 곳에서 풀려요.', '첫 느낌이 맞아요.',
+    '한 걸음 물러서면 보여요.', '이미 답은 정해져 있어요.', '모르는 척하는 게 나아요.', '조금만 더 버텨요.', '맛있는 걸 먹고 다시 생각해요.', '다른 방법이 있어요.', '지금 그 마음 그대로 가요.', '기대해도 좋아요.',
+    '서두르면 놓쳐요.', '혼자 끙끙대지 말아요.', '사소해 보여도 중요해요.', '걱정하는 일은 일어나지 않아요.', '좋은 소식이 오고 있어요.', '그 질문, 다시 해 봐요.', '행운은 준비된 사람 편이에요.', '당신이 생각하는 그거 맞아요.'];
+  let q = '', st = 'closed', last = null, page = 0;
+  const $q = s => document.querySelector(s);
+  function mount(v) {
+    v.innerHTML = `<div class="bk"><form class="cc-q" id="bk-f"><input id="bk-i" maxlength="40" placeholder="고민을 떠올리며 적어요 (예: 고백해도 될까?)" value="${esc(q)}" autocomplete="off"></form>
+      <p class="tr-hint">${st === 'open' ? '책을 다시 누르면 덮여요' : '고민을 마음속으로 생각하면서 책을 눌러요'}</p>
+      <button class="bk-book ${st}" id="bk-b" aria-label="책 펼치기">
+        <span class="bk-back"></span>
+        <span class="bk-pages">${Array.from({ length: 7 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</span>
+        <span class="bk-left"><small>p.${page}</small></span>
+        <span class="bk-right"><em id="bk-ans">${st === 'open' && last ? esc(last) : ''}</em><small>p.${page + 1}</small></span>
+        <span class="bk-cover"><b>고민 해결의 책</b><i>✦</i><small>THE BOOK OF WORRIES</small></span>
+      </button>
+      ${st === 'open' && last ? `<div class="tr-btns"><button class="tr-btn g" id="bk-sh">피드에 공유</button></div>` : ''}</div>`;
+    $q('#bk-i').oninput = e => q = e.target.value;
+    $q('#bk-f').onsubmit = e => { e.preventDefault(); $q('#bk-i').blur() };
+    if ($q('#bk-sh')) $q('#bk-sh').onclick = () => fortShare(`📖 고민 해결의 책을 펼쳤다\nQ. ${q || '(비밀)'}\nA. ${last}`);
+    $q('#bk-b').onclick = () => {
+      if (st === 'flip') return;
+      if (st === 'open') { st = 'closed'; mount(v); return }
+      if (!q.trim()) { toast('고민을 먼저 적어 줘요'); $q('#bk-i').focus(); return }
+      let a; do { a = ANS[Math.random() * ANS.length | 0] } while (a === last); last = a; page = 2 * (10 + (Math.random() * 180 | 0));
+      st = 'flip'; const b = $q('#bk-b'); b.classList.remove('closed'); b.classList.add('flip');
+      try { navigator.vibrate?.([10, 30, 10, 30, 10]) } catch { }
+      setTimeout(() => { st = 'open'; mount(v); const e = $q('#bk-ans'); if (e) { e.classList.add('ink') } }, 1700);
+    };
+  }
+  return { mount, ANS };
+})();
 
 /* ===== 두더지 순위 ===== */
 // scores/{uid} = { best, at } — 각자 최고 점수 하나만 저장, 게임 화면에 있을 때만 불러옴
