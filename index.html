@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261110-2345">
+<meta name="build" content="20261111-0910">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -233,6 +233,44 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .bb-msg{position:absolute;left:0;right:0;top:42%;text-align:center;color:#fff;font-weight:700;font-size:18px;text-shadow:0 2px 6px rgba(0,0,0,.6);opacity:0;pointer-events:none}
 .bb-msg.on{animation:bbm 1.1s ease-out}
 @keyframes bbm{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.1)}70%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+.rm-card{margin:10px 12px;padding:16px 14px;border:1px solid var(--line);border-radius:14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.rm-card big{font-size:18px;font-weight:700}
+.rm-card p{margin:0;font-size:12px;line-height:1.6;color:var(--muted)}
+.rm-hero{font-size:44px;animation:rmb 1.4s ease-in-out infinite}
+@keyframes rmb{50%{transform:scale(1.12)}}
+.rm-odds{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-size:11px}
+.rm-odds span{border:1px solid var(--line);border-radius:10px;padding:3px 8px}
+.rm-card .mg-btn:disabled{opacity:.45}
+.rm-bonus{border:0;background:none;color:#ff4f8b;font:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
+.rm-note{font-size:10px;color:var(--muted)}
+.rm-steps{display:flex;justify-content:space-between;padding:10px 14px 0}
+.rm-steps span{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;color:var(--muted)}
+.rm-steps i{font-style:normal;font-size:16px;font-weight:400;height:20px;line-height:20px;display:block}
+.rm-steps small{font-size:9px}
+.rm-steps{align-items:flex-start}
+.rm-steps .done{color:#ff4f8b}.rm-steps .cur{color:var(--ink)}.rm-steps .cur small{font-weight:700}
+.rm-face{display:flex;flex-direction:column;align-items:center;gap:6px}
+.rm-face .mini{width:76px;height:76px;border-radius:50%;border:3px solid #ff9cbf}
+.rm-face b{font-size:14px}
+.rm-heroav{display:block;width:84px;height:84px;border-radius:50%;border:3px solid #ff9cbf}
+.rm-bam{display:grid;place-items:center;width:100%;height:100%;font-size:44px;background:linear-gradient(160deg,#ffe3c2,#e9a86a)}
+.rm-pot{font-size:12px;color:var(--muted)}.rm-pot b{color:#ff4f8b;font-size:16px}
+.rm-card .rm-q{font-size:14px;color:var(--ink);line-height:1.6;word-break:keep-all}
+.rm-ch{display:flex;flex-direction:column;gap:8px;width:100%}
+.rm-ch button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:none;color:var(--ink);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.rm-ch button:active{background:rgba(255,79,139,.1)}
+.rm-ch em{font-style:normal;font-size:10px;padding:1px 6px;border-radius:6px}
+.rm-ch .t-안전{background:#e2f6e8;color:#1c8a43}.rm-ch .t-도전{background:#fff1d9;color:#b96b00}.rm-ch .t-모험{background:#ffe0e7;color:#d81e4f}
+.rm-doki{font-size:20px;font-weight:700;color:#ff4f8b;animation:rmb .5s ease-in-out infinite}
+.rm-res{font-size:20px;font-weight:700}
+.rm-card.ok .rm-res{color:#ff4f8b}.rm-card.bad .rm-res{color:var(--muted)}
+.rm-card.couple{background:linear-gradient(160deg,rgba(255,156,191,.18),rgba(255,210,63,.15))}
+.rm-lost{color:#d81e4f!important}
+.rm-next{display:flex;flex-direction:column;gap:8px;width:100%}
+.rm-next .mg-btn{width:100%}
+.rm-next .hot{background:#ff4f8b;color:#fff}
+.rm-pick{font-size:11px;color:var(--muted);background:rgba(0,0,0,.04);border-radius:8px;padding:3px 8px}
+.rk-w{font-size:10px;color:#ff4f8b;margin-left:4px}
 .mg-legend{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:10px;font-size:12px;color:var(--muted)}
 .mg-legend span{display:flex;align-items:center;gap:5px}
 .rank{padding:0 12px 16px}
@@ -1451,8 +1489,9 @@ function render() {
     back('Mini Game');
     $('#back').onclick = () => go('home');
     const ids = Object.keys(S.users), gt = S.gtab || 'mole';
-    const tabs = `<div class="mg-tabs"><button data-gt="mole" class="${gt === 'mole' ? 'on' : ''}">🔨 두더지</button><button data-gt="bubble" class="${gt === 'bubble' ? 'on' : ''}">🫧 버블</button><button data-gt="block" class="${gt === 'block' ? 'on' : ''}">🧱 블록 쌓기</button></div>`;
-    if (gt === 'block') { v.innerHTML = tabs; BLOCKS.mount(v, { best: () => G.tscores[S.me.uid] || 0, onEnd: saveTScore }) }
+    const tabs = `<div class="mg-tabs"><button data-gt="mole" class="${gt === 'mole' ? 'on' : ''}">🔨 두더지</button><button data-gt="bubble" class="${gt === 'bubble' ? 'on' : ''}">🫧 버블</button><button data-gt="block" class="${gt === 'block' ? 'on' : ''}">🧱 블록</button><button data-gt="love" class="${gt === 'love' ? 'on' : ''}">💘 위연시</button></div>`;
+    if (gt === 'love') { v.innerHTML = tabs; ROMANCE.mount(v, {}) }
+    else if (gt === 'block') { v.innerHTML = tabs; BLOCKS.mount(v, { best: () => G.tscores[S.me.uid] || 0, onEnd: saveTScore }) }
     else if (gt === 'bubble') { v.innerHTML = tabs; BUBBLE.mount(v, { best: () => G.bscores[S.me.uid] || 0, onEnd: saveBScore }) }
     else { MOLE.mount(v, { pick: () => ids[Math.random() * ids.length | 0], face: u => u ? avatar(u) : '?', best: () => G.scores[S.me.uid] || 0, onEnd: saveScore }); v.insertAdjacentHTML('afterbegin', tabs) }
     v.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => { if (b.dataset.gt !== gt) go('game', { gtab: b.dataset.gt }) });
@@ -2553,9 +2592,138 @@ const BLOCKS = (() => {
   return { mount, stop, playing: () => st.playing, setBest: () => { const b = $q('#tt-b'); if (b) b.textContent = bestGet() } };
 })();
 
+/* ===== 썸 타기 (확률 연애 시뮬레이션 · 게임 코인) ===== */
+// coins/{uid} = { c: 코인, w: 커플 성공 횟수, at } — 진짜 돈이 아닌 게임 코인
+const ROMANCE = (() => {
+  const STAKE = 10, START_COINS = 100, BONUS = 100;
+  // 고르는 선택지: p = 성공 확률, m = 성공 시 코인 배수
+  const SAFE = { p: .75, m: 1.3, tag: '안전' }, MID = { p: .55, m: 1.8, tag: '도전' }, RISK = { p: .35, m: 2.8, tag: '모험' };
+  // 밤티: 위연시 오리지널 캐릭터 — 야행성, 군밤 덕후, 노래 흥얼거리기, 수줍지만 장난기 많음
+  const STAGES = [
+    { name: '첫 만남', scenes: [
+      { q: '밤 12시 편의점. 군밤 마지막 한 봉지를 밤티와 동시에 집었다!', a: [['“먼저 드세요”라며 양보한다', SAFE, '밤티가 반을 나눠 줬다. “같이 먹어요 ㅎㅎ”', '밤티가 “감사합니다” 하고 진짜로 가져갔다. 뒤도 안 돌아봤다.'], ['“가위바위보로 정할까요?”', MID, '밤티가 져 놓고 더 신나 했다 ✌️', '밤티가 보 냈는데 나는 주먹이었다. 밤티가 군밤을 흔들며 춤추며 퇴장했다 💃'], ['군밤 맛집을 안다고 말을 건다', RISK, '밤티 눈이 반짝! “거기 어디예요?”', '“거기 저희 엄마 가게인데요?” 그리고 나는 출입 금지당했다']] },
+      { q: '새벽 산책길, 밤티가 이어폰 없이 노래를 흥얼거리고 있다.', a: [['모른 척 지나간다', SAFE, '밤티가 먼저 “혹시 시끄러웠어요?” 말을 걸었다', '지나치다가 전봇대에 박았다. 밤티가 119를 불러 줬다. 그게 마지막 만남이었다'], ['“그 노래 좋아요”라고 말한다', MID, '밤티가 부끄러워하며 노래 제목을 알려 줬다 🎧', '밤티가 “으아악 누구세요” 하고 전력 질주했다. 100m 11초대였다'], ['다음 소절을 따라 부른다', RISK, '즉석 듀엣 성공! 밤티가 박수를 쳤다 👏', '음이탈이 동네에 울려 퍼졌다. 강아지 다섯 마리가 같이 울었다 🐕🐕🐕']] },
+    ] },
+    { name: '연락처', scenes: [
+      { q: '헤어지기 전, 밤티가 머뭇거린다.', a: [['“또 봐요!” 하고 손을 흔든다', SAFE, '밤티가 쪼르르 와서 번호를 줬다 📱', '밤티가 번호 대신 군밤 껍질을 손에 쥐여 주고 갔다'], ['“밤에 또 산책해요?”', MID, '“저 밤에만 살아요 ㅋㅋ” 연락처 교환 성공', '“저 이제 아침형 인간 됐어요” 밤티 정체성 붕괴. 대화도 붕괴'], ['폰을 내밀며 “번호 찍어 줘요”', RISK, '밤티가 이름을 “🌰밤티”로 저장해 줬다', '밤티가 번호를 찍어 줬다. 걸어 보니 군밤 트럭 사장님이었다 🌰🚚']] },
+      { q: '새벽 2시, 밤티에게 첫 메시지를 보낸다면?', a: [['“아직 안 자요?”', SAFE, '1초 만에 답장. “당연하죠 지금이 낮인데”', '“누구세요?” 저장을 안 해 놨었다'], ['군밤 짤을 보낸다', MID, '밤티: “ㅋㅋㅋㅋ 이거 저예요?”', '밤티: “지금 새벽 2시에 이걸 보내요? 배고파서 잠 다 깼잖아요” 차단'], ['“지금 나올래요?”', RISK, '5분 뒤, 슬리퍼 신은 밤티가 나타났다 🩴', '밤티 엄마가 대신 답장했다. “우리 애 지금 자요.”']] },
+    ] },
+    { name: '첫 데이트', scenes: [
+      { q: '첫 데이트 장소는?', a: [['한강 야경 산책', SAFE, '밤티가 별자리를 하나씩 알려 줬다 ✨', '바람에 밤티 가발이… 아니 모자가 날아갔다. 그 뒤로 연락이 없다'], ['코인 노래방', MID, '밤티가 마이크를 놓지 않았다 🎤', '내가 3시간 동안 혼자 발라드만 불렀다. 밤티가 자고 있었다 😴'], ['군밤 장인 찾아 지방 원정', RISK, '인생 군밤을 찾았다. 밤티가 감동했다 🌰', '4시간 달려 도착했더니 가게 앞에 쪽지 한 장. “추워서 집에 갑니다 -사장-” 🥶'] ]},
+      { q: '데이트 중 밤티가 장난으로 내 모자를 뺏어 갔다!', a: [['웃으면서 기다린다', SAFE, '밤티가 모자를 씌워 주며 “잘 어울려요”', '밤티가 모자를 쓰고 그대로 집에 갔다. 모자도 밤티도 돌아오지 않았다'], ['쫓아가서 잡는다', MID, '잡았다! 둘 다 숨이 차서 웃음이 터졌다', '넘어지면서 밤티 바지를 잡았다. 더는 말하지 않겠다'], ['나도 밤티 목도리를 뺏는다', RISK, '장난 전쟁 시작! 밤티가 제일 신나 보였다 😆', '목도리 실이 풀려서 밤티가 뜨개질 원상태로 돌아갔다. 할머니 작품이었다']] },
+    ] },
+    { name: '고백', scenes: [
+      { q: '새벽 4시, 해 뜨기 직전. 고백 타이밍이다…!', a: [['“나 너 좋아해”', SAFE, '밤티가 작게 말했다. “…나도요”', '고백하는 순간 해가 떴다. 밤티가 “앗 뜨거” 하더니 사라졌다 (야행성)'], ['군밤 봉투에 편지를 넣어 준다', MID, '편지를 읽은 밤티 귀가 새빨개졌다 💌', '밤티가 편지째로 군밤인 줄 알고 먹었다. 맛있다고 했다'], ['같이 부르던 노래 가사로 고백', RISK, '밤티가 다음 소절로 대답했다 🎶', '가사를 까먹어서 “라라라~ 너를~ 라라라~” 하다가 군대 간 친구 노래가 나왔다']] },
+      { q: '밤티가 먼저 “할 말 있어요”라고 한다.', a: [['조용히 들어 준다', SAFE, '“저… 좋아해요” 밤티가 먼저 고백했다', '“저 사실… 내일 이사 가요. 제주도로.” 끝'], ['“나도 할 말 있는데!”', MID, '“하나 둘 셋!” 동시에 “좋아해!” 💕', '“아 그럼 먼저 하세요” “아니 먼저 하세요” 30분째 양보하다가 막차가 끊겼다'], ['대답 대신 꼭 안아 준다', RISK, '밤티가 더 꼭 안았다 🫂', '안았는데 밤티가 아니라 밤티 닮은 마네킹이었다. 진짜 밤티는 옆에서 보고 있었다']] },
+    ] },
+    { name: '커플 성공', scenes: [
+      { q: '사귄 지 100일! 밤티를 위한 선물은?', a: [['커플 잠옷', SAFE, '“이거 입고 밤새 놀아요!” 💤', '잠옷이 4XL이었다. 밤티가 그 안에서 실종됐다'], ['직접 구운 군밤 한 박스', MID, '밤티가 울면서 먹었다 🌰', '다 탔다. 화재경보기가 울렸다. 소방관 아저씨가 군밤 맛있게 드셨다 🚒'], ['새벽 별 보러 가는 캠핑', RISK, '쏟아지는 별 아래서 밤티가 말했다. “평생 같이 밤 새요” 🌌', '폭우에 텐트가 날아갔다. 밤티가 “우리 사이도 날아간 것 같아요” 명언을 남겼다']] },
+    ] },
+  ];
+  const NAME = '밤티';
+  let opt, st = { mode: 'idle' }, busy = false;
+  const $q = s => document.querySelector(s);
+  const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
+  const fill = t => t.replaceAll('{n}', NAME);
+  async function write(c, w) {
+    const ref = doc(db, 'coins', me()), cur = G.coins[me()];
+    await setDoc(ref, { c, w, at: serverTimestamp() });
+    G.coins[me()] = { c, w };
+  }
+  // 사이트 회원 중 닉네임이 '밤티'인 사람의 프로필 사진을 씀 (없으면 군밤 그림)
+  const bamUid = () => Object.keys(S.users).find(u => S.users[u] === NAME);
+  const bamFace = () => { const u = bamUid(); return u ? avatar(u) : '<span class="rm-bam">🌰</span>' };
+  function hearts(i) { return `<div class="rm-steps">${STAGES.map((s, k) => `<span class="${k < i ? 'done' : k === i ? 'cur' : ''}"><i>${k < i ? '♥' : '♡'}</i><small>${s.name}</small></span>`).join('')}</div>` }
+  function view() {
+    const box = $q('#rm'); if (!box) return;
+    const c = coins();
+    const top = `<div class="mg-bar"><span>COIN <b>${c ?? '…'}</b></span><span>커플 <b>${G.coins[me()]?.w || 0}</b>회</span></div>`;
+    if (st.mode === 'idle') {
+      const can = c !== null && c >= STAKE;
+      box.innerHTML = top + `<div class="rm-card"><div class="rm-hero">${bamUid() ? `<span class="mini rm-heroav">${bamFace()}</span>` : '🌰'}</div><big>위연시</big>
+        <p>야행성 군밤 덕후 <b>밤티</b>와 썸을 타요! 선택지마다 성공 확률이 달라요.<br>성공할수록 코인이 불어나고, 실패하면 다 잃어요.<br>중간에 그만두면 모은 코인을 챙길 수 있어요.</p>
+        <div class="rm-odds"><span><b>안전</b> 약 65~85%</span><span><b>도전</b> 약 45~65%</span><span><b>모험</b> 약 25~45%</span></div><small class="rm-note">어떤 선택지가 안전·모험인지와 확률은 판마다 바뀌어요</small>
+        <button class="btn mg-btn" id="rm-go" ${can && !busy ? '' : 'disabled'}>${STAKE}코인 내고 시작</button>
+        ${c !== null && c < STAKE ? `<button class="rm-bonus" id="rm-bonus">${bonusLeft() ? `💸 용돈 받기 +${BONUS}` : '용돈은 하루 한 번! 내일 또 받아요'}</button>` : ''}
+        ${c === null ? '<small class="rm-note">코인 불러오는 중…</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
+      if ($q('#rm-go')) $q('#rm-go').onclick = start;
+      if ($q('#rm-bonus')) $q('#rm-bonus').onclick = bonus;
+      return;
+    }
+    const s = STAGES[st.i], sc = st.scene;
+    const face = `<div class="rm-face"><span class="mini">${bamFace()}</span><b>${NAME}</b></div>`;
+    if (st.mode === 'ask') {
+      box.innerHTML = top + hearts(st.i) + `<div class="rm-card">${face}<div class="rm-pot">걸린 코인 <b>${st.pot}</b></div><p class="rm-q">${fill(sc.q)}</p>
+        <div class="rm-ch">${sc.a.map((x, k) => `<button data-k="${k}"><span>${fill(x[0])}</span><em class="t-${x[1].tag}">${x[1].tag} ${Math.round(x[1].p * 100)}% · ×${x[1].m}</em></button>`).join('')}</div></div>`;
+      box.querySelectorAll('[data-k]').forEach(b => b.onclick = () => choose(+b.dataset.k));
+    } else if (st.mode === 'wait') {
+      box.innerHTML = top + hearts(st.i) + `<div class="rm-card">${face}<div class="rm-doki">두근두근…</div><p class="rm-q">${fill(sc.a[st.k][0])}</p></div>`;
+    } else if (st.mode === 'win') {
+      const last = st.i >= STAGES.length - 1;
+      box.innerHTML = top + hearts(st.i + 1) + `<div class="rm-card ok">${face}<div class="rm-res">성공! 💕</div><small class="rm-pick">내 선택: ${fill(sc.a[st.k][0])}</small><p class="rm-q">${fill(sc.a[st.k][2])}</p><div class="rm-pot">걸린 코인 <b>${st.pot}</b></div>
+        ${last ? '<div class="rm-next"><button class="btn mg-btn hot" id="rm-cashc">코인 받기</button></div>' : `<div class="rm-next"><button class="btn mg-btn" id="rm-cash">그만하고 ${st.pot}코인 받기</button><button class="btn mg-btn hot" id="rm-cont">다음 단계: ${STAGES[st.i + 1].name} →</button></div>`}</div>`;
+      if ($q('#rm-cash')) $q('#rm-cash').onclick = () => cash(false);
+      if ($q('#rm-cashc')) $q('#rm-cashc').onclick = () => cash(true);
+      if ($q('#rm-cont')) $q('#rm-cont').onclick = () => { st.i++; st.scene = pick(st.i); st.mode = 'ask'; view() };
+    } else if (st.mode === 'lose') {
+      box.innerHTML = top + hearts(st.i) + `<div class="rm-card bad">${face}<div class="rm-res">${st.failT}</div><small class="rm-pick">내 선택: ${fill(sc.a[st.k][0])}</small><p class="rm-q">${fill(sc.a[st.k][3])}</p><p class="rm-lost">걸린 ${st.pot}코인을 잃었어요</p><button class="btn mg-btn" id="rm-again">처음으로</button></div>`;
+      $q('#rm-again').onclick = () => { st = { mode: 'idle' }; view() };
+    } else if (st.mode === 'couple') {
+      box.innerHTML = top + hearts(STAGES.length) + `<div class="rm-card ok couple">${face}<div class="rm-res">🎉 커플 탄생! 🎉</div><p class="rm-q">${NAME}와 행복하세요 💑</p><div class="rm-pot">+${st.pot}코인</div><button class="btn mg-btn" id="rm-again">처음으로</button></div>`;
+      $q('#rm-again').onclick = () => { st = { mode: 'idle' }; view() };
+    }
+  }
+  // 판마다 확률이 바뀜: 어떤 선택지가 안전/도전/모험인지 무작위, 확률도 ±10% 흔들림, 순서도 섞임
+  const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]] } return a };
+  const roll = t => { const p = Math.min(.9, Math.max(.15, t.p + (Math.random() * .2 - .1))); return { tag: t.tag, p, m: Math.max(1.1, Math.round(.97 / p * 10) / 10) } };
+  const pick = i => {
+    const sc = STAGES[i].scenes[Math.random() * STAGES[i].scenes.length | 0], tiers = shuffle([SAFE, MID, RISK]).map(roll);
+    return { q: sc.q, a: shuffle(sc.a.map((x, k) => [x[0], tiers[k], x[2], x[3]])) };
+  };
+  const today = () => new Date().toISOString().slice(0, 10);
+  function bonusLeft() { try { return localStorage.getItem('wb_rmbonus_' + me()) !== today() } catch { return true } }
+  async function bonus() {
+    if (!bonusLeft() || busy) return; busy = true;
+    try { await write((coins() || 0) + BONUS, G.coins[me()]?.w || 0); try { localStorage.setItem('wb_rmbonus_' + me(), today()) } catch { } toast(`용돈 ${BONUS}코인을 받았어요!`) } catch (e) { toast('받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    busy = false; view();
+  }
+  async function start() {
+    if (busy || coins() < STAKE) return; busy = true;
+    try { await write(coins() - STAKE, G.coins[me()]?.w || 0); st = { mode: 'ask', i: 0, pot: STAKE }; st.scene = pick(0) }
+    catch (e) { toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    busy = false; view();
+  }
+  function choose(k) {
+    st.k = k; st.mode = 'wait'; view();
+    const c = st.scene.a[k][1];
+    setTimeout(() => {
+      if (Math.random() < c.p) {
+        st.pot = Math.min(5000, Math.round(st.pot * c.m));
+        if (st.i >= STAGES.length - 1) { st.pot = Math.min(5000, Math.round(st.pot * 1.5)); cash(true) } else { st.mode = 'win'; view() }
+      } else { st.failT = ['차였어요 💔', '밤티가 도망갔어요 🏃', '흑역사 생성 완료 📸', '이불킥 예약 🛏️', '인연이 아니었나 봐요', '밤티 차단 엔딩 🚫', '눈물 젖은 군밤 🌰💧'][Math.random() * 7 | 0]; st.mode = 'lose'; view() }
+    }, 1100);
+  }
+  async function cash(couple) {
+    if (busy) return; busy = true;
+    try { await write((coins() || 0) + st.pot, (G.coins[me()]?.w || 0) + (couple ? 1 : 0)); if (couple) st.mode = 'couple'; else { toast(`${st.pot}코인을 챙겼어요!`); st = { mode: 'idle' } } }
+    catch (e) { toast('코인을 받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '') + ' 잠시 뒤 다시 눌러 주세요'); if (couple) st.mode = 'win' }
+    busy = false; view();
+  }
+  async function ensure() { // 처음이면 시작 코인 지급
+    if (!G.cloaded || G.coins[me()] || busy) return;
+    busy = true; try { await write(START_COINS, 0) } catch { } busy = false; view();
+  }
+  function mount(v, o) {
+    opt = o; if (st.mode === 'wait') st.mode = 'ask';
+    v.insertAdjacentHTML('beforeend', `<div id="rm"></div><div class="sect">코인 부자 RANKING</div><div class="rank" id="rm-rank"><div class="empty">불러오는 중…</div></div>`);
+    view(); ensure();
+  }
+  return { mount, stop: () => { }, refresh: () => { if ($q('#rm') && st.mode !== 'wait') view(); ensure() } };
+})();
+
 /* ===== 두더지 순위 ===== */
 // scores/{uid} = { best, at } — 각자 최고 점수 하나만 저장, 게임 화면에 있을 때만 불러옴
-const G = { scores: {}, bscores: {}, tscores: {}, loaded: false, bloaded: false, tloaded: false };
+const G = { scores: {}, bscores: {}, tscores: {}, coins: {}, loaded: false, bloaded: false, tloaded: false, cloaded: false };
 function watchScores() {
   const on = S.me && S.screen === 'game';
   if (on && !subs.scores) subs.scores = onSnapshot(collection(db, 'scores'), q => {
@@ -2571,17 +2739,22 @@ function watchScores() {
     G.tscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.tscores[d.id] = b }); G.tloaded = true;
     if (S.screen === 'game') { drawRank(); BLOCKS.setBest() }
   }, () => { G.tloaded = true; unsub('tscores') });
-  if (!on) ['scores', 'bscores', 'tscores'].forEach(k => subs[k] && unsub(k));
+  if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
+    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0 } }); G.cloaded = true;
+    if (S.screen === 'game') { drawRank(); ROMANCE.refresh() }
+  }, () => { G.cloaded = true; unsub('coins') });
+  if (!on) ['scores', 'bscores', 'tscores', 'coins'].forEach(k => subs[k] && unsub(k));
 }
 function drawRank() {
-  const kind = $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank'); if (!el) return;
-  const isB = kind === 'b', map = kind === 'b' ? G.bscores : kind === 't' ? G.tscores : G.scores, col = kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : 'scores';
-  if (!(kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : G.loaded)) return;
+  const kind = $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : $('#rm-rank') ? 'r' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank') || $('#rm-rank'); if (!el) return;
+  const isB = kind === 'b', unit = kind === 'r' ? '코인' : '점';
+  const map = kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.c])) : G.scores, col = kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : kind === 'r' ? 'coins' : 'scores';
+  if (!(kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : kind === 'r' ? G.cloaded : G.loaded)) return;
   const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
   if (!arr.length) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
   let rank = 0, prev = null;
   const rows = arr.map(([u, b], i) => { if (b !== prev) { rank = i + 1; prev = b } return { u, b, rank } });
-  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}점</b>${S.isAdmin ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
+  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${S.isAdmin ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
   const top = rows.slice(0, 10), mine = rows.find(r => r.u === me);
   el.innerHTML = top.map(line).join('') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
   el.querySelectorAll('[data-rkdel]').forEach(b => b.onclick = async () => { // 관리자: 기록 지우기
