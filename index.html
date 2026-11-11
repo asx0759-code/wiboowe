@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1400">
+<meta name="build" content="20261111-1402">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -3358,7 +3358,7 @@ function watchScores() {
 }
 function drawRank() {
   const kind = $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : $('#rm-rank') ? 'r' : $('#ft-rank') ? 'f' : $('#sh-rank') ? 's' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank') || $('#rm-rank') || $('#ft-rank') || $('#sh-rank'); if (!el) return;
-  const isB = kind === 'b', unit = kind === 'r' ? '코인 벌었음' : kind === 'f' ? '승' : '점';
+  const isB = kind === 'b', unit = kind === 'r' ? '코인' : kind === 'f' ? '승' : '점';
   const map = kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, rmOf(x)])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
   if (!(kind === 's' ? G.sloaded : kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : (kind === 'r' || kind === 'f') ? G.cloaded : G.loaded)) return;
   const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
