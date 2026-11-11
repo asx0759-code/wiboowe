@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-2130">
+<meta name="build" content="20261111-2200">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -90,6 +90,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--line)}
 .tabs button{font-family:var(--pixel);font-size:12px;background:#fff;border:0;padding:10px;color:var(--muted);cursor:pointer}
 .tabs button.on{color:var(--pink-deep);box-shadow:inset 0 -3px 0 var(--pink)}
+.it-to{display:block;font-size:10px;color:var(--muted);margin-bottom:1px}
 .seg{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--pink)}
 .seg button{font-family:var(--hand);font-size:12px;background:#fff;border:0;padding:6px;cursor:pointer;color:var(--pink-deep)}
 .seg button.on{background:var(--pink);color:#fff}
@@ -1007,7 +1008,7 @@ async function loadMe(u) {
   measureClock(false);
 }
 let mineSeen = null;
-function cleanup() { mineSeen = null; F.list = []; F.loaded = false; F.stories = []; F.notifs = []; F.nLoaded = false; F.extra = {}; F.cmts = []; F.cmtTw = null; S.draftTw = null; $('.st-view')?.remove(); AN.toMe = {}; AN.mine = {}; AN.mineIdx = {}; AN.msgs = []; AN.msgTid = null; AN.loaded = false; P.list = {}; P.pics = {}; P.dmIn = []; P.dmOut = []; P.dmLoaded = false; S.admDm = null; P.taps = []; P.tapsLoaded = false; P.lastAct = ''; P.lastW = 0; $('#nw-sheet')?.remove(); G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
+function cleanup() { mineSeen = null; S.sent = null; S.itab = null; F.list = []; F.loaded = false; F.stories = []; F.notifs = []; F.nLoaded = false; F.extra = {}; F.cmts = []; F.cmtTw = null; S.draftTw = null; $('.st-view')?.remove(); AN.toMe = {}; AN.mine = {}; AN.mineIdx = {}; AN.msgs = []; AN.msgTid = null; AN.loaded = false; P.list = {}; P.pics = {}; P.dmIn = []; P.dmOut = []; P.dmLoaded = false; S.admDm = null; P.taps = []; P.tapsLoaded = false; P.lastAct = ''; P.lastW = 0; $('#nw-sheet')?.remove(); G.scores = {}; G.loaded = false; G.synced = false; B.posts = []; B.comments = {}; B.mine = {}; B.alias = {}; B.real = {}; B.cmtPid = null; S.isAdmin = false; S.adm = null; Object.keys(subs).forEach(unsub); leaveRoom(); S.mine = []; S.other = []; S.priv = {}; Object.keys(privSub).forEach(k => delete privSub[k]); Object.keys(anonChk).forEach(k => delete anonChk[k]); S.users = {}; S.photos = {}; S.wall = null; applyWall() }
 function list(q) { const a = []; q.forEach(d => a.push({ id: d.id, ...d.data() })); return a.sort((x, y) => ms(y.createdAt) - ms(x.createdAt)) }
 // 익명으로 보낸 메시지가 내 것인지 확인 (보낸 본인과 관리자만 meta/sender 를 읽을 수 있음)
 const anonChk = {}, privSub = {};
@@ -1096,7 +1097,7 @@ function render() {
     v.querySelectorAll('[data-app]').forEach(b => b.onclick = () => {
       const a = b.dataset.app;
       if (a === 'admin') { go('admin', { admUser: null }); loadAdmin() }
-      else if (a === 'inbox') go('inbox', { owner: S.me.uid });
+      else if (a === 'inbox') go('inbox', { owner: S.me.uid, itab: null });
       else go(a);
     });
     return;
@@ -1139,28 +1140,34 @@ function render() {
   }
 
   if (S.screen === 'inbox') {
-    const owner = S.owner || S.me.uid, mine = owner === S.me.uid, arr = mine ? msgsOf(owner) : msgsOf(owner).filter(m => !(m.bc && m.secret)); // 비밀 전체 쪽지는 남의 방명록에선 안 보임
-    if (mine) back(`Inbox {${arr.length}}`); else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
-    v.innerHTML = (arr.length ? arr.map((m, i) => {
+    const owner = S.owner || S.me.uid, mine = owner === S.me.uid, sentTab = mine && S.itab === 'sent';
+    if (sentTab && !subs.sent) subs.sent = onSnapshot(query(collection(db, 'messages'), where('from', '==', S.me.uid)), q => { S.sent = list(q); loadPriv(S.sent); if (S.screen === 'inbox' || S.screen === 'read') render() }, () => { S.sent = []; unsub('sent'); if (S.screen === 'inbox') render() });
+    // 비밀 전체 쪽지는 남의 방명록에선 안 보임 (보낸 본인은 보임)
+    const arr = sentTab ? (S.sent || []) : mine ? msgsOf(owner) : msgsOf(owner).filter(m => !(m.bc && m.secret) || sentByMe(m));
+    if (mine) back(`Inbox {${sentTab ? (S.sent || []).length : S.mine.length}}`); else back(`${esc(S.users[owner] || '')} {${arr.length}}`);
+    const itabs = mine ? `<div class="tabs"><button id="it-in" class="${sentTab ? '' : 'on'}">받은 쪽지</button><button id="it-out" class="${sentTab ? 'on' : ''}">보낸 쪽지</button></div>` : '';
+    if (sentTab && !S.sent) { v.innerHTML = itabs + '<div class="empty">불러오는 중…</div>'; $('#it-in').onclick = () => go('inbox', { itab: null }); return }
+    v.innerHTML = itabs + (arr.length ? arr.map((m, i) => {
       const c = content(m);
       // 아이템은 목록에서 무엇인지 보이지 않게: 공개면 선물상자, 비밀이면 자물쇠. 눌러서 열어야 확인 가능
       const isItem = m.kind === 'item' || !!c?.item;
       const icon = m.secret ? LOCK : isItem ? pix('gift', 18) : (m.read || !mine ? ENV_O : ENV_C);
-      const title = isItem ? '아이템이 도착했어요' : c ? esc(c.title) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요');
+      const title = (sentTab ? `<small class="it-to">To. ${esc(S.users[m.to] || '(탈퇴)')}</small>` : '') + (isItem ? (sentTab && c ? `🎁 ${esc((ITEMS[c.item] || {}).name || c.title)}` : '아이템이 도착했어요') : c ? esc(c.title) : (m.secret && S.priv[m.id] === 'loading' ? '…' : '비밀 메시지예요'));
       return `<button class="row" data-id="${m.id}" ${c ? '' : 'data-locked="1"'}><span class="num">${i + 1}</span><span class="ic">${icon}</span><span class="ttl ${c ? '' : 'secret'}">${m.bc ? '<span class="bc">전체</span>' : ''}${title}</span>${m.hasImage && c ? '<span class="meta">IMG</span>' : ''}${mine && !m.read ? '<span class="meta">NEW</span>' : ''}</button>`;
-    }).join('') : `<div class="empty">아직 받은 메시지가 없어요</div>`)
+    }).join('') : `<div class="empty">${sentTab ? '아직 보낸 쪽지가 없어요' : '아직 받은 메시지가 없어요'}</div>`)
       + (mine ? '' : `<div class="form"><button class="btn" id="write">${esc(S.users[owner] || '')}에게 남기기</button></div>`);
     v.querySelectorAll('[data-id]').forEach(b => b.onclick = () => {
       if (b.dataset.locked) { toast('주인과 보낸 사람만 볼 수 있어요'); return }
       go('read', { open: b.dataset.id });
     });
+    if ($('#it-in')) { $('#it-in').onclick = () => go('inbox', { itab: null }); $('#it-out').onclick = () => go('inbox', { itab: 'sent' }) }
     if (!mine) $('#back').onclick = () => go('prof', { prof: owner });
     if ($('#write')) $('#write').onclick = () => go('send', { to: owner });
     return;
   }
 
   if (S.screen === 'read') {
-    const m = msgsOf(S.owner).find(x => x.id === S.open), c = m && content(m);
+    const m = msgsOf(S.owner).find(x => x.id === S.open) || (S.sent || []).find(x => x.id === S.open), c = m && content(m);
     back('Message');
     $('#back').onclick = () => go('inbox');
     if (!m || !c) { v.innerHTML = '<div class="empty">메시지를 찾을 수 없어요</div>'; return }
