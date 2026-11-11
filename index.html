@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0220">
+<meta name="build" content="20261112-0250">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1003,6 +1003,18 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
   .home-btn{width:42px;height:42px;margin-top:10px}
 }
 @media (max-width:420px){ body{padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))} }
+/* 휴대폰에서는 가짜 폰 테두리·상태바·홈 버튼 없이 화면을 위아래 꽉 채움 (PC에서는 폰 모양 그대로) */
+@media (max-width:520px){
+  body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);background:#0b0b0d;gap:0}
+  .phone{width:100%;height:100%;max-height:none;border-radius:0;padding:0;background:none;box-shadow:none}
+  .top,.home-btn,.lcd>.status{display:none}
+  .lcd{border:0;border-radius:0}
+  .hbar{display:flex}
+}
+.hbar{display:none;flex:none;justify-content:center;align-items:center;height:18px;padding:0;border:0;background:transparent;cursor:pointer;touch-action:none}
+.hbar[hidden]{display:none!important}
+.hbar i{width:120px;height:5px;border-radius:3px;background:rgba(120,120,128,.55)}
+.hbar:active i{background:rgba(120,120,128,.9)}
 </style>
 </head>
 <body>
@@ -1020,6 +1032,7 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
       </div>
       <div class="head" id="head"></div>
       <div class="body" id="view"></div>
+      <button class="hbar" id="hbar" aria-label="홈으로"><i></i></button>
       <nav class="nav" id="nav" hidden>
         <button data-go="home">HOME</button>
         <button data-go="inbox">INBOX</button>
@@ -1198,7 +1211,7 @@ function content(m) { // 화면에 보여 줄 제목·내용·답장
 /* ===== 화면 ===== */
 function render() {
   const v = $('#view'), h = $('#head');
-  $('#nav').hidden = true;
+  $('#nav').hidden = true; $('#hbar').hidden = S.screen === 'home' || S.screen === 'login';
   h.hidden = S.screen === 'home'; $('#view').classList.toggle('homebg', S.screen === 'home'); $('#view').classList.toggle('nowbg', S.screen.startsWith('now')); $('#view').classList.toggle('feedbg', ['feed', 'prof', 'compose', 'tweet'].includes(S.screen)); applyWall(); $('.lcd').classList.toggle('dark', S.screen === 'home');
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === S.screen || (b.dataset.go === 'board' && (S.screen === 'post' || S.screen === 'board-write')) || (S.screen === 'read' && b.dataset.go === 'inbox' && S.owner === S.me?.uid)));
   const back = html => { h.innerHTML = '<button id="back" aria-label="뒤로">&lt;</button>' + html; $('#back').onclick = () => go('home') };
@@ -5267,6 +5280,12 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 /* ===== 공통 ===== */
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => go(b.dataset.go, { owner: S.me?.uid }));
 $('#homebtn').onclick = () => { if (S.me) go('home') };
+// 휴대폰: 화면 맨 아래 작은 바를 누르거나 위로 쓸어 올리면 홈으로
+(() => { const b = $('#hbar'); let y0 = null;
+  b.onclick = () => { if (S.me) go('home') };
+  b.addEventListener('pointerdown', e => { y0 = e.clientY });
+  b.addEventListener('pointerup', e => { if (y0 !== null && y0 - e.clientY > 15 && S.me) go('home'); y0 = null });
+})();
 function tick() { const d = new Date(), t = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); $('#clock').textContent = t; if ($('#hstime')) $('#hstime').textContent = t }
 tick(); setInterval(tick, 30000);
 render();
