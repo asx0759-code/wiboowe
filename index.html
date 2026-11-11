@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1900">
+<meta name="build" content="20261111-2010">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -221,14 +221,21 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .mg-tabs button.on{background:var(--ink);color:#fff;font-weight:700;border-color:transparent}
 .gf{min-height:100%;background:#17161c center/cover no-repeat;display:flex}
 .gf-in{flex:1;display:flex;flex-direction:column;align-items:center;padding:34px 18px 30px;background:rgba(14,13,20,.55);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
-.gf h2{margin:0 0 18px;color:#fff;font-size:28px;font-weight:600;letter-spacing:-.01em;align-self:flex-start;padding-left:14px}
+.gf-hd{width:100%;max-width:360px;display:flex;align-items:center;justify-content:space-between;margin:0 0 18px;padding:0 4px 0 14px}
+.gf h2{margin:0;color:#fff;font-size:28px;font-weight:600;letter-spacing:-.01em}
+.gf-coin{display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:5px 6px 5px 12px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);color:#fff;font:inherit;cursor:pointer}
+.gf-cn{font-size:13px}.gf-cn b{font-variant-numeric:tabular-nums}
+.gf-cb{display:flex;flex-direction:column;align-items:center;line-height:1.15;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.18);color:rgba(255,255,255,.6)}
+.gf-cb small{font-size:9px;font-weight:400;opacity:.85}
+.gf-coin.ok .gf-cb{background:linear-gradient(165deg,#ffe14a,#ff9a1a);color:#3a2200;box-shadow:0 2px 6px rgba(255,160,30,.5)}
+.gf p small{font-size:11px;opacity:.85}
 .gf-box{width:100%;max-width:360px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px 14px;padding:26px 20px;border-radius:34px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 .gf-box button{border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font:inherit;-webkit-tap-highlight-color:transparent}
 .gf-box button:active .gf-ic{transform:scale(.92);filter:brightness(.88)}
 .gf-ic{width:100%;max-width:78px;aspect-ratio:1;border-radius:23%;display:grid;place-items:center;box-shadow:inset 0 3px 2px rgba(255,255,255,.5),inset 0 -6px 9px rgba(0,0,0,.22),0 6px 10px rgba(0,0,0,.4);transition:transform .12s}
 .gf-ic svg{width:66%;height:66%;filter:drop-shadow(0 2px 1px rgba(0,0,0,.25))}
 .gf-box small{color:#fff;font-size:12px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.gf p{margin:16px 0 0;color:rgba(255,255,255,.55);font-size:12px}
+.gf p{margin:16px 0 0;color:rgba(255,255,255,.55);font-size:12px;text-align:center;line-height:1.6}
 .sd-table{margin:4px 10px 0;padding:18px 12px 20px;border-radius:18px;background:radial-gradient(ellipse at 50% 30%,#2f9a5f,#0d5230 75%);box-shadow:inset 0 0 0 5px #5a3414,inset 0 0 0 7px #8a5a2a,inset 0 0 40px rgba(0,0,0,.35);color:#fff;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
 .sd-title{font-family:var(--pixel);font-size:18px;color:#ffe9a8;margin-top:6px}
 .sd-rule{margin:0;font-size:12.5px;line-height:1.7;color:#d7f2de}.sd-rule b{color:#ffe14a}.sd-rule small{color:#a9d6b6}
@@ -298,6 +305,24 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .rc-fin{position:absolute;top:0;bottom:0;right:6px;width:8px;background:repeating-conic-gradient(#fff 0 25%,#1a191c 0 50%) 0 0/8px 8px}
 .rc-podium{display:flex;justify-content:center;gap:16px;padding:12px 10px 4px;font-size:13px}.rc-podium span{display:flex;align-items:center;gap:5px}.rc-podium b{font-family:var(--pixel);color:#e0a800}.rc-podium i{width:10px;height:10px;border-radius:50%}
 .rc-again{display:block;margin:8px auto 4px}
+.stk{width:100%;display:flex;flex-direction:column;gap:6px;align-items:center;font-size:13px}
+.stk label{display:flex;align-items:center;gap:6px;font-weight:700}
+.stk input{width:110px;font:inherit;font-size:17px;font-weight:700;text-align:center;padding:6px 4px;border:2px solid currentColor;border-radius:10px;background:#fff;color:#1a191c}
+.stk div{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
+.stk button{border:1px solid currentColor;background:none;color:inherit;font:inherit;font-size:11px;padding:4px 8px;border-radius:999px;cursor:pointer;opacity:.85}
+.sd-table .mg-btn:disabled{opacity:.45}
+.acn{padding:10px 14px 12px;display:flex;flex-direction:column;gap:9px;border-bottom:1px solid var(--line)}
+.acn-l{display:flex;align-items:center;gap:8px;font-size:13px}
+.acn-l input{flex:1;min-width:0;font:inherit;font-size:15px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#1a191c}
+.acn-l input[type=number]{flex:none;width:110px;font-weight:700;text-align:center}
+.acn-q{display:flex;flex-wrap:wrap;gap:6px}
+.acn-q button{border:1px solid var(--line);background:none;color:inherit;font:inherit;font-size:12px;padding:5px 10px;border-radius:999px;cursor:pointer}
+.acn-go{width:100%}.acn-go:disabled{opacity:.45}
+.acn small{font-size:11px;color:var(--muted)}
+.acn-row.on{background:var(--tint)}
+.acn-ck{flex:none;width:20px;height:20px;border:1.5px solid var(--muted);border-radius:6px;display:grid;place-items:center;font-size:13px;font-weight:700;margin:0 8px 0 2px}
+.acn-row.on .acn-ck{background:#ff4f8b;border-color:#ff4f8b;color:#fff}
+.acn-row .mini{width:28px;height:28px;border-radius:50%;margin-right:8px}
 .tt-stage{display:flex;justify-content:center}
 .tt-wrap{position:relative;display:flex;gap:8px;align-items:flex-start}
 .tt-wrap #tt-cv{border-radius:8px;touch-action:none;display:block}
@@ -947,7 +972,7 @@ async function loadMe(u) {
   }, retrySub('taps', subTaps)) })();
   (function subNotif() { subs.notif = onSnapshot(query(collection(db, 'notifs'), where('to', '==', u.uid)), q => {
     const first = !F.nLoaded; F.notifs = []; q.forEach(d => F.notifs.push({ id: d.id, ...d.data() }));
-    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const n = c.doc.data(), who = S.users[n.from] || '누군가'; ping({ who: n.from, body: n.text || '', open: () => n.tw ? go('tweet', { tw: n.tw }) : go('feed', { ftab: 'noti' }), title: n.kind === 'like' ? `${who}님이 글을 좋아해요 ♥` : n.kind === 'cmt' ? `${who}님이 댓글을 남겼어요` : n.kind === 'mention' ? `${who}님이 회원님을 언급했어요` : n.kind === 'quote' ? `${who}님이 글을 인용했어요` : `${who}님이 스토리에 반응했어요` }) } });
+    if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const n = c.doc.data(), who = S.users[n.from] || '누군가'; ping({ who: n.from, body: n.text || '', open: () => n.kind === 'coin' ? go('game') : n.tw ? go('tweet', { tw: n.tw }) : go('feed', { ftab: 'noti' }), title: n.kind === 'like' ? `${who}님이 글을 좋아해요 ♥` : n.kind === 'cmt' ? `${who}님이 댓글을 남겼어요` : n.kind === 'mention' ? `${who}님이 회원님을 언급했어요` : n.kind === 'quote' ? `${who}님이 글을 인용했어요` : n.kind === 'coin' ? (n.text.startsWith('-') ? `관리자가 코인을 가져갔어요` : `관리자가 코인을 보냈어요 🪙`) : `${who}님이 스토리에 반응했어요` }) } });
     F.nLoaded = true; if (S.screen === 'home' || (S.screen === 'feed' && S.ftab === 'noti')) refresh();
   }, retrySub('notif', subNotif)) })();
   anSubs(u.uid);
@@ -1324,9 +1349,23 @@ function render() {
         body = `<div class="sect">익명 쪽지 · ${an.length}</div>` + (an.length ? an.map((x, i) => `<button class="row" data-adan="${x.id}"><span class="num">${i + 1}</span><span class="ttl">🤫 ${x.owner ? nm(x.owner) : '?'} → ${nm(x.to)}${x.rev ? ' <span class="bc">공개</span>' : ''}${x.blocked ? ' <span class="bc">차단</span>' : ''}<small class="adm-who">${esc((x.last || '').slice(0, 40))} · ${fmt(x.at)}</small></span></button>`).join('') : '<div class="empty">익명 쪽지가 없어요</div>')
           + `<div class="sect">이름 쪽지 · ${P2.length}</div>` + (P2.length ? P2.map((x, i) => { const [a, b] = x.k.split('|'); return `<button class="row" data-pair="${x.k}"><span class="num">${i + 1}</span><span class="ttl">${nm(a)} ↔ ${nm(b)}<small class="adm-who">${nm(x.last.from)}: ${esc(x.last.text.slice(0, 40))} · ${fmt(x.last.at)}</small></span><span class="meta">${x.n}</span></button>` }).join('') : '<div class="empty">이름 쪽지가 없어요</div>');
       }
+    } else if (tab === 'coin') { // 코인 보내기 · 빼기
+      const C = S.admC || {}, sel = S.admCsel || [];
+      if (C.loading || !C.map) body = '<div class="empty">불러오는 중…</div>';
+      else if (C.err) body = `<div class="empty">${esc(C.err)}</div>`;
+      else {
+        const list = Object.entries(S.users).sort((a, b) => a[1].localeCompare(b[1])), amt = S.admCamt ?? 100;
+        body = `<div class="acn"><label class="acn-l">보낼 코인 <input id="acn-amt" type="number" inputmode="numeric" step="10" value="${amt}"> 코인</label>
+          <div class="acn-q">${[100, 500, 1000, 5000].map(n => `<button data-acq="${n}">+${n}</button>`).join('')}<button data-acq="-1">빼기로</button><button data-acq="0">0</button></div>
+          <label class="acn-l">한마디 <input id="acn-memo" maxlength="40" placeholder="(선택) 예: 이벤트 당첨 축하!" value="${esc(S.admCmemo || '')}"></label>
+          <div class="acn-q"><button id="acn-all">전체 선택</button><button id="acn-none">선택 해제</button></div>
+          <button class="btn acn-go" id="acn-go" ${sel.length && amt ? '' : 'disabled'}>${sel.length ? `${sel.length}명에게 ${amt > 0 ? amt + '코인 보내기' : Math.abs(amt) + '코인 빼기'}` : '받을 사람을 골라요'}</button>
+          <small>받은 사람에게는 친구들 알림으로 알려 줘요 · 위연시 순위 기록은 바뀌지 않아요</small></div>`
+          + list.map(([u, n]) => { const x = C.map[u], on = sel.includes(u); return `<button class="row acn-row${on ? ' on' : ''}" data-acn="${u}"><span class="acn-ck">${on ? '✓' : ''}</span><span class="mini">${avatar(u)}</span><span class="ttl">${esc(n)}</span><span class="meta">${x ? x.c : '-'} 코인</span></button>` }).join('');
+      }
     } else body = rows(listAll);
-    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button><button id="at-board" class="${tab === 'board' ? 'on' : ''}">게시판</button><button id="at-now" class="${tab === 'now' ? 'on' : ''}">NOW</button></div>`)
-      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : tab === 'board' ? 'BOARD POSTS' : tab === 'now' ? 'NOW 쪽지' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : tab === 'board' ? (S.admB?.posts || []).length : tab === 'now' ? (S.admDm?.list || []).length + (S.admDm?.an || []).length : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
+    v.innerHTML = (U ? '' : `<div class="tabs"><button id="at-all" class="${tab === 'all' ? 'on' : ''}">전체 메시지</button><button id="at-users" class="${tab === 'users' ? 'on' : ''}">방명록별</button><button id="at-board" class="${tab === 'board' ? 'on' : ''}">게시판</button><button id="at-now" class="${tab === 'now' ? 'on' : ''}">NOW</button><button id="at-coin" class="${tab === 'coin' ? 'on' : ''}">코인</button></div>`)
+      + `<div class="sect">${U ? 'MESSAGES' : tab === 'users' ? 'GUESTBOOKS' : tab === 'board' ? 'BOARD POSTS' : tab === 'now' ? 'NOW 쪽지' : tab === 'coin' ? '코인 보내기' : 'ALL MESSAGES'} · ${U ? listAll.filter(m => m.to === U).length : tab === 'users' ? Object.keys(S.users).length : tab === 'board' ? (S.admB?.posts || []).length : tab === 'now' ? (S.admDm?.list || []).length + (S.admDm?.an || []).length : tab === 'coin' ? Object.keys(S.users).length + '명' : listAll.length}<button class="out" id="areload" style="float:right;padding:0">새로고침</button></div>`
       + body;
     if ($('#at-all')) $('#at-all').onclick = () => go('admin', { admTab: 'all' });
     if ($('#at-users')) $('#at-users').onclick = () => go('admin', { admTab: 'users' });
@@ -1354,7 +1393,9 @@ function render() {
       S.admDel = null; b.textContent = '지우는 중…';
       try { await deletePost(id); toast('글과 댓글을 지웠어요'); loadAdminBoard() } catch (err) { console.warn(err); toast('지우지 못했어요 (' + (err?.code || '') + ')'); render() }
     });
-    if ($('#areload')) $('#areload').onclick = () => tab === 'board' && !U ? loadAdminBoard() : tab === 'now' && !U ? loadAdminDm() : loadAdmin();
+    if ($('#at-coin')) $('#at-coin').onclick = () => { go('admin', { admTab: 'coin' }); loadAdminCoins() };
+    if (tab === 'coin' && !U) bindAdminCoins();
+    if ($('#areload')) $('#areload').onclick = () => tab === 'coin' && !U ? loadAdminCoins() : tab === 'board' && !U ? loadAdminBoard() : tab === 'now' && !U ? loadAdminDm() : loadAdmin();
     v.querySelectorAll('[data-u]').forEach(b => b.onclick = () => go('admin', { admUser: b.dataset.u }));
     v.querySelectorAll('[data-aid]').forEach(b => b.onclick = () => go('admin-read', { admOpen: b.dataset.aid }));
     return;
@@ -1546,7 +1587,7 @@ function render() {
     } else {
       try { localStorage.setItem('wb_notiseen_' + me, Date.now()) } catch { }
       const L = [...F.notifs].filter(n => S.users[n.from]).sort((a, b) => ms(b.at) - ms(a.at)).slice(0, 60);
-      const what = n => n.kind === 'like' ? '회원님의 글을 좋아해요 ♥' : n.kind === 'cmt' ? '댓글을 남겼어요' : n.kind === 'mention' ? '회원님을 언급했어요' : n.kind === 'quote' ? '회원님의 글을 인용했어요' : '회원님의 스토리에 반응했어요';
+      const what = n => n.kind === 'like' ? '회원님의 글을 좋아해요 ♥' : n.kind === 'cmt' ? '댓글을 남겼어요' : n.kind === 'mention' ? '회원님을 언급했어요' : n.kind === 'quote' ? '회원님의 글을 인용했어요' : n.kind === 'coin' ? (n.text.startsWith('-') ? '코인을 가져갔어요' : '코인을 보냈어요 🪙') : '회원님의 스토리에 반응했어요';
       body = L.length ? L.map(n => `<button class="fd-nt" data-ntw="${n.tw || ''}"><span class="mini">${avatar(n.from)}</span><span class="fd-ntt"><b>${esc(S.users[n.from])}</b>님이 ${what(n)}${n.text ? `<small>${esc(n.text)}</small>` : ''}</span><em>${relT(n.at)}</em></button>`).join('') : '<div class="empty" style="color:#888">아직 알림이 없어요</div>';
     }
     v.innerHTML = `<div class="fd">${tabs}${body}</div>`;
@@ -2749,7 +2790,7 @@ const ROMANCE = (() => {
   // 고르는 선택지: p = 성공 확률, m = 성공 시 코인 배수
   const SAFE = { p: .75, m: 1.3, tag: '안전' }, MID = { p: .55, m: 1.8, tag: '도전' }, RISK = { p: .35, m: 2.8, tag: '모험' }, LOTTO = { p: .14, m: 6.5, tag: '로또', j: .04 };
   // 걸린 코인이 많을수록 성공 확률이 깎임 (20코인까지는 그대로, 2배가 될 때마다 -10%, 최대 -60%)
-  const potPen = pot => pot <= 20 ? 1 : Math.max(.4, 1 - .1 * Math.log2(pot / 20));
+  const potPen = pot => { const r = pot * 10 / (st?.stake || 10); return r <= 20 ? 1 : Math.max(.4, 1 - .1 * Math.log2(r / 20)) }; // 처음 건 판돈의 몇 배로 불었는지로 따짐
   // 밤티: 위연시 오리지널 캐릭터 — 야행성, 군밤 덕후, 노래 흥얼거리기, 수줍지만 장난기 많음
   const STAGES = [
     { name: '첫 만남', scenes: [
@@ -2784,7 +2825,7 @@ const ROMANCE = (() => {
     ] },
   ];
   const pickHidden = () => { const sc = HIDDEN[Math.random() * HIDDEN.length | 0]; return { q: sc.q, hidden: 1, a: shuffle(sc.a.map(x => [x[0], { ...x[1], p: Math.min(.95, Math.max(.03, x[1].p + (Math.random() * .1 - .05) * (x[1].p < .1 ? .4 : 1))) * potPen(st.pot || 0) }, x[2], x[3]])) } };
-  let opt, st = { mode: 'idle' }, busy = false;
+  let opt, st = { mode: 'idle' }, busy = false, stake = 10;
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
   const fill = t => t.replaceAll('{n}', NAME);
@@ -2798,14 +2839,15 @@ const ROMANCE = (() => {
     const c = coins();
     const top = `<div class="mg-bar"><span>COIN <b>${c ?? '…'}</b></span><span>커플 <b>${G.coins[me()]?.w || 0}</b>회</span></div>`;
     if (st.mode === 'idle') {
-      const can = c !== null && c >= STAKE;
+      const can = c !== null && c >= STAKE; stake = stakeFix(stake, c);
       box.innerHTML = top + `<div class="rm-card"><div class="rm-hero">${bamUid() ? `<span class="mini rm-heroav">${bamFace()}</span>` : '🌰'}</div><big>위연시</big>
         <p>야행성 군밤 덕후 <b>밤티</b>와 썸을 타요! 선택지마다 성공 확률이 달라요.<br>성공할수록 코인이 불어나고, 실패하면 다 잃어요.<br>중간에 그만두면 모은 코인을 챙길 수 있어요.</p>
         <div class="rm-odds"><span><b>안전</b> 약 65~85%</span><span><b>도전</b> 약 45~65%</span><span><b>모험</b> 약 25~45%</span><span><b>로또</b> 약 10~18% · ×6↑</span></div><small class="rm-note">선택지는 4개! 어떤 게 안전·로또인지와 확률은 판마다 바뀌어요</small><small class="rm-note">💰 걸린 코인이 많아질수록 성공 확률이 뚝뚝 떨어져요 (최대 -60%)</small>
-        <button class="btn mg-btn" id="rm-go" ${can && !busy ? '' : 'disabled'}>${STAKE}코인 내고 시작</button>
+        ${stakeHTML(stake, c)}<button class="btn mg-btn" id="rm-go" ${can && !busy ? '' : 'disabled'}>${stake}코인 내고 시작</button>
         ${c !== null && c < STAKE ? `<button class="rm-bonus" id="rm-bonus">${bonusLeft() ? `💸 용돈 받기 +${BONUS}` : '용돈은 하루 한 번! 내일 또 받아요'}</button>` : ''}
         ${c === null ? '<small class="rm-note">코인 불러오는 중…</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
       if ($q('#rm-go')) $q('#rm-go').onclick = start;
+      stakeBind(box, c, v => { stake = v; const b = $q('#rm-go'); if (b) { b.textContent = `${v}코인 내고 시작`; b.disabled = !(can && !busy && c >= v) } });
       if ($q('#rm-bonus')) $q('#rm-bonus').onclick = bonus;
       return;
     }
@@ -2847,8 +2889,8 @@ const ROMANCE = (() => {
     busy = false; view();
   }
   async function start() {
-    if (busy || coins() < STAKE) return; busy = true;
-    try { await write(coins() - STAKE, G.coins[me()]?.w || 0, -STAKE); st = { mode: 'ask', i: 0, pot: STAKE, hidAt: 2 }; st.scene = pick(0) }
+    stake = stakeFix(stake, coins()); if (busy || coins() < stake) return; busy = true;
+    try { await write(coins() - stake, G.coins[me()]?.w || 0, -stake); st = { mode: 'ask', i: 0, pot: stake, stake, hidAt: 2 }; st.scene = pick(0) }
     catch (e) { toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
     busy = false; view();
   }
@@ -2857,8 +2899,8 @@ const ROMANCE = (() => {
     const c = st.scene.a[k][1];
     setTimeout(() => {
       if (Math.random() < c.p) {
-        st.pot = Math.min(5000, Math.round(st.pot * c.m));
-        if (st.i >= STAGES.length - 1) { st.pot = Math.min(5000, Math.round(st.pot * 1.5)); cash(true) } else { st.mode = 'win'; view() }
+        st.pot = Math.min(500 * (st.stake || 10), Math.round(st.pot * c.m));
+        if (st.i >= STAGES.length - 1) { st.pot = Math.min(500 * (st.stake || 10), Math.round(st.pot * 1.5)); cash(true) } else { st.mode = 'win'; view() }
       } else { st.failT = ['차였어요 💔', '밤티가 도망갔어요 🏃', '흑역사 생성 완료 📸', '이불킥 예약 🛏️', '인연이 아니었나 봐요', '밤티 차단 엔딩 🚫', '눈물 젖은 군밤 🌰💧'][Math.random() * 7 | 0]; st.mode = 'lose'; view() }
     }, 1100);
   }
@@ -2877,10 +2919,57 @@ const ROMANCE = (() => {
     v.insertAdjacentHTML('beforeend', `<div id="rm"></div><div class="sect">위연시 RANKING · 위연시로 번 코인</div><div class="rank" id="rm-rank"><div class="empty">불러오는 중…</div></div>`);
     view(); ensure();
   }
-  return { mount, stop: () => { }, refresh: () => { if ($q('#rm') && st.mode !== 'wait') view(); ensure() } };
+  return { mount, stop: () => { }, refresh: () => { if ($q('#rm') && st.mode !== 'wait' && !typing()) view(); ensure() } };
 })();
 
+/* ===== 관리자: 코인 보내기 ===== */
+async function loadAdminCoins() {
+  S.admC = { loading: 1 }; if (S.screen === 'admin') render();
+  try { const q = await getDocs(collection(db, 'coins')), map = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) map[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null, g: Number.isFinite(x.g) ? x.g : null } }); S.admC = { map } }
+  catch (e) { S.admC = { err: '불러오지 못했어요 (' + (e?.code || '') + ')' } }
+  if (S.screen === 'admin') render();
+}
+function bindAdminCoins() {
+  const inp = $('#acn-amt'); if (!inp) return;
+  const btn = () => { const a = S.admCamt ?? 100, n = (S.admCsel || []).length, b = $('#acn-go'); b.disabled = !(n && a); b.textContent = n ? `${n}명에게 ${a > 0 ? a + '코인 보내기' : Math.abs(a) + '코인 빼기'}` : '받을 사람을 골라요' };
+  inp.oninput = () => { S.admCamt = Math.round(+inp.value || 0); btn() };
+  $('#acn-memo').oninput = e => { S.admCmemo = e.target.value };
+  document.querySelectorAll('[data-acq]').forEach(b => b.onclick = () => { const k = +b.dataset.acq, a = S.admCamt ?? 100; S.admCamt = k === 0 ? 0 : k === -1 ? -Math.abs(a) : a + k; inp.value = S.admCamt; btn() });
+  $('#acn-all').onclick = () => { S.admCsel = Object.keys(S.users); render() };
+  $('#acn-none').onclick = () => { S.admCsel = []; render() };
+  document.querySelectorAll('[data-acn]').forEach(b => b.onclick = () => { const u = b.dataset.acn, s = new Set(S.admCsel || []); s.has(u) ? s.delete(u) : s.add(u); S.admCsel = [...s]; render() });
+  $('#acn-go').onclick = async () => {
+    const amt = S.admCamt ?? 100, sel = (S.admCsel || []).filter(u => S.users[u]), map = S.admC?.map || {}; if (!amt || !sel.length || S.busy) return;
+    S.busy = true; const b = $('#acn-go'); b.disabled = true; b.textContent = '보내는 중…';
+    try {
+      for (let i = 0; i < sel.length; i += 400) { // 한 번에 최대 400명씩
+        const bt = writeBatch(db);
+        sel.slice(i, i + 400).forEach(u => { const x = map[u], d = x ? { c: Math.max(0, x.c + amt), w: x.w || 0, k: x.k || 0, rm: Math.round(rmOf(x)), g: gOf(x) } : { c: Math.max(0, 100 + amt), w: 0, k: 0, rm: 0, g: 0 }; bt.set(doc(db, 'coins', u), { ...d, at: serverTimestamp() }); map[u] = d; if (G.coins[u]) G.coins[u] = d });
+        await bt.commit();
+      }
+      toast(`${sel.length}명에게 ${amt > 0 ? amt + '코인을 보냈어요' : Math.abs(amt) + '코인을 뺐어요'}`);
+      try { const nb = writeBatch(db); sel.forEach(u => notify(nb, u, 'coin', '', `${amt > 0 ? '+' : ''}${amt}코인${S.admCmemo?.trim() ? ' · ' + S.admCmemo.trim() : ''}`)); await nb.commit() } catch (e) { console.warn('코인 알림', e) }
+      S.admCsel = [];
+    } catch (e) { toast('보내지 못했어요 (' + (e?.code || '') + ')') }
+    S.busy = false; render();
+  };
+}
+
 /* ===== 게임 코인 공용 ===== */
+// 판돈 입력: 최소 10코인, 가진 코인까지(최대 MAXBET) 원하는 만큼
+const MINBET = 10, MAXBET = 10000;
+const stakeFix = (v, c) => Math.max(MINBET, Math.min(MAXBET, Math.floor(+v || 0), Math.max(MINBET, c ?? MINBET)));
+const stakeHTML = (v, c) => `<div class="stk"><label>판돈 <input id="stk-in" type="number" inputmode="numeric" min="${MINBET}" max="${MAXBET}" step="10" value="${stakeFix(v, c)}" ${c !== null && c >= MINBET ? '' : 'disabled'}> 코인</label>
+  <div>${[['최소', 'r'], ['+10', '10'], ['+100', '100'], ['+1000', '1000'], ['절반', 'h'], ['올인', 'a']].map(([t, k]) => `<button type="button" data-stk="${k}">${t}</button>`).join('')}</div></div>`;
+function stakeBind(root, c, onVal) { // 입력이 바뀔 때마다 onVal(판돈) — 화면을 다시 그리지 않고 버튼 글자만 바꿈
+  const inp = root.querySelector('#stk-in'); if (!inp) return;
+  inp.oninput = () => onVal(stakeFix(inp.value, c));
+  inp.onblur = () => { inp.value = stakeFix(inp.value, c); onVal(+inp.value) };
+  root.querySelectorAll('[data-stk]').forEach(b => b.onclick = () => { const k = b.dataset.stk; inp.value = stakeFix(k === 'a' ? c : k === 'h' ? c / 2 : k === 'r' ? MINBET : (+inp.value || 0) + +k, c); onVal(+inp.value) });
+  onVal(stakeFix(inp.value, c));
+}
+const typing = () => document.activeElement?.id === 'stk-in'; // 판돈 입력 중에는 화면을 다시 그리지 않음
+
 // 예전 기록(순수익 칸이 없던 때)은 '가진 코인 - 처음 100코인'을 위연시 기록으로 봄
 const rmOf = x => x ? (Number.isFinite(x.rm) ? x.rm : (x.c || 0) - 100) : 0;
 // 주먹왕: g = 한 판 수(없던 예전 기록은 승수의 2배로 봄) · 승률과 난이도 레벨
@@ -3060,7 +3149,7 @@ const FIGHT = (() => {
   }
   const TAUNT = ['“그게 다야?”', '“간지럽다~”', '“엄마한테 이를 거야”', '“오늘 컨디션 별로라서 봐준다”', '“아 잠깐 신발 끈 좀…”', '“이거 녹화 안 하지?”'];
   const OUCH = ['“악!! 반칙이야!”', '“그건 좀 아팠다…”', '“어? 어??”', '“잠깐 타임!!”', '“내 앞머리!!”'];
-  let st = { mode: 'idle' }, busy = false;
+  let st = { mode: 'idle' }, busy = false, stake = 10;
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
   const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -3079,10 +3168,11 @@ const FIGHT = (() => {
     if (st.mode === 'idle') {
       box.innerHTML = top + `<div class="rm-card ft-card"><div class="rm-hero">🥊</div><big>주먹왕</big>
         <p>랜덤으로 뽑힌 회원과 한 판 붙어요!<br>턴마다 기술 3개가 나오고, 성공 확률과 데미지는 매번 달라요.<br>상대는 체력이 더 많고, 체력이 줄면 🔥분노해요.<br>승률 순위가 높을수록 더 센 상대가 나와요 (지금 내 상대 Lv.${fightLv(me()) + 1}${winRate(G.coins[me()]) !== null ? ` · 내 승률 ${Math.round(winRate(G.coins[me()]) * 100)}%` : ''})</p>
-        <div class="rm-odds"><span>참가 ${STAKE}코인</span><span>승리 +${WIN}</span><span>체력 50↑ 퍼펙트 +${PERFECT}</span></div>
-        <button class="btn mg-btn" id="ft-go" ${c !== null && c >= STAKE && !busy ? '' : 'disabled'}>${STAKE}코인 내고 상대 뽑기</button>
+        <div class="rm-odds" id="ft-odds"></div>
+        ${stakeHTML(stake, c)}<button class="btn mg-btn" id="ft-go" ${c !== null && c >= STAKE && !busy ? '' : 'disabled'}>${stake}코인 내고 상대 뽑기</button>
         ${c !== null && c < STAKE ? '<small class="rm-note">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
       if ($q('#ft-go')) $q('#ft-go').onclick = start;
+      stakeBind(box, c, v => { stake = v; $q('#ft-odds').innerHTML = `<span>참가 ${v}코인</span><span>승리 +${v * 3}</span><span>체력 50↑ 퍼펙트 +${v * 2} 더</span>`; const b = $q('#ft-go'); b.textContent = `${v}코인 내고 상대 뽑기`; b.disabled = !(c !== null && c >= v && !busy) });
       return;
     }
     const arena = `<div class="ft-arena ${st.fx || ''}">
@@ -3106,12 +3196,12 @@ const FIGHT = (() => {
   }
   const pause = ms => new Promise(r => setTimeout(r, ms));
   async function start() {
-    if (busy || coins() < STAKE) return;
+    stake = stakeFix(stake, coins()); if (busy || coins() < stake) return;
     const others = Object.keys(S.users).filter(u => u !== me()); if (!others.length) { toast('아직 붙을 상대가 없어요'); return }
     busy = true;
     const lv0 = fightLv(me()); // 이번 판 난이도는 시작할 때의 내 승률 순위로 정함
-    try { await coinWrite({ c: coins() - STAKE, g: gOf(G.coins[me()]) + 1 }) } catch (e) { busy = false; toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); return }
-    st = { mode: 'turn', foe: others[Math.random() * others.length | 0], hp: 100, turn: 1, log: [], combo: 0, bMe: rollBody(), bFoe: rollBody(), lv: lv0 };
+    try { await coinWrite({ c: coins() - stake, g: gOf(G.coins[me()]) + 1 }) } catch (e) { busy = false; toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); return }
+    st = { mode: 'turn', foe: others[Math.random() * others.length | 0], hp: 100, turn: 1, log: [], combo: 0, bMe: rollBody(), bFoe: rollBody(), lv: lv0, stake };
     st.fmax = st.fhp = 108 + st.lv * 5; // 상대는 체력이 더 많고, 내 승률 순위가 높을수록 레벨이 올라감
     st.log.push(`${st.bFoe.t.n} ${foeName()}님이 링에 올라왔다! 🔔`); st.hand = deal(); busy = false; view();
   }
@@ -3147,7 +3237,7 @@ const FIGHT = (() => {
   async function finish(win) {
     st.mode = win ? 'win' : 'lose';
     if (win) {
-      st.prize = WIN + (st.hp >= 50 ? PERFECT : 0);
+      st.prize = (st.stake || STAKE) * 3 + (st.hp >= 50 ? (st.stake || STAKE) * 2 : 0);
       try { await coinWrite({ c: coins() + st.prize, k: (G.coins[me()]?.k || 0) + 1 }) } catch (e) { toast('코인을 받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
     }
     busy = false; view();
@@ -3158,7 +3248,7 @@ const FIGHT = (() => {
     v.insertAdjacentHTML('beforeend', `<div id="ft"></div><div class="sect">주먹왕 RANKING · K.O. 승리 수</div><div class="rank" id="ft-rank"><div class="empty">불러오는 중…</div></div>`);
     view(); coinEnsure();
   }
-  return { mount, refresh: () => { if ($q('#ft') && st.mode !== 'anim') view(); coinEnsure() } };
+  return { mount, refresh: () => { if ($q('#ft') && st.mode !== 'anim' && !typing()) view(); coinEnsure() } };
 })();
 
 /* ===== 슈팅 (세로 비행 슈팅 · 라운드마다 회원 보스) ===== */
@@ -3448,7 +3538,7 @@ const SUTDA = (() => {
   const BETS = [10, 30, 50, 100];
   const DEAL = ['“패는 거짓말을 안 하지.”', '“쫄리면 접으시든가.”', '“오늘 운은 누구 편일까.”', '“손이 가벼워 보이는데?”', '“판은 이제 시작이야.”'];
   const WINL = ['“허허, 오늘은 자네 날이구먼.”', '“…다음 판은 다를 거야.”', '“그 패, 어디서 났나.”'], LOSEL = ['“수업료라고 생각해.”', '“도박판에 공짜는 없지.”', '“집에 갈 차비는 남겨 둬.”'];
-  let st = { mode: 'bet' }, busy = false, last = 0;
+  let st = { mode: 'bet' }, busy = false, last = 0, bet = 10;
   const FEE = .2, BACK = .4, CHEAT = .6, gain = b => Math.round(b * (1 - FEE));
   const gap = async () => { const w = 1150 - (Date.now() - last); if (w > 0) await new Promise(r => setTimeout(r, w)) }; // 코인 기록은 1초에 한 번
   const $q = s => document.querySelector(s);
@@ -3470,9 +3560,10 @@ const SUTDA = (() => {
     const dealer = st.dealer ? `<div class="sd-dealer"><span class="mini">${avatar(st.dealer)}</span><p>${st.line || ''}</p></div>` : '';
     if (st.mode === 'bet') {
       box.innerHTML = top + `<div class="sd-table"><div class="sd-title">섯다 한 판</div><p class="sd-rule">화투 두 장으로 승부!<br><b>땡</b>(같은 숫자) &gt; <b>끗</b>(두 장 합의 끝자리)<br>내 패 2장과 딜러 패 1장을 보고 결정해요<br><small>이기면 하우스가 고리 20%를 떼 가요 · <b>따블</b>을 외치면 딜러가 밑장을 뺄 수도…</small></p>
-        <div class="sd-bets">${BETS.map(b => `<button data-b="${b}" ${c !== null && c >= b && !busy ? '' : 'disabled'}>${b}<small>코인</small></button>`).join('')}</div>
+        ${stakeHTML(bet, c)}<button class="btn mg-btn" id="sd-deal" ${c !== null && c >= MINBET && !busy ? '' : 'disabled'}>패 받기</button>
         ${c !== null && c < 10 ? '<small class="rm-note" style="color:#ffd9a0">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note" style="color:#bfe3c8">게임 코인은 진짜 돈이 아니에요</small></div>`;
-      box.querySelectorAll('[data-b]').forEach(b => b.onclick = () => deal(+b.dataset.b));
+      $q('#sd-deal').onclick = () => deal(stakeFix(bet, coins()));
+      stakeBind(box, c, v => { bet = v; const b = $q('#sd-deal'); b.textContent = `${v}코인 걸고 패 받기`; b.disabled = !(c !== null && c >= v && !busy) });
       return;
     }
     const o = st.mode === 'pick' ? odds() : null, done = st.mode === 'end';
@@ -3526,7 +3617,7 @@ const SUTDA = (() => {
     v.insertAdjacentHTML('beforeend', `<div id="sd"></div><div class="sect">섯다 승률 RANKING · 3판 이상</div><div class="rank" id="sd-rank"><div class="empty">불러오는 중…</div></div>`);
     view(); coinEnsure();
   }
-  return { mount, refresh: () => { if ($q('#sd') && !busy) view(); coinEnsure() } };
+  return { mount, refresh: () => { if ($q('#sd') && !busy && !typing()) view(); coinEnsure() } };
 })();
 
 /* ===== 간식 냥이 (터치 점프 달리기) ===== */
@@ -3649,11 +3740,11 @@ const RACE = (() => {
       const can = c !== null && sel !== null && c >= bet && !busy;
       box.innerHTML = top + `<div class="rc-list">${T.map(t => `<button class="rc-team${sel === t.i ? ' on' : ''}" data-t="${t.i}" style="--tc:${t.c};--tl:${t.l}"><span class="rc-th"><b>${t.n}</b><span class="rc-od">×${t.odds.toFixed(1)}</span></span>
           ${t.m.map((r, j) => `<span class="rc-mem"><i>${j + 1}</i><span class="mini">${avatar(r.u)}</span><span class="rc-nm"><b>${esc(S.users[r.u])}${r.u === me() ? ' (나)' : ''}</b><small>${r.cond}</small></span></span>`).join('')}</button>`).join('')}</div>
-        <div class="rc-foot"><div class="rc-bets">${BETS.map(b => `<button data-b="${b}" class="${bet === b ? 'on' : ''}" ${c !== null && c >= b ? '' : 'disabled'}>${b}</button>`).join('')}</div>
-        <button class="btn mg-btn" id="rc-go" ${can ? '' : 'disabled'}>${sel !== null ? `${T[sel].n}에 ${bet}코인 걸기 · 맞히면 +${Math.floor(bet * T[sel].odds) - bet}` : '1등 할 것 같은 팀을 골라요'}</button>
+        <div class="rc-foot">${stakeHTML(bet, c)}
+        <button class="btn mg-btn" id="rc-go" ${can ? '' : 'disabled'}>1등 할 것 같은 팀을 골라요</button>
         ${c !== null && c < 10 ? '<small class="rm-note">코인이 부족해요. 위연시에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note">이어달리기 · 1번 → 2번 → 3번 순서로 달려요 · 게임 코인은 진짜 돈이 아니에요</small></div>`;
       box.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { sel = +b.dataset.t; view() });
-      box.querySelectorAll('[data-b]').forEach(b => b.onclick = () => { bet = +b.dataset.b; view() });
+      stakeBind(box, c, v => { bet = v; const b = $q('#rc-go'); b.disabled = !(c !== null && sel !== null && c >= v && !busy); if (sel !== null) b.textContent = `${T[sel].n}에 ${v}코인 걸기 · 맞히면 +${Math.floor(v * T[sel].odds) - v}` });
       $q('#rc-go').onclick = start;
       return;
     }
@@ -3678,7 +3769,7 @@ const RACE = (() => {
         const ev = j === p.j && p.ev ? p.ev : null, key = ev ? ev.c : ''; if ((el.dataset.ev || '') !== key) { el.dataset.ev = key; el.className = 'rc-r' + (el.classList.contains('wait') ? ' wait' : '') + (el.classList.contains('doneR') ? ' doneR' : '') + (ev ? ' ev ev-' + ev.c : ''); el.querySelector('.rc-bub').textContent = ev ? ev.b : '' } }) });
   }
   async function start() {
-    const c = coins(); if (busy || sel === null || c === null || c < bet) return; busy = true; view();
+    const c = coins(); bet = stakeFix(bet, c); if (busy || sel === null || c === null || c < bet) return; busy = true; view();
     await gap();
     try { await coinWrite({ c: coins() - bet }); last = Date.now() } catch (e) { busy = false; toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); view(); return }
     // 순위는 확률대로 뽑고, 달리는 모습(구간별 빠르기)은 그 결과에 맞춰 보여 줌
@@ -3716,7 +3807,7 @@ const RACE = (() => {
     if (st && st.mode === 'run') { view(); loop() } else view();
     coinEnsure();
   }
-  return { mount, stop: () => { if (st && st.mode === 'run') settle(); cancelAnimationFrame(raf) }, refresh: () => { if ($q('#rc') && st && st.mode !== 'run' && !busy) view(); coinEnsure() } };
+  return { mount, stop: () => { if (st && st.mode === 'run') settle(); cancelAnimationFrame(raf) }, refresh: () => { if ($q('#rc') && st && st.mode !== 'run' && !busy && !typing()) view(); coinEnsure() } };
 })();
 
 /* ===== 게임 폴더 (아이콘 모음) ===== */
@@ -3741,11 +3832,45 @@ const GAMES = [
     px: ['............', '.oo.....oo..', '.ooo...ooo..', '.ooooooooo..', '.ooooooooo..', '.oeoooooeo..', '.ooooppooo..', '.ooooooooo..', '..ooooooo...', '.........bb.', '.......bbbkb', '.........bb.'] }
 ];
 const gameIcon = g => `<span class="gf-ic" style="background:linear-gradient(165deg,${g.bg[0]},${g.bg[1]} 75%)"><svg viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">${g.px.map((r, y) => [...r].map((c, x) => c !== '.' ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${g.pal[c]}"/>` : '').join('')).join('')}</svg></span>`;
+// 코인 충전: 가진 코인이 100 이하일 때만, 하루(한국 시간) 3번까지 1000코인
+// charges/{uid} = { d: 'YYYY-MM-DD', n: 오늘 충전한 횟수, at }
+const CHARGE = { amt: 1000, max: 3, under: 100 };
+const kstDay = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+const chargeLeft = () => { const x = G.charge; return CHARGE.max - (x && x.d === kstDay() ? x.n : 0) };
+async function loadCharge() {
+  if (G.chargeLoaded || !S.me) return; G.chargeLoaded = 1;
+  try { const d = await getDoc(doc(db, 'charges', S.me.uid)); G.charge = d.exists() ? d.data() : null } catch { G.charge = null }
+  gfCoin();
+}
+function gfCoin() { // 폴더 오른쪽 위 코인 · 충전 버튼
+  const el = $('#gf-coin'); if (!el) return;
+  const c = G.coins[S.me.uid]?.c, left = chargeLeft(), ok = c !== undefined && c <= CHARGE.under && left > 0;
+  el.className = 'gf-coin' + (ok ? ' ok' : '');
+  el.innerHTML = `<span class="gf-cn">🪙 <b>${c ?? '…'}</b></span><span class="gf-cb">${G.chargeBusy ? '충전 중…' : `+${CHARGE.amt} 충전`}<small>오늘 ${left}/${CHARGE.max}</small></span>`;
+}
+async function doCharge() {
+  if (G.chargeBusy) return;
+  const u = S.me.uid, c = G.coins[u]?.c;
+  if (c === undefined) { toast('코인을 불러오는 중이에요'); coinEnsure(); return }
+  if (!G.chargeLoaded) { toast('잠시 뒤 다시 눌러 주세요'); loadCharge(); return }
+  if (chargeLeft() <= 0) { toast('오늘 충전 3번을 다 썼어요. 내일 또 와요!'); return }
+  if (c > CHARGE.under) { toast(`코인이 ${CHARGE.under}개 이하일 때만 충전할 수 있어요`); return }
+  G.chargeBusy = 1; gfCoin();
+  const was = G.charge, day = kstDay(), n = (was && was.d === day ? was.n : 0) + 1;
+  try {
+    await setDoc(doc(db, 'charges', u), { d: day, n, at: serverTimestamp() }); G.charge = { d: day, n };
+    try { await coinWrite({ c: c + CHARGE.amt }); toast(`${CHARGE.amt}코인 충전 완료! (오늘 ${CHARGE.max - n}번 남음)`) }
+    catch (e) { G.charge = was; try { await setDoc(doc(db, 'charges', u), { d: day, n: n - 1 || 1, at: serverTimestamp() }) } catch { } toast('충전하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '') + ' 잠시 뒤 다시 눌러 주세요') }
+  } catch (e) { toast('충전하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+  G.chargeBusy = 0; gfCoin();
+}
 function gameFolder(v) {
-  v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><h2>게임</h2>
+  v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><div class="gf-hd"><h2>게임</h2><button id="gf-coin" class="gf-coin"></button></div>
     <div class="gf-box">${GAMES.map(g => `<button data-gt="${g.id}" aria-label="${g.name}">${gameIcon(g)}<small>${g.name}</small></button>`).join('')}</div>
-    <p>하고 싶은 게임을 골라요</p></div></div>`;
+    <p>하고 싶은 게임을 골라요<br><small>코인이 ${CHARGE.under}개 이하면 하루 ${CHARGE.max}번 ${CHARGE.amt}코인을 충전할 수 있어요</small></p></div></div>`;
   v.querySelectorAll('[data-gt]').forEach(b => b.onclick = () => go('game', { gtab: b.dataset.gt }));
+  $('#gf-coin').onclick = doCharge;
+  gfCoin(); loadCharge(); coinEnsure();
 }
 
 /* ===== 두더지 순위 ===== */
@@ -3768,7 +3893,7 @@ function watchScores() {
   }, () => { G.tloaded = true; unsub('tscores') });
   if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
     G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null, g: Number.isFinite(x.g) ? x.g : null } }); G.cloaded = true;
-    if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh(); SUTDA.refresh(); RACE.refresh() }
+    if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh(); SUTDA.refresh(); RACE.refresh(); gfCoin() }
   }, () => { G.cloaded = true; unsub('coins') });
   if (on && !subs.sscores) subs.sscores = onSnapshot(collection(db, 'sscores'), q => {
     G.sscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.sscores[d.id] = b }); G.sloaded = true;
