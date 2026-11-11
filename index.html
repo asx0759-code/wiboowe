@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1355">
+<meta name="build" content="20261111-1400">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -319,6 +319,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .rk .mini{width:26px;height:26px;flex:none}
 .rk-nick{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rk b{font-variant-numeric:tabular-nums}
+.cfix{margin:10px 0 0;font-size:12px}
+.cfix summary{cursor:pointer;color:var(--muted)}
+.cfix-b{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:8px 0}
+.cfix-b label{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--muted)}
+.cfix-b input,.cfix-b select{width:76px;font:inherit;font-size:16px;padding:4px 6px;border:1px solid var(--line);background:none;color:var(--ink)}
+.cfix-b select{width:auto}
+.cfix-b .btn{padding:6px 14px}
 .rk-del{border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:10px;padding:2px 6px;cursor:pointer}
 .rk-gap{text-align:center;color:var(--muted);padding:2px 0}
 .lg{display:inline-block;width:14px;height:14px}
@@ -2680,7 +2687,7 @@ const ROMANCE = (() => {
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
   const fill = t => t.replaceAll('{n}', NAME);
-  const write = (c, w, dr = 0) => coinWrite({ c, w, rm: (G.coins[me()]?.rm || 0) + dr }); // rm = 위연시로 번 순수익 (순위용)
+  const write = (c, w, dr = 0) => coinWrite({ c, w, rm: rmOf(G.coins[me()]) + dr }); // rm = 위연시로 번 순수익 (순위용)
   // 사이트 회원 중 닉네임이 '밤티'인 사람의 프로필 사진을 씀 (없으면 군밤 그림)
   const bamUid = () => Object.keys(S.users).find(u => S.users[u] === NAME);
   const bamFace = () => { const u = bamUid(); return u ? avatar(u) : '<span class="rm-bam">🌰</span>' };
@@ -2773,9 +2780,11 @@ const ROMANCE = (() => {
 })();
 
 /* ===== 게임 코인 공용 ===== */
+// 예전 기록(순수익 칸이 없던 때)은 '가진 코인 - 처음 100코인'을 위연시 기록으로 봄
+const rmOf = x => x ? (Number.isFinite(x.rm) ? x.rm : Math.max(0, (x.c || 0) - 100)) : 0;
 async function coinWrite({ c, w, k, rm }) {
   const u = S.me.uid, cur = G.coins[u] || { c: 0, w: 0, k: 0, rm: 0 };
-  const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0, rm: rm ?? cur.rm ?? 0 };
+  const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0, rm: rm ?? rmOf(cur) };
   await setDoc(doc(db, 'coins', u), { ...d, at: serverTimestamp() });
   G.coins[u] = d;
 }
@@ -3338,7 +3347,7 @@ function watchScores() {
     if (S.screen === 'game') { drawRank(); BLOCKS.setBest() }
   }, () => { G.tloaded = true; unsub('tscores') });
   if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
-    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: x.rm || 0 } }); G.cloaded = true;
+    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null } }); G.cloaded = true;
     if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh() }
   }, () => { G.cloaded = true; unsub('coins') });
   if (on && !subs.sscores) subs.sscores = onSnapshot(collection(db, 'sscores'), q => {
@@ -3350,7 +3359,7 @@ function watchScores() {
 function drawRank() {
   const kind = $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : $('#rm-rank') ? 'r' : $('#ft-rank') ? 'f' : $('#sh-rank') ? 's' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank') || $('#rm-rank') || $('#ft-rank') || $('#sh-rank'); if (!el) return;
   const isB = kind === 'b', unit = kind === 'r' ? '코인 벌었음' : kind === 'f' ? '승' : '점';
-  const map = kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.rm || 0])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
+  const map = kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, rmOf(x)])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
   if (!(kind === 's' ? G.sloaded : kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : (kind === 'r' || kind === 'f') ? G.cloaded : G.loaded)) return;
   const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
   if (!arr.length) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
@@ -3359,6 +3368,19 @@ function drawRank() {
   const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${S.isAdmin && kind !== 'r' && kind !== 'f' ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
   const top = rows.slice(0, 10), mine = rows.find(r => r.u === me);
   el.innerHTML = top.map(line).join('') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
+  if (S.isAdmin && (kind === 'r' || kind === 'f')) { // 관리자: 회원 코인·기록 직접 고치기
+    const opts = Object.entries(S.users).sort((a, b) => a[1].localeCompare(b[1])).map(([u, n]) => `<option value="${u}">${esc(n)}</option>`).join('');
+    el.insertAdjacentHTML('beforeend', `<details class="cfix"><summary>관리자 · 기록 고치기</summary><div class="cfix-b"><select id="cf-u">${opts}</select>
+      <label>코인<input id="cf-c" type="number" min="0"></label><label>위연시 기록<input id="cf-rm" type="number"></label><label>커플<input id="cf-w" type="number" min="0"></label><label>KO 승<input id="cf-k" type="number" min="0"></label>
+      <button class="btn" id="cf-save">저장</button></div></details>`);
+    const fill = () => { const x = G.coins[$('#cf-u').value] || { c: 100, w: 0, k: 0, rm: 0 }; $('#cf-c').value = x.c; $('#cf-rm').value = rmOf(x); $('#cf-w').value = x.w || 0; $('#cf-k').value = x.k || 0 };
+    $('#cf-u').onchange = fill; fill();
+    $('#cf-save').onclick = async () => {
+      const u = $('#cf-u').value, n = id => Math.round(+$(id).value || 0);
+      try { await setDoc(doc(db, 'coins', u), { c: Math.max(0, n('#cf-c')), rm: n('#cf-rm'), w: Math.max(0, n('#cf-w')), k: Math.max(0, n('#cf-k')), at: serverTimestamp() }); toast(`${S.users[u]}님 기록을 저장했어요`) }
+      catch (e) { toast('저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+    };
+  }
   el.querySelectorAll('[data-rkdel]').forEach(b => b.onclick = async () => { // 관리자: 기록 지우기
     const u = b.dataset.rkdel; if (G.delAsk !== u) { G.delAsk = u; drawRank(); return }
     G.delAsk = null;
