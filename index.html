@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0720">
+<meta name="build" content="20261112-0730">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -553,6 +553,14 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .tr-fan button{position:absolute;bottom:0;left:calc(50% - 29px);width:58px;aspect-ratio:300/527;border:0;border-radius:8px;padding:0;background:none;transform-origin:50% 260%;transition:opacity .2s;cursor:pointer}
 .tr-fan button .tr-back{border-width:2px}.tr-fan button .tr-back i{font-size:14px}
 .tr-fan button.pick{opacity:.12;pointer-events:none}
+.tr-strip{width:calc(100% + 24px);margin:0 -12px;overflow-x:auto;overflow-y:visible;padding:18px 12px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tr-strip::-webkit-scrollbar{display:none}
+.tr-row{display:flex;width:max-content;padding:0 40px}
+.tr-row button{flex:none;width:56px;aspect-ratio:300/527;margin-right:-34px;border:0;padding:0;background:none;border-radius:8px;cursor:pointer;transition:transform .15s,opacity .2s;box-shadow:-4px 4px 8px #0006;position:relative}
+.tr-row button:nth-child(odd){transform:translateY(4px)}
+.tr-row button:hover,.tr-row button:focus-visible{transform:translateY(-14px);z-index:2}
+.tr-row button .tr-back{border-width:2px}.tr-row button .tr-back i{font-size:13px}
+.tr-row button.pick{opacity:.1;transform:translateY(-30px);pointer-events:none}
 .tr-spread,.tr-pair{display:flex;gap:8px;justify-content:center;align-items:center}
 .tr-spread figure,.tr-pair figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#a99cc8}
 .tr-sum{border-top:1px dashed #3b2f63;padding-top:8px}.tr-sum b{color:#ff8fb8;font-weight:400}
@@ -3871,37 +3879,65 @@ const TAROT = (() => {
   const BACK = `<span class="tr-back"><i>✦</i></span>`;
   const card = (i, rev, cls = '') => `<button class="tr-card ${cls}" aria-label="카드"><span class="in"><span class="b">${BACK}</span><span class="f${rev ? ' rev' : ''}"><img src="${CARDS[i].img}" alt="${CARDS[i].n}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('em'),{textContent:'🔮'}))"><b>${CARDS[i].no ? CARDS[i].no + '. ' : ''}${CARDS[i].n}${rev ? ' (역)' : ''}</b></span></span></button>`;
   async function loadHist() { if (hist) return hist; try { const d = await getDoc(doc(db, 'tarot', me())); hist = d.exists() ? d.data().h || [] : [] } catch { hist = [] } return hist }
-  async function addHist(k, c) { await loadHist(); hist.unshift({ k, c, at: Date.now() }); hist = hist.slice(0, 60); try { await setDoc(doc(db, 'tarot', me()), { h: hist, at: serverTimestamp() }) } catch { } }
+  async function addHist(k, c, todayPick) { await loadHist(); hist.unshift({ k, c, at: Date.now() }); hist = hist.slice(0, 60); try { await setDoc(doc(db, 'tarot', me()), { h: hist, ...(todayPick ? { today: todayPick } : {}), at: serverTimestamp() }, { merge: true }) } catch { } }
   function mount(v) {
     v.innerHTML = `<div class="tr"><nav class="tr-tabs">${[['today', '오늘의 카드'], ['ask', '질문하기'], ['love', '궁합'], ['hist', '기록']].map(([k, n]) => `<button data-tt="${k}" class="${tab === k ? 'on' : ''}">${n}</button>`).join('')}</nav><div class="tr-stage" id="tr-st"></div><p class="tr-foot">재미로 보는 운세예요 · 카드 그림: 라이더–웨이트 타로 (1909)</p></div>`;
     v.querySelectorAll('[data-tt]').forEach(b => b.onclick = () => { tab = b.dataset.tt; mount(v) });
     ({ today, ask: askView, love: loveView, hist: histView })[tab]();
   }
-  // ---------- 오늘의 카드 ----------
-  function today() {
-    const r = rng(hash(me() + day())), i = Math.floor(r() * 78), rev = r() < .3, key = 'wb_tarot_' + me(); let seen = false; try { seen = localStorage.getItem(key) === day() } catch { }
-    const c = CARDS[i];
-    $q('#tr-st').innerHTML = `<p class="tr-hint">${seen ? '오늘의 카드는 자정까지 그대로예요' : '카드를 눌러서 뒤집어 봐요'}</p>${card(i, rev, seen ? 'open' : 'glow')}
-      <div class="tr-read" id="tr-rd"${seen ? '' : ' hidden'}><h3>${c.no ? c.no + '. ' : ''}${c.n}${rev ? ' (역방향)' : ''}</h3><div class="tr-kw">${c.kw.map(k => `<span>#${k}</span>`).join('')}</div><p>${rev ? c.rv : c.up}</p>
+  // ---------- 78장 펼쳐 놓고 고르기 (옆으로 밀어서 구경) ----------
+  const shuffle = () => [...Array(78).keys()].sort(() => Math.random() - .5);
+  function strip(deck, used, label) {
+    return `<p class="tr-hint">${label}</p><div class="tr-strip" id="tr-strip"><div class="tr-row">${deck.map((ci, k) => `<button data-k="${k}" class="${used.includes(k) ? 'pick' : ''}" aria-label="카드 ${k + 1}">${BACK}</button>`).join('')}</div></div><p class="tr-sub" style="text-align:center">← 옆으로 밀면 78장 전부 볼 수 있어요 →</p>`;
+  }
+  function bindStrip(onPick) {
+    const el = $q('#tr-strip'); if (!el) return;
+    el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+    el.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { if (b.classList.contains('pick')) return; b.classList.add('pick'); try { navigator.vibrate?.(10) } catch { } setTimeout(() => onPick(+b.dataset.k), 180) });
+  }
+  // ---------- 오늘의 카드 (하루 한 장 직접 뽑기) ----------
+  let todayDeck = null, todayPick = undefined, justPicked = false;
+  async function loadToday() {
+    if (todayPick !== undefined && todayPick?.d === day()) return todayPick;
+    let x = null; try { const v = localStorage.getItem('wb_tarot_pick_' + me()); x = v ? JSON.parse(v) : null } catch { }
+    if (!x || x.d !== day()) { try { const d = await getDoc(doc(db, 'tarot', me())); const t = d.exists() ? d.data().today : null; if (t && t.d === day()) x = t } catch { } }
+    todayPick = x && x.d === day() ? x : null; return todayPick;
+  }
+  async function today() {
+    $q('#tr-st').innerHTML = '<div class="empty">카드를 섞는 중…</div>';
+    const t = await loadToday(); if (tab !== 'today' || !$q('#tr-st')) return;
+    if (!t) {
+      todayDeck = todayDeck || shuffle();
+      $q('#tr-st').innerHTML = strip(todayDeck, [], '오늘의 카드를 직접 골라요 · 하루에 한 장만 뽑을 수 있어요');
+      bindStrip(async k => {
+        const i = todayDeck[k], rev = Math.random() < .3; todayPick = { d: day(), i, r: rev }; justPicked = true;
+        try { localStorage.setItem('wb_tarot_pick_' + me(), JSON.stringify(todayPick)) } catch { }
+        await addHist('오늘의 카드', [[i, rev]], todayPick); today();
+      });
+      return;
+    }
+    const { i, r: rev } = t, c = CARDS[i], fresh = justPicked; justPicked = false;
+    $q('#tr-st').innerHTML = `<p class="tr-hint">${fresh ? '카드를 눌러서 뒤집어 봐요' : '오늘 뽑은 카드예요 · 자정이 지나면 새로 뽑을 수 있어요'}</p>${card(i, rev, fresh ? 'glow' : 'open')}
+      <div class="tr-read" id="tr-rd"${fresh ? ' hidden' : ''}><h3>${c.no ? c.no + '. ' : ''}${c.n}${rev ? ' (역방향)' : ''}</h3><div class="tr-kw">${c.kw.map(k => `<span>#${k}</span>`).join('')}</div><p>${rev ? c.rv : c.up}</p>
         <dl><dt>💗 연애</dt><dd>${c.love}</dd><dt>💰 금전</dt><dd>${c.money}</dd><dt>🍀 행운의 색</dt><dd>${COLORS[i % 7]}</dd></dl>
         <div class="tr-btns"><button class="tr-btn g" id="tr-share">친구들 피드에 공유</button></div></div>`;
     const el = $q('#tr-st .tr-card');
-    el.onclick = () => { if (el.classList.contains('open')) return; el.classList.remove('glow'); el.classList.add('open'); setTimeout(() => { const rd = $q('#tr-rd'); if (rd) rd.hidden = false }, 500);
-      if (!seen) { try { localStorage.setItem(key, day()) } catch { } addHist('오늘의 카드', [[i, rev]]) } };
-    $q('#tr-share').onclick = () => { S.draftTw = { text: `🔮 오늘의 타로: ${c.n}${rev ? ' (역방향)' : ''}\n${rev ? c.rv : c.up}`, imgs: [] }; go('compose', { quote: null }) };
+    el.onclick = () => { if (el.classList.contains('open')) return; el.classList.remove('glow'); el.classList.add('open'); setTimeout(() => { const rd = $q('#tr-rd'); if (rd) rd.hidden = false }, 500) };
+    $q('#tr-share').onclick = () => fortShare(`🔮 오늘의 타로: ${c.n}${rev ? ' (역방향)' : ''}\n${rev ? c.rv : c.up}`);
   }
   // ---------- 질문하고 세 장 ----------
   function askView() {
     if (ask.picks.length === 3) return askResult();
-    if (!ask.deck.length) ask.deck = [...Array(78).keys()].sort(() => Math.random() - .5).slice(0, 21);
+    if (!ask.deck.length) ask.deck = shuffle();
     $q('#tr-st').innerHTML = `<form class="tr-q" id="tr-qf"><input id="tr-qi" maxlength="40" placeholder="고민을 적어 봐요 (예: 이번 주 연애운은?)" value="${esc(ask.q)}" autocomplete="off"></form>
       <div class="tr-chips">${['이번 주 연애운은?', '시험 잘 볼까?', '이직해도 될까?', '오늘 연락 올까?'].map(t => `<button data-q="${t}">${t}</button>`).join('')}</div>
-      <p class="tr-hint">마음속으로 질문을 떠올리고 카드 3장을 골라요 · <b>${ask.picks.length}/3</b></p>
-      <div class="tr-fan" id="tr-fan">${ask.deck.map((_, k) => `<button data-k="${k}" class="${ask.picks.some(p => p[2] === k) ? 'pick' : ''}" style="transform:rotate(${(k - 10) * 5.4}deg);z-index:${k}" aria-label="카드 ${k + 1}">${BACK}</button>`).join('')}</div>`;
+      ${strip(ask.deck, ask.picks.map(p => p[2]), `마음속으로 질문을 떠올리고 카드 3장을 골라요 · <b>${ask.picks.length}/3</b>`)}`;
     $q('#tr-qi').oninput = e => ask.q = e.target.value;
     $q('#tr-qf').onsubmit = e => e.preventDefault();
     document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { ask.q = b.dataset.q; $q('#tr-qi').value = ask.q });
-    document.querySelectorAll('#tr-fan [data-k]').forEach(b => b.onclick = () => { const k = +b.dataset.k; if (!ask.q.trim()) { toast('질문을 먼저 적어 줘요'); $q('#tr-qi').focus(); return } ask.picks.push([ask.deck[k], Math.random() < .3, k]); askView() });
+    const keep = $q('#tr-strip').scrollLeft;
+    bindStrip(k => { if (!ask.q.trim()) { toast('질문을 먼저 적어 줘요'); $q('#tr-qi').focus(); askView(); return } ask.picks.push([ask.deck[k], Math.random() < .3, k]); const sl = $q('#tr-strip')?.scrollLeft; askView(); if (ask.picks.length < 3 && $q('#tr-strip')) $q('#tr-strip').scrollLeft = sl });
+    if (ask.picks.length) $q('#tr-strip').scrollLeft = keep;
   }
   function askResult() {
     const pos = ['과거', '현재', '미래'], P = ask.picks;
@@ -3912,26 +3948,36 @@ const TAROT = (() => {
     let opened = 0;
     document.querySelectorAll('.tr-spread .tr-card').forEach(c => c.onclick = () => { if (c.classList.contains('open')) return; c.classList.add('open'); if (++opened === 3) { setTimeout(() => { $q('#tr-rd').hidden = false; $q('#tr-h2').hidden = true }, 500); addHist('질문: ' + ask.q, P.map(p => [p[0], p[1]])) } });
     $q('#tr-again').onclick = () => { ask = { q: '', picks: [], deck: [] }; askView() };
-    $q('#tr-share').onclick = () => { S.draftTw = { text: `🔮 "${ask.q}"\n과거 ${CARDS[P[0][0]].n} · 현재 ${CARDS[P[1][0]].n} · 미래 ${CARDS[P[2][0]].n}\n${summary(P)}`, imgs: [] }; go('compose', { quote: null }) };
+    $q('#tr-share').onclick = () => fortShare(`🔮 "${ask.q}"\n과거 ${CARDS[P[0][0]].n} · 현재 ${CARDS[P[1][0]].n} · 미래 ${CARDS[P[2][0]].n}\n${summary(P)}`);
   }
   function summary(P) {
     const good = P.filter(p => !p[1]).length, last = CARDS[P[2][0]].n;
     return good === 3 ? `흐름이 아주 좋아요! 결국 '${last}'처럼 풀릴 거예요 ✨` : good === 2 ? `대체로 순항 중. 마지막 '${last}' 카드를 믿어 봐요` : good === 1 ? `조금 꼬여 있지만 '${last}'에 힌트가 있어요` : `오늘은 질문을 잠깐 내려놓고 쉬어도 돼요 🍵`;
   }
-  // ---------- 궁합 ----------
+  // ---------- 궁합 (내 카드 · 친구 카드를 직접 한 장씩) ----------
+  let lv = { deck: [], picks: [] };
   function loveView() {
     const others = Object.entries(S.users).filter(([u]) => u !== me()).sort((a, b) => a[1].localeCompare(b[1]));
     $q('#tr-st').innerHTML = `<p class="tr-hint">궁합 볼 친구를 골라요</p><div class="tr-mem">${others.map(([u, n]) => `<button data-m="${u}" class="${who === u ? 'on' : ''}">${esc(n)}</button>`).join('')}</div><div id="tr-lv" class="tr-lv"></div>`;
-    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { who = b.dataset.m; loveView() });
+    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { if (who !== b.dataset.m) lv = { deck: [], picks: [] }; who = b.dataset.m; loveView() });
     if (!who || !S.users[who]) return;
-    const r = rng(hash([me(), who].sort().join('+') + day())), a = Math.floor(r() * 78), b = Math.floor(r() * 78), score = 30 + Math.floor(r() * 70), line = LOVE.find(x => score >= x[0])[1];
+    if (lv.picks.length < 2) {
+      if (!lv.deck.length) lv.deck = shuffle();
+      $q('#tr-lv').innerHTML = strip(lv.deck, lv.picks.map(p => p[1]), lv.picks.length ? `이번엔 <b>${esc(S.users[who])}</b>의 카드를 골라요 · 1/2` : `먼저 <b>내</b> 카드를 골라요 · 0/2`);
+      const keep = G.trLvScroll;
+      bindStrip(k => { lv.picks.push([lv.deck[k], k]); G.trLvScroll = $q('#tr-strip')?.scrollLeft; loveView() });
+      if (lv.picks.length && keep != null) $q('#tr-strip').scrollLeft = keep;
+      return;
+    }
+    const a = lv.picks[0][0], b = lv.picks[1][0], r = rng(hash([a, b].sort().join('+') + [me(), who].sort().join('+'))), score = 30 + Math.floor(r() * 70), line = LOVE.find(x => score >= x[0])[1];
     $q('#tr-lv').innerHTML = `<div class="tr-pair"><figure>${card(a, false, 'sm open')}<figcaption>${esc(S.me.nick)}</figcaption></figure><span class="tr-heart">♥</span><figure>${card(b, false, 'sm open')}<figcaption>${esc(S.users[who])}</figcaption></figure></div>
       <div class="tr-read"><div class="tr-score">${score}%</div><div class="tr-bar"><i style="width:0"></i></div><p style="text-align:center">${line}</p>
         <p class="tr-sub">${esc(S.me.nick)}는 '${CARDS[a].n}', ${esc(S.users[who])}는 '${CARDS[b].n}' · ${CARDS[a].kw[0]}과 ${CARDS[b].kw[0]}이 만나는 날</p>
-        <div class="tr-btns"><button class="tr-btn g" id="tr-send">${esc(S.users[who])}에게 결과 보내기</button></div></div>`;
+        <div class="tr-btns"><button class="tr-btn" id="tr-re">다시 뽑기</button><button class="tr-btn g" id="tr-send">${esc(S.users[who])}에게 결과 보내기</button></div></div>`;
     setTimeout(() => { const i = $q('.tr-bar i'); if (i) i.style.width = score + '%' }, 80);
+    $q('#tr-re').onclick = () => { lv = { deck: [], picks: [] }; loveView() };
     $q('#tr-send').onclick = () => go('send', { to: who, kind: 'msg', attach: null, draft: { title: '🔮 타로 궁합', body: `오늘 우리 궁합 ${score}%!\n${line}\n나: ${CARDS[a].n} · 너: ${CARDS[b].n}` } });
-    if (G.trLoveSaved !== who + day()) { G.trLoveSaved = who + day(); addHist(`궁합 · ${S.users[who]} ${score}%`, [[a, false], [b, false]]) }
+    const key = who + a + '_' + b; if (G.trLoveSaved !== key) { G.trLoveSaved = key; addHist(`궁합 · ${S.users[who]} ${score}%`, [[a, false], [b, false]]) }
   }
   // ---------- 기록 ----------
   async function histView() {
