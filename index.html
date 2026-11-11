@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0050">
+<meta name="build" content="20261112-0110">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1237,6 +1237,13 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .gc .tr-btn.g{background:linear-gradient(180deg,#9fd8ff,#4aa3ff);color:#fff;box-shadow:0 4px 0 #2a6fc0}
 .gc .tr-btn:disabled{opacity:.45;pointer-events:none}
 .gc-odds{text-align:center;font-size:11px;line-height:1.7;opacity:.85;margin:4px 12px 0}
+.gc-show{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 12px}
+.gc-show small{font-size:11px;opacity:.75}
+.gc-show>div{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.gc-show span,.gc-show button{border:0;border-radius:999px;padding:6px 11px;font:inherit;font-size:11.5px;background:#ffffffb0;color:#9a4a78;box-shadow:0 0 0 1px #ffb3d1}
+.gc-show button{cursor:pointer}
+.gc-show .on{background:#ff5f9e;color:#fff;box-shadow:none}
+.gc-show span.on{opacity:.75}
 .gc-me{text-align:center;font-size:12px}.gc-me b{font-weight:400;color:#e2307a}
 .gc-book{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:0 12px}
 .gc-cell{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:var(--rb,#fff);box-shadow:0 0 0 2px var(--rc,#ddd);display:flex;align-items:center;justify-content:center;padding:3px;font:inherit;cursor:pointer;overflow:hidden}
@@ -1354,7 +1361,7 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .ak-real{color:#c2461f !important;font-size:10.5px}
 .ak-x,.ak-ad{position:absolute;right:10px;bottom:8px;padding:2px 6px !important;font-size:11px}
 .ak-ad{position:static;margin:-2px 12px 6px auto;display:block}
-.gc-tl{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;color:var(--rc,#e2307a);box-shadow:inset 0 0 0 1px var(--rc,#e2307a);vertical-align:2px}
+.gc-tl{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:400;white-space:nowrap;line-height:1.5;color:var(--rc,#e2307a);box-shadow:inset 0 0 0 1px var(--rc,#e2307a);vertical-align:2px}
 
 </style>
 </head>
@@ -1449,7 +1456,7 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'fortune' && !(S.screen === 'asks' && document.activeElement?.closest?.('.ak')) && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop() } if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function go(screen, extra = {}) { if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop() } if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -1688,7 +1695,7 @@ function render() {
     if (isOwner && !m.read) updateDoc(doc(db, 'messages', m.id), { read: true }).catch(() => { });
     setTimeout(() => { const b = $('#from-av'); if (b) b.onclick = () => go('send', { to: m.from }) });
     v.innerHTML = `<div class="letter">
-      <div class="from"><span class="who">${!m.anon && m.from && m.from !== S.me.uid && S.users[m.from] ? `<button class="mini rep-av" id="from-av" aria-label="${esc(c.fromNick)}님에게 방명록 쓰기"><span class="rep-in">${avatar(m.from, c.fromNick)}</span><i>✉</i></button>` : `<span class="mini">${m.anon ? '?' : avatar(m.from, c.fromNick)}</span>`}<b>From. ${esc(c.fromNick)}${m.anon && anonChk[m.id] === true ? ' (내가 보냄)' : ''}</b></span><span>${fmt(m.createdAt)}</span></div>
+      <div class="from"><span class="who">${!m.anon && m.from && m.from !== S.me.uid && S.users[m.from] ? `<button class="mini rep-av" id="from-av" aria-label="${esc(c.fromNick)}님에게 방명록 쓰기"><span class="rep-in">${avatar(m.from, c.fromNick)}</span><i>✉</i></button>` : `<span class="mini">${m.anon ? '?' : avatar(m.from, c.fromNick)}</span>`}<b>From. ${esc(c.fromNick)}${m.anon ? '' : ttl(m.from, 'gb')}${m.anon && anonChk[m.id] === true ? ' (내가 보냄)' : ''}</b></span><span>${fmt(m.createdAt)}</span></div>
       <span class="chip ${m.secret ? '' : 'pub'}">${m.bc ? '전체 쪽지' : m.secret ? 'SECRET' : 'PUBLIC'}</span>
       ${c.item ? `<div class="itembox">${pix(c.item, 108)}<b>${esc((ITEMS[c.item] || {}).name || c.title)}</b><span>${m.anon ? '누군가가' : esc(c.fromNick) + '님이'} 보낸 선물이에요</span></div>` : ''}
       ${m.hasImage ? `<div class="photo">${S.imgs[m.id] && S.imgs[m.id] !== 'loading' ? `<img src="${S.imgs[m.id]}" alt="첨부 사진">` : '<span>사진 불러오는 중…</span>'}</div>` : ''}
@@ -2027,7 +2034,7 @@ function render() {
   if (S.screen === 'now-dm') { // NOW 쪽지함: 이름 쪽지 + 익명 쪽지(내가 보낸 것 / 받은 것)
     back('쪽지함'); $('#back').onclick = () => go('now'); P.hintEdit = false; P.revConfirm = false;
     const me = S.me.uid, items = [];
-    threads().forEach(x => items.push({ t: ms(x.last.at), html: `<button class="nd-row" data-c="${x.u}"><span class="mini">${S.users[x.u] ? nowPic(x.u) : '?'}</span><span class="nd-t"><b>${esc(S.users[x.u] || '(탈퇴)')}</b><small>${x.last.from === me ? '나: ' : ''}${esc(x.last.text || '📷 사진')}</small></span><span class="nd-m"><small>${fmt(x.last.at)}</small>${x.unread ? `<i>${x.unread}</i>` : ''}</span></button>` }));
+    threads().forEach(x => items.push({ t: ms(x.last.at), html: `<button class="nd-row" data-c="${x.u}"><span class="mini">${S.users[x.u] ? nowPic(x.u) : '?'}</span><span class="nd-t"><b>${esc(S.users[x.u] || '(탈퇴)')}${ttl(x.u, 'nw')}</b><small>${x.last.from === me ? '나: ' : ''}${esc(x.last.text || '📷 사진')}</small></span><span class="nd-m"><small>${fmt(x.last.at)}</small>${x.unread ? `<i>${x.unread}</i>` : ''}</span></button>` }));
     Object.entries(AN.mine).forEach(([id, t]) => items.push({ t: ms(t.at), html: `<button class="nd-row" data-am="${id}"><span class="mini an-av">${S.users[t.to] ? nowPic(t.to) : '?'}</span><span class="nd-t"><b>${esc(S.users[t.to] || '(탈퇴)')} <span class="nd-tag">${t.rev ? '정체 공개함' : '익명으로 보냄'}</span></b><small>${t.ls === 'a' ? '나: ' : ''}${esc(t.last || '')}</small></span><span class="nd-m"><small>${fmt(t.at)}</small>${anUnread(id) ? '<i>N</i>' : ''}</span></button>` }));
     Object.entries(AN.toMe).forEach(([id, t]) => items.push({ t: ms(t.at), html: `<button class="nd-row" data-at="${id}"><span class="mini an-av">${t.rev && S.users[t.rev] ? nowPic(t.rev) : `<span class="an-q" style="--h:${anHue(id)}">?</span>`}</span><span class="nd-t"><b>${t.rev && S.users[t.rev] ? `${esc(S.users[t.rev])} <span class="nd-tag">정체 공개</span>` : '익명의 누군가 <span class="nd-tag">🤫</span>'}</b><small>${t.ls === 'b' ? '나: ' : ''}${esc(t.last || '')}</small></span><span class="nd-m"><small>${fmt(t.at)}</small>${anUnread(id) ? '<i>N</i>' : ''}</span></button>` }));
     items.sort((a, b) => b.t - a.t);
@@ -2041,7 +2048,7 @@ function render() {
 
   if (S.screen === 'now-chat') { // 내가 쓰는 쪽지: 이름으로 / 익명으로 (토글)
     const u = S.chatWith, me = S.me.uid, anon = !!S.chatAnon, tid = anon ? S.athread : null, t = tid ? AN.mine[tid] : null;
-    back(esc(S.users[u] || '(탈퇴)')); $('#back').onclick = () => go('now-dm');
+    back(esc(S.users[u] || '(탈퇴)') + (anon ? '' : ttl(u, 'nw'))); $('#back').onclick = () => go('now-dm');
     const keep = $('#nc-in'), kv = keep?.value || '', kf = document.activeElement === keep;
     let list, banner = '';
     if (anon) {
@@ -2142,11 +2149,11 @@ function render() {
     const tw = F.list.filter(t => t.by === u), st = [];
     v.innerHTML = `<div class="fd"><div class="pf-cover"></div><div class="pf-top"><button class="pf-av ${st.length ? 'ring' : ''}" id="pf-av"><span class="av">${avatar(u)}</span></button>
       <div class="pf-btns">${mine ? `<button id="pf-ak">내 질문함${ASKS.newCount() ? ` <b class="pf-n">${ASKS.newCount()}</b>` : ''}</button><button id="pf-gb" class="hot">내 방명록</button>` : `<button id="pf-ak">❓ 질문함</button><button id="pf-gb">방명록</button><button id="pf-dm" class="hot">✉ 메시지</button>`}</div></div>
-      <div class="pf-name"><b>${esc(S.users[u] || '(탈퇴)')}<span id="pf-tl"></span></b><small>글 ${tw.length}개</small></div>
+      <div class="pf-name"><b>${esc(S.users[u] || '(탈퇴)')}${ttl(u, 'pf')}</b><small>글 ${tw.length}개</small></div>
       <div class="fd-sect">글</div>${tw.length ? tw.map(t => twCard(t)).join('') : `<div class="empty" style="color:#888">${mine ? '아직 올린 글이 없어요' : '아직 글이 없어요'}</div>`}</div>`;
     $('#pf-gb').onclick = () => go('inbox', { owner: u });
     $('#pf-ak').onclick = () => go('asks', { askU: u, askFrom: null });
-    GACHA.titleOf(u).then(t => { const el = $('#pf-tl'); if (el && t && S.prof === u) el.innerHTML = `<span class="gc-tl">${esc(t)}</span>` });
+
     if ($('#pf-dm')) $('#pf-dm').onclick = () => go('send', { to: u });
     if ($('#pf-st')) $('#pf-st').onclick = () => pickStory();
     $('#pf-av').onclick = () => st.length ? openStories(u) : null;
@@ -2194,7 +2201,7 @@ function render() {
     const keep = $('#tw-in'), kv = keep?.value || '', kf = document.activeElement === keep;
     const cs = F.cmtTw === t.id ? F.cmts : null;
     v.innerHTML = `<div class="fd">${twCard(t, true)}<div class="fd-sect">댓글 ${t.cc || 0}</div>
-      ${cs ? (cs.length ? cs.map(c => `<div class="tw-c"><span class="mini" data-pu="${c.by}">${avatar(c.by)}</span><div><b data-pu="${c.by}">${esc(S.users[c.by] || '(탈퇴)')}</b><em>${relT(c.at)}</em>${c.by === me || S.isAdmin ? `<button class="tw-x" data-cdel="${c.id}">삭제</button>` : ''}<p>${richText(c.text)}</p></div></div>`).join('') : '<div class="empty" style="color:#888">첫 댓글을 남겨 보세요</div>') : '<div class="empty" style="color:#888">불러오는 중…</div>'}
+      ${cs ? (cs.length ? cs.map(c => `<div class="tw-c"><span class="mini" data-pu="${c.by}">${avatar(c.by)}</span><div><b data-pu="${c.by}">${esc(S.users[c.by] || '(탈퇴)')}</b>${ttl(c.by, 'fd')}<em>${relT(c.at)}</em>${c.by === me || S.isAdmin ? `<button class="tw-x" data-cdel="${c.id}">삭제</button>` : ''}<p>${richText(c.text)}</p></div></div>`).join('') : '<div class="empty" style="color:#888">첫 댓글을 남겨 보세요</div>') : '<div class="empty" style="color:#888">불러오는 중…</div>'}
       <form class="nc-bar" id="tw-f"><input id="tw-in" maxlength="300" autocomplete="off" placeholder="댓글 남기기 (@닉네임으로 언급)"><button>등록</button></form></div>`;
     const inp = $('#tw-in'); inp.value = kv; if (kf) inp.focus();
     $('#tw-f').onsubmit = async e => { e.preventDefault(); const text = inp.value.trim(); if (!text) return; inp.value = ''; try { await addTwComment(t, text) } catch (err) { inp.value = text; toast('등록하지 못했어요' + (err?.code ? ' (' + err.code + ')' : '')) } };
@@ -2691,7 +2698,7 @@ async function loadTweet(id) {
 }
 function quoteCard(q) {
   if (!q) return '<div class="tw-q gone">지워진 글이에요</div>';
-  return `<div class="tw-q" data-open="${q.id}"><div class="tw-h"><span class="mini">${avatar(q.by)}</span><b>${esc(S.users[q.by] || '(탈퇴)')}</b><small>· ${relT(q.at)}</small></div>${q.text ? `<div class="tw-t">${richText(q.text)}</div>` : ''}${q.imgs?.length ? `<div class="tw-qi">🖼 사진 ${q.imgs.length}장</div>` : ''}</div>`;
+  return `<div class="tw-q" data-open="${q.id}"><div class="tw-h"><span class="mini">${avatar(q.by)}</span><b>${esc(S.users[q.by] || '(탈퇴)')}</b>${ttl(q.by, 'fd')}<small>· ${relT(q.at)}</small></div>${q.text ? `<div class="tw-t">${richText(q.text)}</div>` : ''}${q.imgs?.length ? `<div class="tw-qi">🖼 사진 ${q.imgs.length}장</div>` : ''}</div>`;
 }
 function twCard(t, big) {
   const me = S.me.uid, liked = (t.likes || []).includes(me), q = t.q ? twById(t.q) : null;
@@ -2699,7 +2706,7 @@ function twCard(t, big) {
   const imgs = t.imgs || [];
   return `<article class="tw ${big ? 'big' : ''}" ${big ? '' : `data-open="${t.id}"`}>
     <span class="mini tw-av" data-pu="${t.by}">${avatar(t.by)}</span>
-    <div class="tw-b"><div class="tw-h"><b data-pu="${t.by}">${esc(S.users[t.by] || '(탈퇴)')}</b><small>· ${relT(t.at)}</small>${t.by === me || S.isAdmin ? `<button class="tw-x" data-tdel="${t.id}">${F.delAsk === t.id ? '정말 삭제' : '삭제'}</button>` : ''}</div>
+    <div class="tw-b"><div class="tw-h"><b data-pu="${t.by}">${esc(S.users[t.by] || '(탈퇴)')}</b>${ttl(t.by, 'fd')}<small>· ${relT(t.at)}</small>${t.by === me || S.isAdmin ? `<button class="tw-x" data-tdel="${t.id}">${F.delAsk === t.id ? '정말 삭제' : '삭제'}</button>` : ''}</div>
       ${t.text ? `<div class="tw-t">${richText(t.text)}</div>` : ''}
       ${imgs.length ? `<div class="tw-im n${imgs.length}">${imgs.map((s, i) => `<img src="${s}" alt="" data-zoom="${t.id}:${i}">`).join('')}</div>` : ''}
       ${t.text ? ytCards(t.text).split('<div class="ytwrap">').slice(0, 2).join('<div class="ytwrap">') : ''}
@@ -3001,6 +3008,15 @@ async function pickNowPic(file) {
   } catch (e) { toast('사진을 올리지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
 }
 setInterval(() => { if (S.screen === 'now' && !document.querySelector('#nw-sheet')) render() }, 30000); // '3분 전' 같은 시간 갱신
+// 가챠 칭호: 모두의 gacha 문서를 받아서 닉네임 옆에 뱃지 (show = { gb: 방명록, fd: 피드, nw: 잭디 } 본인이 고른 곳만)
+function watchGall() {
+  if (subs.gall || !S.me) return;
+  subs.gall = onSnapshot(collection(db, 'gacha'), q => { const a = {}; q.forEach(d => { const x = d.data(); a[d.id] = { title: x.title || '', show: x.show || {} } }); G.gall = a; refresh() }, retrySub('gall', watchGall));
+}
+function ttl(u, w) {
+  const x = G.gall?.[u]; if (!x?.title || (w !== 'pf' && !x.show?.[w])) return '';
+  const t = GACHA.info(x.title); return t ? `<span class="gc-tl" style="--rc:${t.fg}">${esc(t.n)}</span>` : '';
+}
 // 쪽지 사진: 본문엔 img: true 표시만, 사진은 media/image 에 따로 (목록이 무거워지지 않게)
 const IMGC = {};
 function loadPic(path) {
@@ -3070,7 +3086,7 @@ function openNow(u) {
   const pics = P.pics[u] || [];
   box.innerHTML = `<div class="nw-card">
     <div class="nw-big" id="nw-big"><span class="nw-ph" id="nw-ph">${pics[0] ? `<img src="${pics[0]}" alt="">` : avatar(u)}</span>${pics.length > 1 ? `<div class="nw-bars">${pics.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}<button class="nw-x" id="nw-x" aria-label="닫기">✕</button>
-      <div class="nw-info"><div class="nw-nm"><b>${esc(S.users[u])}${mine ? ' (나)' : ''}</b>${x.song ? `<button class="nw-sp" id="nw-sp" aria-label="프로필 음악 듣기"><i>▶</i><img src="https://i.ytimg.com/vi/${x.song}/default.jpg" alt=""><span class="ytt" data-id="${x.song}">프로필 음악</span></button>` : ''}</div><span><i class="dot ${x.on ? x.act : ''}"></i>${statusText(x)}</span></div></div>
+      <div class="nw-info"><div class="nw-nm"><b>${esc(S.users[u])}${mine ? ' (나)' : ''}${ttl(u, 'nw')}</b>${x.song ? `<button class="nw-sp" id="nw-sp" aria-label="프로필 음악 듣기"><i>▶</i><img src="https://i.ytimg.com/vi/${x.song}/default.jpg" alt=""><span class="ytt" data-id="${x.song}">프로필 음악</span></button>` : ''}</div><span><i class="dot ${x.on ? x.act : ''}"></i>${statusText(x)}</span></div></div>
     ${mine ? `<div class="nw-lab" style="padding:14px 14px 0">NOW 사진 (최대 3장 · 첫 장이 대표 사진)</div>
       <div class="nw-pics">${[0, 1, 2].map(i => pics[i] ? `<div class="nw-slot"><img src="${pics[i]}" alt=""><button data-rm="${i}" aria-label="사진 지우기">✕</button>${i ? `<button class="fst" data-fst="${i}">대표로</button>` : '<span class="fst on">대표</span>'}</div>` : `<button class="nw-slot add" data-add="1" ${i > pics.length ? 'disabled' : ''}>+</button>`).join('')}</div>
       <input type="file" id="nw-file" accept="image/*" hidden>
@@ -5319,7 +5335,7 @@ const GACHA = (() => {
   const cardH = (x, cls = '') => `<div class="gc-card r${x[2]} ${cls}" style="--rb:${RAR[x[2]].bg};--rc:${RAR[x[2]].fg}"><i>${RAR[x[2]].n}</i>${art(x, 46)}${x[3] === 'T' ? '<b>칭호</b>' : `<b>${esc(x[1])}</b>`}</div>`;
   function roll() { let r = 0, v = Math.random() * 100; while (v >= RAR[r].w) { v -= RAR[r].w; r++ } const pool = IT.filter(x => x[2] === r); return pool[Math.random() * pool.length | 0] }
   async function loadMe() { if (me) return; try { const d = await getDoc(doc(db, 'gacha', S.me.uid)); me = d.exists() ? { have: {}, title: '', n: 0, ...d.data() } : { have: {}, title: '', n: 0 } } catch { me = { have: {}, title: '', n: 0 } } }
-  const saveMe = () => setDoc(doc(db, 'gacha', S.me.uid), { have: me.have, title: me.title || '', n: me.n || 0, at: serverTimestamp() });
+  const saveMe = () => setDoc(doc(db, 'gacha', S.me.uid), { have: me.have, title: me.title || '', n: me.n || 0, show: me.show || {}, at: serverTimestamp() });
   function watch() {
     if (sub) return;
     sub = onSnapshot(query(collection(db, 'gachagift'), where('to', '==', S.me.uid)), q => { gifts = []; q.forEach(d => gifts.push({ id: d.id, ...d.data() })); if ($q('#gc')) giftPop() }, () => { sub = null });
@@ -5334,11 +5350,13 @@ const GACHA = (() => {
       <div class="gc-btns">${PRICE.map(([n, p]) => `<button class="tr-btn${n > 1 ? ' g' : ''}" data-pull="${n}" ${busy || c === undefined || c < p ? 'disabled' : ''}>${n}번 뽑기 · ${p}코인</button>`).join('')}</div>
       <p class="gc-odds">${RAR.map(r => `<span style="color:${r.fg}">${r.n} ${r.w}%</span>`).join(' · ')}<br>스티커와 칭호가 나와요 · 도감에서 친구에게 선물할 수 있어요</p>` : `
       <div class="gc-me">달고 있는 칭호 <b>${me.title && BY[me.title] ? esc(BY[me.title][1]) : '없음'}</b></div>
+      <div class="gc-show"><small>칭호를 보여 줄 곳</small><div><span class="on">프로필 (항상)</span>${[['gb', '방명록'], ['fd', '피드 글·댓글'], ['nw', '잭디']].map(([k, l]) => `<button data-sh="${k}" class="${me.show?.[k] ? 'on' : ''}">${me.show?.[k] ? '✓ ' : ''}${l}</button>`).join('')}</div></div>
       <div class="gc-book">${IT.map(x => { const n = me.have[x[0]] || 0; return n ? `<button data-it="${x[0]}" class="gc-cell r${x[2]}" style="--rb:${RAR[x[2]].bg};--rc:${RAR[x[2]].fg}">${art(x, 34)}${n > 1 ? `<em>×${n}</em>` : ''}${me.title === x[0] ? '<em class="on">착용</em>' : ''}</button>` : `<span class="gc-cell no"><b>?</b><small>${RAR[x[2]].n}</small></span>` }).join('')}</div>
       <p class="gc-odds">모은 걸 누르면 칭호를 달거나 친구에게 선물할 수 있어요</p>`);
     v.querySelectorAll('[data-gt2]').forEach(b => b.onclick = () => { tab = b.dataset.gt2; view() });
     v.querySelectorAll('[data-pull]').forEach(b => b.onclick = () => pull(+b.dataset.pull));
     v.querySelectorAll('[data-it]').forEach(b => b.onclick = () => detail(b.dataset.it));
+    v.querySelectorAll('[data-sh]').forEach(b => b.onclick = async () => { if (busy) return; busy = true; const k = b.dataset.sh, was = { ...(me.show || {}) }; me.show = { ...was, [k]: !was[k] }; view(); try { await saveMe(); toast(me.show[k] ? `이제 ${b.textContent.replace('✓ ', '')}에도 칭호가 보여요` : `${b.textContent.replace('✓ ', '')}에서는 칭호를 숨겼어요`) } catch (e) { me.show = was; toast('저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } busy = false; view() });
     if (show) reveal();
     giftPop();
   }
@@ -5374,7 +5392,7 @@ const GACHA = (() => {
       if (busy) return; busy = true;
       const to = b.dataset.to, bt = writeBatch(db), was = { ...me.have }, wasT = me.title;
       me.have[id] = n - 1; if (!me.have[id]) { delete me.have[id]; if (me.title === id) me.title = '' }
-      bt.set(doc(db, 'gacha', S.me.uid), { have: me.have, title: me.title || '', n: me.n || 0, at: serverTimestamp() });
+      bt.set(doc(db, 'gacha', S.me.uid), { have: me.have, title: me.title || '', n: me.n || 0, show: me.show || {}, at: serverTimestamp() });
       bt.set(doc(collection(db, 'gachagift')), { from: S.me.uid, to, it: id, at: serverTimestamp() });
       try { await bt.commit(); toast(`${S.users[to]}님에게 '${x[1]}'을(를) 보냈어요 🎁`) } catch (e) { me.have = was; me.title = wasT; toast('보내지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
       busy = false; view();
@@ -5387,7 +5405,7 @@ const GACHA = (() => {
     $q('#gc-take').onclick = async () => {
       if (gfOpen) return; gfOpen = 1;
       const was = { ...me.have }; me.have[g.it] = (me.have[g.it] || 0) + 1;
-      const bt = writeBatch(db); bt.set(doc(db, 'gacha', S.me.uid), { have: me.have, title: me.title || '', n: me.n || 0, at: serverTimestamp() }); bt.delete(doc(db, 'gachagift', g.id));
+      const bt = writeBatch(db); bt.set(doc(db, 'gacha', S.me.uid), { have: me.have, title: me.title || '', n: me.n || 0, show: me.show || {}, at: serverTimestamp() }); bt.delete(doc(db, 'gachagift', g.id));
       try { await bt.commit(); gifts = gifts.filter(y => y.id !== g.id) } catch (e) { me.have = was; toast('받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
       gfOpen = null; $q('#gc-gf')?.remove(); view();
     };
@@ -5398,7 +5416,7 @@ const GACHA = (() => {
   }
   // 프로필에 보여 줄 칭호
   async function titleOf(u) { G.gtl = G.gtl || {}; if (!(u in G.gtl)) { G.gtl[u] = ''; try { const d = await getDoc(doc(db, 'gacha', u)); G.gtl[u] = d.exists() && BY[d.data().title] ? BY[d.data().title][1] : '' } catch { } } return G.gtl[u] }
-  return { mount, stop: () => { if (sub) { sub(); sub = null } }, refresh: () => { if ($q('#gc') && !busy && !show && !$q('#gc-dt') && !$q('#gc-gf')) view() }, titleOf, rarOf: id => BY[id] ? RAR[BY[id][2]] : null };
+  return { mount, stop: () => { if (sub) { sub(); sub = null } }, refresh: () => { if ($q('#gc') && !busy && !show && !$q('#gc-dt') && !$q('#gc-gf')) view() }, titleOf, info: id => BY[id] && BY[id][3] === 'T' ? { n: BY[id][1], fg: RAR[BY[id][2]].fg } : null };
 })();
 
 /* ===== 이미지 게임 (이 중에 제일 ○○할 것 같은 사람은?) ===== */
