@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1447">
+<meta name="build" content="20261111-1515">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2801,9 +2801,19 @@ const ROMANCE = (() => {
 /* ===== 게임 코인 공용 ===== */
 // 예전 기록(순수익 칸이 없던 때)은 '가진 코인 - 처음 100코인'을 위연시 기록으로 봄
 const rmOf = x => x ? (Number.isFinite(x.rm) ? x.rm : (x.c || 0) - 100) : 0;
-async function coinWrite({ c, w, k, rm }) {
+// 주먹왕: g = 한 판 수(없던 예전 기록은 승수의 2배로 봄) · 승률과 난이도 레벨
+const gOf = x => x ? (Number.isFinite(x.g) ? x.g : (x.k || 0) * 2) : 0;
+const winRate = x => { const g = gOf(x); return g >= 3 ? (x.k || 0) / g : null }; // 3판 이상 해야 승률 인정
+function fightLv(u) { // 승률 순위가 높을수록 상대가 세짐: 1등 Lv.5 · 상위 25% Lv.4 · 50% Lv.3 · 75% Lv.2 · 나머지 Lv.1
+  const my = winRate(G.coins[u]); if (my === null) return 0;
+  const all = Object.entries(G.coins).filter(([id]) => S.users[id]).map(([, x]) => winRate(x)).filter(v => v !== null).sort((a, b) => b - a);
+  if (all.length < 2) return my >= .5 ? 2 : 0;
+  const pos = all.findIndex(v => v <= my + 1e-9), pct = pos / (all.length - 1);
+  return pos === 0 ? 4 : pct <= .25 ? 3 : pct <= .5 ? 2 : pct <= .75 ? 1 : 0;
+}
+async function coinWrite({ c, w, k, rm, g }) {
   const u = S.me.uid, cur = G.coins[u] || { c: 0, w: 0, k: 0, rm: 0 };
-  const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0, rm: rm ?? rmOf(cur) };
+  const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0, rm: rm ?? rmOf(cur), g: g ?? gOf(cur) };
   await setDoc(doc(db, 'coins', u), { ...d, at: serverTimestamp() });
   G.coins[u] = d;
 }
@@ -2811,7 +2821,7 @@ async function coinEnsure() { if (G.cloaded && !G.coins[S.me.uid] && !G.coinMaki
 
 /* ===== 주먹왕 (확률 대전 격투 · 상대는 랜덤 회원) ===== */
 const FIGHT = (() => {
-  const STAKE = 10, WIN = 25, PERFECT = 15;
+  const STAKE = 10, WIN = 30, PERFECT = 20;
   const MOVES = [
     { n: '잽잽', p: .82, d: [7, 11], e: '👊' }, { n: '로우킥', p: .72, d: [9, 14], e: '🦵' }, { n: '어퍼컷', p: .56, d: [15, 22], e: '💥' },
     { n: '플라잉 니킥', p: .42, d: [22, 30], e: '🦘' }, { n: '박치기', p: .5, d: [17, 25], e: '🐏' }, { n: '필살 회오리 펀치', p: .26, d: [34, 44], e: '🌪️' },
@@ -2980,14 +2990,14 @@ const FIGHT = (() => {
     return pickN(hand, 3);
   }
   const foeName = () => esc(S.users[st.foe] || '???');
-  const bar = (hp, side) => `<div class="ft-hp ${side}"><i style="width:${Math.max(0, hp)}%" class="${hp <= 30 ? 'low' : ''}"></i><span>${Math.max(0, hp)}</span></div>`;
+  const bar = (hp, side, max = 100) => `<div class="ft-hp ${side}"><i style="width:${Math.max(0, hp) / max * 100}%" class="${hp <= max * .3 ? 'low' : ''}"></i><span>${Math.max(0, hp)}</span></div>`;
   function view() {
     const box = $q('#ft'); if (!box) return;
     const c = coins(), top = `<div class="mg-bar"><span>COIN <b>${c ?? '…'}</b></span><span>KO 승 <b>${G.coins[me()]?.k || 0}</b></span></div>`;
     if (st.mode === 'idle') {
       box.innerHTML = top + `<div class="rm-card ft-card"><div class="rm-hero">🥊</div><big>주먹왕</big>
-        <p>랜덤으로 뽑힌 회원과 한 판 붙어요!<br>턴마다 기술 3개가 나오고, 성공 확률과 데미지는 매번 달라요.<br>상대 체력을 먼저 0으로 만들면 K.O. 승리!</p>
-        <div class="rm-odds"><span>참가 ${STAKE}코인</span><span>승리 +${WIN}</span><span>체력 70↑ 퍼펙트 +${PERFECT}</span></div>
+        <p>랜덤으로 뽑힌 회원과 한 판 붙어요!<br>턴마다 기술 3개가 나오고, 성공 확률과 데미지는 매번 달라요.<br>상대는 체력이 더 많고, 체력이 줄면 🔥분노해요.<br>승률 순위가 높을수록 더 센 상대가 나와요 (지금 내 상대 Lv.${fightLv(me()) + 1}${winRate(G.coins[me()]) !== null ? ` · 내 승률 ${Math.round(winRate(G.coins[me()]) * 100)}%` : ''})</p>
+        <div class="rm-odds"><span>참가 ${STAKE}코인</span><span>승리 +${WIN}</span><span>체력 50↑ 퍼펙트 +${PERFECT}</span></div>
         <button class="btn mg-btn" id="ft-go" ${c !== null && c >= STAKE && !busy ? '' : 'disabled'}>${STAKE}코인 내고 상대 뽑기</button>
         ${c !== null && c < STAKE ? '<small class="rm-note">코인이 부족해요. 위연시 탭에서 하루 한 번 용돈을 받을 수 있어요</small>' : ''}<small class="rm-note">게임 코인은 진짜 돈이 아니에요</small></div>`;
       if ($q('#ft-go')) $q('#ft-go').onclick = start;
@@ -2996,16 +3006,16 @@ const FIGHT = (() => {
     const arena = `<div class="ft-arena ${st.fx || ''}">
       <div class="ft-side pl"><div class="ft-fig"><span class="mini">${avatar(me())}</span>${bodySVG(st.bMe)}${gearSVG(st.bMe)}</div><b>${esc(S.me.nick)}</b><small class="ft-type">${st.bMe.t.n}</small>${bar(st.hp, 'l')}</div>
       <div class="ft-vs">VS<small>R${st.turn}</small></div>
-      <div class="ft-side op"><div class="ft-fig"><span class="mini">${avatar(st.foe)}</span>${bodySVG(st.bFoe)}${gearSVG(st.bFoe)}</div><b>${foeName()}</b><small class="ft-type">${st.bFoe.t.n}</small>${bar(st.fhp, 'r')}</div>
+      <div class="ft-side op"><div class="ft-fig"><span class="mini">${avatar(st.foe)}</span>${bodySVG(st.bFoe)}${gearSVG(st.bFoe)}</div><b>${foeName()}</b><small class="ft-type">Lv.${st.lv + 1} ${st.bFoe.t.n}${st.rage ? ' 🔥' : ''}</small>${bar(st.fhp, 'r', st.fmax)}</div>
       ${st.pop ? `<div class="ft-pop ${st.pop.side}">${st.pop.t}</div>` : ''}</div>
       <div class="ft-log">${st.log.slice(-3).map((l, i, a) => `<p class="${i === a.length - 1 ? 'new' : ''}">${l}</p>`).join('')}</div>`;
     if (st.mode === 'turn') {
-      box.innerHTML = top + arena + `<div class="ft-moves">${st.hand.map((m, k) => `<button data-k="${k}" ${busy ? 'disabled' : ''}><span>${m.e} ${m.n}</span><em>${m.guard ? '상대 공격 70% 막기 · 반격 기회' : `${Math.round(m.p * 100)}% · ${m.d[0]}~${m.d[1]} 데미지`}</em></button>`).join('')}</div>`;
+      box.innerHTML = top + arena + `<div class="ft-moves">${st.hand.map((m, k) => `<button data-k="${k}" ${busy ? 'disabled' : ''}><span>${m.e} ${m.n}</span><em>${m.guard ? '상대 공격 절반 막기 · 반격 기회' : `${Math.round(m.p * 100)}% · ${m.d[0]}~${m.d[1]} 데미지`}</em></button>`).join('')}</div>`;
       box.querySelectorAll('[data-k]').forEach(b => b.onclick = () => act(+b.dataset.k));
     } else if (st.mode === 'anim') {
       box.innerHTML = top + arena + '<div class="ft-moves wait"><p>…</p></div>';
     } else {
-      const win = st.mode === 'win', perfect = win && st.hp >= 70;
+      const win = st.mode === 'win', perfect = win && st.hp >= 50;
       box.innerHTML = top + arena + `<div class="rm-card ${win ? 'ok' : 'bad'}"><div class="rm-res">${win ? (perfect ? '🏆 PERFECT K.O.!' : '🏆 K.O. 승리!') : '💫 K.O. 패배…'}</div>
         <p class="rm-q">${win ? `${foeName()}님을 쓰러뜨렸어요! +${st.prize}코인` : `${foeName()}님: ${TAUNT[Math.random() * TAUNT.length | 0]}`}</p>
         <button class="btn mg-btn" id="ft-again">다시 하기</button></div>`;
@@ -3017,8 +3027,10 @@ const FIGHT = (() => {
     if (busy || coins() < STAKE) return;
     const others = Object.keys(S.users).filter(u => u !== me()); if (!others.length) { toast('아직 붙을 상대가 없어요'); return }
     busy = true;
-    try { await coinWrite({ c: coins() - STAKE }) } catch (e) { busy = false; toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); return }
-    st = { mode: 'turn', foe: others[Math.random() * others.length | 0], hp: 100, fhp: 100, turn: 1, log: [], combo: 0, bMe: rollBody(), bFoe: rollBody() };
+    const lv0 = fightLv(me()); // 이번 판 난이도는 시작할 때의 내 승률 순위로 정함
+    try { await coinWrite({ c: coins() - STAKE, g: gOf(G.coins[me()]) + 1 }) } catch (e) { busy = false; toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')); return }
+    st = { mode: 'turn', foe: others[Math.random() * others.length | 0], hp: 100, turn: 1, log: [], combo: 0, bMe: rollBody(), bFoe: rollBody(), lv: lv0 };
+    st.fmax = st.fhp = 108 + st.lv * 5; // 상대는 체력이 더 많고, 내 승률 순위가 높을수록 레벨이 올라감
     st.log.push(`${st.bFoe.t.n} ${foeName()}님이 링에 올라왔다! 🔔`); st.hand = deal(); busy = false; view();
   }
   async function act(k) {
@@ -3035,13 +3047,15 @@ const FIGHT = (() => {
     view(); await pause(750); st.fx = ''; st.pop = null;
     if (st.fhp <= 0) return finish(true);
     // 상대 차례
-    const fm = pickN(MOVES.filter(x => !x.guard), 1)[0], fp = jit(fm.p);
+    if (!st.rage && st.fhp <= st.fmax * .4) { st.rage = true; st.log.push(`🔥 ${foe}님이 분노했다! 공격이 더 세고 정확해진다`) }
+    const fm = pickN(MOVES.filter(x => !x.guard), 1)[0], fp = Math.min(.95, jit(fm.p) + .03 + st.lv * .012 + (st.rage ? .06 : 0));
     if (Math.random() < fp) {
-      let dmg = rnd(fm.d[0], fm.d[1]);
-      if (guard) { dmg = Math.round(dmg * .3); st.log.push(`${foe}님의 ${fm.n}! 가드로 막아서 -${dmg}`) }
-      else st.log.push(`${foe}님의 ${fm.e} ${fm.n}! -${dmg} ${fm.hit ? fm.hit.replaceAll('{f}님이', '내가').replaceAll('{f}님', '나') : ''}`);
-      st.hp -= dmg; st.fx = 'hit-l atk-r'; st.pop = { side: 'l', t: `-${dmg}` };
-      if (guard && Math.random() < .35) { const c = rnd(8, 14); st.fhp -= c; st.log.push(`↩️ 반격 성공! ${foe}님 -${c}`) }
+      let dmg = Math.round(rnd(fm.d[0], fm.d[1]) * (1 + st.lv * .035) * (st.rage ? 1.2 : 1));
+      const fcrit = Math.random() < .12; if (fcrit) dmg = Math.round(dmg * 1.5);
+      if (guard) { dmg = Math.round(dmg * .5); st.log.push(`${foe}님의 ${fm.n}! 가드로 막아서 -${dmg}`) }
+      else st.log.push(`${foe}님의 ${fm.e} ${fm.n}! -${dmg}${fcrit ? ' 💥크리티컬' : ''} ${fm.hit ? fm.hit.replaceAll('{f}님이', '내가').replaceAll('{f}님', '나') : ''}`);
+      st.hp -= dmg; st.fx = 'hit-l atk-r'; st.pop = { side: 'l', t: `-${dmg}${fcrit && !guard ? ' 크리!' : ''}` };
+      if (guard && Math.random() < .25) { const c = rnd(8, 14); st.fhp -= c; st.log.push(`↩️ 반격 성공! ${foe}님 -${c}`) }
     } else { st.log.push(`${foe}님의 ${fm.n}… 헛방! ${guard ? '(괜히 막았다)' : ''}`); st.pop = { side: 'l', t: 'MISS' } }
     view(); await pause(750); st.fx = ''; st.pop = null;
     if (st.fhp <= 0) return finish(true);
@@ -3051,7 +3065,7 @@ const FIGHT = (() => {
   async function finish(win) {
     st.mode = win ? 'win' : 'lose';
     if (win) {
-      st.prize = WIN + (st.hp >= 70 ? PERFECT : 0);
+      st.prize = WIN + (st.hp >= 50 ? PERFECT : 0);
       try { await coinWrite({ c: coins() + st.prize, k: (G.coins[me()]?.k || 0) + 1 }) } catch (e) { toast('코인을 받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
     }
     busy = false; view();
@@ -3366,7 +3380,7 @@ function watchScores() {
     if (S.screen === 'game') { drawRank(); BLOCKS.setBest() }
   }, () => { G.tloaded = true; unsub('tscores') });
   if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
-    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null } }); G.cloaded = true;
+    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null, g: Number.isFinite(x.g) ? x.g : null } }); G.cloaded = true;
     if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh() }
   }, () => { G.cloaded = true; unsub('coins') });
   if (on && !subs.sscores) subs.sscores = onSnapshot(collection(db, 'sscores'), q => {
@@ -3386,7 +3400,7 @@ function drawRank() {
   if (!arr.length && !(S.isAdmin && (kind === 'r' || kind === 'f'))) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
   let rank = 0, prev = null;
   const rows = arr.map(([u, b], i) => { if (b !== prev) { rank = i + 1; prev = b } return { u, b, rank } });
-  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${S.isAdmin && kind !== 'r' && kind !== 'f' ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
+  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${kind === 'f' && winRate(G.coins[r.u]) !== null ? `<small class="rk-w">승률 ${Math.round(winRate(G.coins[r.u]) * 100)}% · Lv.${fightLv(r.u) + 1}</small>` : ''}${S.isAdmin && kind !== 'r' && kind !== 'f' ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
   const top = rows.slice(0, kind === 'r' || kind === 'f' ? 20 : 10), mine = rows.find(r => r.u === me);
   el.innerHTML = (arr.length ? top.map(line).join('') : '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
   if (S.isAdmin && (kind === 'r' || kind === 'f')) { // 관리자: 회원 코인·기록 직접 고치기
@@ -3398,7 +3412,7 @@ function drawRank() {
     $('#cf-u').onchange = fill; fill();
     $('#cf-save').onclick = async () => {
       const u = $('#cf-u').value, n = id => Math.round(+$(id).value || 0);
-      try { await setDoc(doc(db, 'coins', u), { c: Math.max(0, n('#cf-c')), rm: n('#cf-rm'), w: Math.max(0, n('#cf-w')), k: Math.max(0, n('#cf-k')), at: serverTimestamp() }); toast(`${S.users[u]}님 기록을 저장했어요`) }
+      try { await setDoc(doc(db, 'coins', u), { c: Math.max(0, n('#cf-c')), rm: n('#cf-rm'), w: Math.max(0, n('#cf-w')), k: Math.max(0, n('#cf-k')), g: gOf(G.coins[u]), at: serverTimestamp() }); toast(`${S.users[u]}님 기록을 저장했어요`) }
       catch (e) { toast('저장하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
     };
   }
