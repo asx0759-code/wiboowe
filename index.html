@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261111-1350">
+<meta name="build" content="20261111-1355">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2680,7 +2680,7 @@ const ROMANCE = (() => {
   const $q = s => document.querySelector(s);
   const me = () => S.me.uid, coins = () => G.coins[me()]?.c ?? null;
   const fill = t => t.replaceAll('{n}', NAME);
-  const write = (c, w) => coinWrite({ c, w });
+  const write = (c, w, dr = 0) => coinWrite({ c, w, rm: (G.coins[me()]?.rm || 0) + dr }); // rm = 위연시로 번 순수익 (순위용)
   // 사이트 회원 중 닉네임이 '밤티'인 사람의 프로필 사진을 씀 (없으면 군밤 그림)
   const bamUid = () => Object.keys(S.users).find(u => S.users[u] === NAME);
   const bamFace = () => { const u = bamUid(); return u ? avatar(u) : '<span class="rm-bam">🌰</span>' };
@@ -2740,7 +2740,7 @@ const ROMANCE = (() => {
   }
   async function start() {
     if (busy || coins() < STAKE) return; busy = true;
-    try { await write(coins() - STAKE, G.coins[me()]?.w || 0); st = { mode: 'ask', i: 0, pot: STAKE }; st.scene = pick(0) }
+    try { await write(coins() - STAKE, G.coins[me()]?.w || 0, -STAKE); st = { mode: 'ask', i: 0, pot: STAKE }; st.scene = pick(0) }
     catch (e) { toast('시작하지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
     busy = false; view();
   }
@@ -2756,7 +2756,7 @@ const ROMANCE = (() => {
   }
   async function cash(couple) {
     if (busy) return; busy = true;
-    try { await write((coins() || 0) + st.pot, (G.coins[me()]?.w || 0) + (couple ? 1 : 0)); if (couple) st.mode = 'couple'; else { toast(`${st.pot}코인을 챙겼어요!`); st = { mode: 'idle' } } }
+    try { await write((coins() || 0) + st.pot, (G.coins[me()]?.w || 0) + (couple ? 1 : 0), st.pot); if (couple) st.mode = 'couple'; else { toast(`${st.pot}코인을 챙겼어요!`); st = { mode: 'idle' } } }
     catch (e) { toast('코인을 받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '') + ' 잠시 뒤 다시 눌러 주세요'); if (couple) st.mode = 'win' }
     busy = false; view();
   }
@@ -2766,20 +2766,20 @@ const ROMANCE = (() => {
   }
   function mount(v, o) {
     opt = o; if (st.mode === 'wait') st.mode = 'ask';
-    v.insertAdjacentHTML('beforeend', `<div id="rm"></div><div class="sect">코인 부자 RANKING</div><div class="rank" id="rm-rank"><div class="empty">불러오는 중…</div></div>`);
+    v.insertAdjacentHTML('beforeend', `<div id="rm"></div><div class="sect">위연시 RANKING · 위연시로 번 코인</div><div class="rank" id="rm-rank"><div class="empty">불러오는 중…</div></div>`);
     view(); ensure();
   }
   return { mount, stop: () => { }, refresh: () => { if ($q('#rm') && st.mode !== 'wait') view(); ensure() } };
 })();
 
 /* ===== 게임 코인 공용 ===== */
-async function coinWrite({ c, w, k }) {
-  const u = S.me.uid, cur = G.coins[u] || { c: 0, w: 0, k: 0 };
-  const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0 };
+async function coinWrite({ c, w, k, rm }) {
+  const u = S.me.uid, cur = G.coins[u] || { c: 0, w: 0, k: 0, rm: 0 };
+  const d = { c: c ?? cur.c, w: w ?? cur.w ?? 0, k: k ?? cur.k ?? 0, rm: rm ?? cur.rm ?? 0 };
   await setDoc(doc(db, 'coins', u), { ...d, at: serverTimestamp() });
   G.coins[u] = d;
 }
-async function coinEnsure() { if (G.cloaded && !G.coins[S.me.uid] && !G.coinMaking) { G.coinMaking = 1; try { await coinWrite({ c: 100, w: 0, k: 0 }) } catch { } G.coinMaking = 0 } }
+async function coinEnsure() { if (G.cloaded && !G.coins[S.me.uid] && !G.coinMaking) { G.coinMaking = 1; try { await coinWrite({ c: 100, w: 0, k: 0, rm: 0 }) } catch { } G.coinMaking = 0 } }
 
 /* ===== 주먹왕 (확률 대전 격투 · 상대는 랜덤 회원) ===== */
 const FIGHT = (() => {
@@ -3031,7 +3031,7 @@ const FIGHT = (() => {
   function mount(v) {
     if (st.mode === 'anim') st.mode = 'turn';
     busy = false;
-    v.insertAdjacentHTML('beforeend', `<div id="ft"></div><div class="sect">K.O. 왕 RANKING</div><div class="rank" id="ft-rank"><div class="empty">불러오는 중…</div></div>`);
+    v.insertAdjacentHTML('beforeend', `<div id="ft"></div><div class="sect">주먹왕 RANKING · K.O. 승리 수</div><div class="rank" id="ft-rank"><div class="empty">불러오는 중…</div></div>`);
     view(); coinEnsure();
   }
   return { mount, refresh: () => { if ($q('#ft') && st.mode !== 'anim') view(); coinEnsure() } };
@@ -3338,7 +3338,7 @@ function watchScores() {
     if (S.screen === 'game') { drawRank(); BLOCKS.setBest() }
   }, () => { G.tloaded = true; unsub('tscores') });
   if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
-    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0 } }); G.cloaded = true;
+    G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: x.rm || 0 } }); G.cloaded = true;
     if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh() }
   }, () => { G.cloaded = true; unsub('coins') });
   if (on && !subs.sscores) subs.sscores = onSnapshot(collection(db, 'sscores'), q => {
@@ -3349,14 +3349,14 @@ function watchScores() {
 }
 function drawRank() {
   const kind = $('#bb-rank') ? 'b' : $('#tt-rank') ? 't' : $('#rm-rank') ? 'r' : $('#ft-rank') ? 'f' : $('#sh-rank') ? 's' : 'm', el = $('#mo-rank') || $('#bb-rank') || $('#tt-rank') || $('#rm-rank') || $('#ft-rank') || $('#sh-rank'); if (!el) return;
-  const isB = kind === 'b', unit = kind === 'r' ? '코인' : kind === 'f' ? '승' : '점';
-  const map = kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.c])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
+  const isB = kind === 'b', unit = kind === 'r' ? '코인 벌었음' : kind === 'f' ? '승' : '점';
+  const map = kind === 's' ? G.sscores : kind === 'b' ? G.bscores : kind === 't' ? G.tscores : kind === 'r' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.rm || 0])) : kind === 'f' ? Object.fromEntries(Object.entries(G.coins).map(([u, x]) => [u, x.k || 0])) : G.scores, col = kind === 's' ? 'sscores' : kind === 'b' ? 'bscores' : kind === 't' ? 'tscores' : (kind === 'r' || kind === 'f') ? 'coins' : 'scores';
   if (!(kind === 's' ? G.sloaded : kind === 'b' ? G.bloaded : kind === 't' ? G.tloaded : (kind === 'r' || kind === 'f') ? G.cloaded : G.loaded)) return;
   const me = S.me.uid, arr = Object.entries(map).filter(([u, b]) => S.users[u] && b > 0).sort((a, b) => b[1] - a[1]);
   if (!arr.length) { el.innerHTML = '<div class="empty">아직 기록이 없어요.<br>첫 1등이 되어 보세요!</div>'; return }
   let rank = 0, prev = null;
   const rows = arr.map(([u, b], i) => { if (b !== prev) { rank = i + 1; prev = b } return { u, b, rank } });
-  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${S.isAdmin ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
+  const line = r => `<div class="rk${r.u === me ? ' me' : ''}"><span class="rk-n r${r.rank <= 3 ? r.rank : ''}">${r.rank}</span><span class="mini">${avatar(r.u)}</span><span class="rk-nick">${esc(S.users[r.u])}${r.u === me ? ' (나)' : ''}</span><b>${r.b}${unit}</b>${kind === 'r' && G.coins[r.u]?.w ? `<small class="rk-w">💑${G.coins[r.u].w}</small>` : ''}${S.isAdmin && kind !== 'r' && kind !== 'f' ? `<button class="rk-del" data-rkdel="${r.u}">${G.delAsk === r.u ? '정말?' : '삭제'}</button>` : ''}</div>`;
   const top = rows.slice(0, 10), mine = rows.find(r => r.u === me);
   el.innerHTML = top.map(line).join('') + (mine && !top.includes(mine) ? '<div class="rk-gap">⋯</div>' + line(mine) : '');
   el.querySelectorAll('[data-rkdel]').forEach(b => b.onclick = async () => { // 관리자: 기록 지우기
