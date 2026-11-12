@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0915">
+<meta name="build" content="20261112-0940">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -795,6 +795,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .tile.photo.p3f .appav{box-shadow:none}
 .w-clock.p3f svg{box-shadow:inset 0 0 0 3px #fff}
 .c-game{--l:#b48cff;--b:#6c3ef0}
+.c-pet{--l:#ffc4dc;--b:#ff6fa5}
+.tile .pti{display:grid;place-items:center;width:100%;height:100%;line-height:0}.tile .pti svg{width:84%;height:84%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}.tile .pti.away{font-size:30px;line-height:1}
 .c-friends{--l:#ffffff;--b:#dcdbe3;color:#8b93a7}
 .c-friends .vi{filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
 .c-admin{--l:#5a6b8f;--b:#263252}
@@ -1363,7 +1365,7 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .ak-ad{position:static;margin:-2px 12px 6px auto;display:block}
 .gc-tl{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:400;white-space:nowrap;line-height:1.5;color:var(--rc,#e2307a);box-shadow:inset 0 0 0 1px var(--rc,#e2307a);vertical-align:2px}
 
-/* ===== 말랑몬 ===== */
+/* ===== 다마쿨찌 ===== */
 .pt{min-height:100%;display:flex;flex-direction:column;gap:12px;padding:12px 12px 18px;background:linear-gradient(180deg,#fff7fb,#ffe9f2);color:#4b3550;font-family:var(--pixel);position:relative}
 .pt-room{position:relative;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:22px;background:linear-gradient(180deg,#fdf1ff 0 62%,#ffd9e8 62% 100%);box-shadow:inset 0 0 0 3px #fff,0 4px 0 #f3c3d6;overflow:hidden;transition:background .6s}
 .pt-room.night{background:linear-gradient(180deg,#2c2550 0 62%,#3d2f5c 62% 100%);color:#efe8ff}
@@ -1527,8 +1529,8 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').cat
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, t.length > 25 ? 4000 : 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
-function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'fortune' && !(S.screen === 'asks' && document.activeElement?.closest?.('.ak')) && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop(); PET.stop() } if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); PET.watch(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'fortune' && S.screen !== 'pet' && !(S.screen === 'asks' && document.activeElement?.closest?.('.ak')) && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
+function go(screen, extra = {}) { if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop() } if (S.screen === 'pet' && screen !== 'pet') PET.stop(); if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); PET.watch(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
@@ -1665,11 +1667,12 @@ function render() {
       <div class="hs-grid">
         <div class="tile w-clock p3f" aria-label="시계">${clockSVG()}</div>
         ${tile('me', 'photo p3f', `<span class="appav">${avatar(S.me.uid)}</span>`, '프로필', ASKS.newCount())}
-        ${tile('game', 'p3 c-game', ico('pad'), '게임', PET.need() ? '!' : 0)}
+        ${tile('game', 'p3 c-game', ico('pad'), '게임')}
         ${tile('feed', 'p3 c-friends', ico('friends'), '친구들', newNotifs())}
         ${tile('now', 'p3 c-now', `<img class="vi jic" src="${JICON}" alt="">`, 'NOW', newTaps() + unreadDm())}
         ${tile('sketch', 'p3 c-sketch', ico('sketch'), '낙서장')}
         ${tile('fortune', 'p3 c-tarot', ico('tarot'), '고민 상담소')}
+        ${tile('pet', 'p3 c-pet', PET.icon(), '다마쿨찌', PET.need() ? '!' : 0)}
       </div>
       ${S.isAdmin || boatPass() ? `<div class="hs-adm"><span></span>${tile('boat', 'p3 c-boat', ico('boat'), '나룻배')}${S.isAdmin ? tile('admin', 'p3 c-admin', ico('gear'), '관리자') : '<span></span>'}</div>` : ''}
       <div class="hs-dock">
@@ -2283,6 +2286,7 @@ function render() {
   }
 
   if (S.screen === 'asks') { ASKS.render(v, back); return }
+  if (S.screen === 'pet') { back('다마쿨찌'); PET.mount(v); return }
   if (S.screen === 'sketch') { back('낙서장'); SKETCH.mount(v); return }
   if (S.screen === 'boat') { back('울렁울렁 나룻배'); BOAT.mount(v); return }
   if (S.screen === 'tarot') { go('fortune', { ftab: 'tarot' }); return }
@@ -2300,8 +2304,7 @@ function render() {
     back(esc(cur.name)); $('#back').onclick = () => go('game', { gtab: null });
     const ids = Object.keys(S.users);
     v.innerHTML = '';
-    if (gt === 'pet') PET.mount(v);
-    else if (gt === 'gacha') GACHA.mount(v);
+    if (gt === 'gacha') GACHA.mount(v);
     else if (gt === 'imgg') IMGG.mount(v);
     else if (gt === 'relay') RELAY.mount(v);
     else if (gt === 'cat') CATRUN.mount(v, { best: () => G.cscores[S.me.uid] || 0, onEnd: saveCScore });
@@ -5725,7 +5728,7 @@ const ASKS = (() => {
   return { render: draw, watchMine, stop, newCount };
 })();
 
-/* ===== 말랑몬 (다 같이 키우는 다마고치) ===== */
+/* ===== 다마쿨찌 (다 같이 키우는 다마고치 · 펫 이름은 말랑) ===== */
 // pet/main = { name, st: 'egg'|'pet'|'away', warm, born(알 받은 때), hatch(태어난 때), at(게이지 기록 시각),
 //   h 배부름, m 기분, c 깨끗함, e 기운, poop(어질러진 물건 수), pt(어지르는 시계), sleep, form(어른 모습), meals, snacks, plays, ran, back(돌아올 시각), log:[{u,a,t}] }
 const PET = (() => {
@@ -5752,7 +5755,7 @@ const PET = (() => {
   };
   // 얼굴 위치: [눈 윗줄, 왼눈 x, 오른눈 x, 볼 줄, 입 줄]
   const FACE = { baby: [9, 4, 10, 11, 11], child: [7, 4, 10, 9, 9], adult: [7, 4, 10, 10, 10], gloom: [8, 4, 10, 11, 11] };
-  const FORMS = { shine: '반짝 말랑몬', chub: '통통 말랑몬', gloom: '시무룩 말랑몬' };
+  const FORMS = { shine: '반짝 말랑', chub: '통통 말랑', gloom: '시무룩 말랑' };
   let p = null, sub = null, busy = false, skipName = false, blink = false, bt = 0, game = null, $q = s => document.querySelector(s), fx = '';
   const now = () => Date.now();
   const clamp = x => Math.max(0, Math.min(100, x));
@@ -5815,7 +5818,7 @@ const PET = (() => {
   }
   const need = (c = p && cur()) => !!c && p.st === 'pet' && !ranAway() && (c.h < 30 || c.m < 30 || c.c < 30 || c.poop > 0);
   const who = u => esc(S.users[u] || '누군가');
-  const ACT = { warm: '알을 품어 줬어요', hatch: '알이 깨어났어요! 🐣', name: '이름을 지어 줬어요', meal: '밥을 줬어요 🍙', snack: '간식을 줬어요 🍬', play: '놀아 줬어요 🎾', win: '놀이에서 이겼어요 ✨', bath: '씻겨 줬어요 🛁', sweep: '방을 치웠어요 🧹', sleep: '재웠어요 💤', wake: '깨웠어요 ☀️', lure: '간식을 놓아뒀어요 🍪', back: '말랑몬이 돌아왔어요!', ran: '말랑몬이 가출했어요… 💨', grow: '어른이 됐어요! 🎉', rename: '이름을 바꿨어요' };
+  const ACT = { warm: '알을 품어 줬어요', hatch: '알이 깨어났어요! 🐣', name: '이름을 지어 줬어요', meal: '밥을 줬어요 🍙', snack: '간식을 줬어요 🍬', play: '놀아 줬어요 🎾', win: '놀이에서 이겼어요 ✨', bath: '씻겨 줬어요 🛁', sweep: '방을 치웠어요 🧹', sleep: '재웠어요 💤', wake: '깨웠어요 ☀️', lure: '간식을 놓아뒀어요 🍪', back: '말랑이가 돌아왔어요!', ran: '말랑이가 가출했어요… 💨', grow: '어른이 됐어요! 🎉', rename: '이름을 바꿨어요' };
   // 한 사람씩 차례로 바꾸기 (동시에 눌러도 꼬이지 않게)
   async function act(fn) {
     if (busy) return; busy = true;
@@ -5855,12 +5858,12 @@ const PET = (() => {
   const bar = (ic, lb, v) => `<div class="pt-g ${v < 30 ? 'low' : ''}"><span>${ic}</span><small>${lb}</small><i><b style="width:${Math.round(v)}%"></b></i></div>`;
   function view() {
     const v = $q('#pt'); if (!v) return;
-    if (p === undefined) { v.innerHTML = '<div class="empty">말랑몬 집에 가는 중…</div>'; return }
-    if (!p) { v.innerHTML = `<div class="pt-start">${svg('egg', 'egg', null, 140)}<p>아직 말랑몬이 없어요.<br>알을 받아서 다 같이 키워 봐요!</p><button class="tr-btn" id="pt-new">🥚 알 받기</button></div>`; $q('#pt-new').onclick = create; return }
+    if (p === undefined) { v.innerHTML = '<div class="empty">말랑이 집에 가는 중…</div>'; return }
+    if (!p) { v.innerHTML = `<div class="pt-start">${svg('egg', 'egg', null, 140)}<p>아직 말랑이가 없어요.<br>알을 받아서 다 같이 키워 봐요!</p><button class="tr-btn" id="pt-new">🥚 알 받기</button></div>`; $q('#pt-new').onclick = create; return }
     auto();
     const t = now(), sg = stage(), c = cur(), [kind, pal] = kindPal(), coins = G.coins[S.me.uid]?.c;
     const logH = `<div class="pt-log"><b>돌봄 기록</b>${(p.log || []).slice(0, 8).map(l => `<p><span>${l.u ? who(l.u) + '님이 ' : ''}${ACT[l.a] || ''}</span><small>${relT({ toMillis: () => l.t })}</small></p>`).join('') || '<p><span>아직 기록이 없어요</span></p>'}</div>`;
-    const nm = p.name ? esc(p.name) : '이름 없는 말랑몬';
+    const nm = p.name ? esc(p.name) : '이름 없는 말랑이';
     if (p.st === 'egg') {
       const left = Math.max(0, Math.ceil((p.born + HATCH_AUTO - t) / 60000));
       v.innerHTML = `<div class="pt-room"><div class="pt-stage egg"><div class="pt-me wob">${svg('egg', 'egg', null)}</div></div>
@@ -5891,7 +5894,7 @@ const PET = (() => {
         <button data-a="bath" ${p.sleep ? 'disabled' : ''}>🛁<small>씻기기</small></button>
         <button data-a="sweep" ${!c.poop ? 'disabled' : ''}>🧹<small>방 치우기</small></button>
         <button data-a="${p.sleep ? 'wake' : 'sleep'}">${p.sleep ? '☀️<small>깨우기</small>' : '💡<small>재우기</small>'}</button>
-      </div><p class="pt-coin">🪙 ${coins ?? '…'} 코인 · 다 같이 키우는 말랑몬이에요</p></div>${logH}`;
+      </div><p class="pt-coin">🪙 ${coins ?? '…'} 코인 · 다 같이 키우는 말랑이에요</p></div>${logH}`;
     v.querySelectorAll('[data-a]').forEach(b => b.onclick = () => doAct(b.dataset.a));
     $q('#pt-rn').onclick = rename;
     if (!p.name && !skipName && !$q('#pt-nmbox')) rename(true);
@@ -5899,7 +5902,7 @@ const PET = (() => {
   function rename(first) {
     const v = $q('#pt'); if (!v || $q('#pt-nmbox')) return;
     if (p.name && !S.isAdmin) { toast('이름은 관리자만 바꿀 수 있어요'); return } // 이름은 처음 지은 걸로 · 관리자만 바꿀 수 있어요
-    v.insertAdjacentHTML('beforeend', `<div class="pt-pop" id="pt-nmbox"><div><b>${p.name ? '이름 바꾸기' : '말랑몬이 태어났어요! 🐣<br>이름을 지어 주세요'}</b><input id="pt-nmi" maxlength="10" placeholder="최대 10글자" value="${esc(p.name || '')}"><div class="tr-btns"><button class="tr-btn" id="pt-nmok">${p.name ? '바꾸기' : '이 이름으로!'}</button><button class="tr-btn g" id="pt-nmx">나중에</button></div></div></div>`);
+    v.insertAdjacentHTML('beforeend', `<div class="pt-pop" id="pt-nmbox"><div><b>${p.name ? '이름 바꾸기' : '말랑이가 태어났어요! 🐣<br>이름을 지어 주세요'}</b><input id="pt-nmi" maxlength="10" placeholder="최대 10글자" value="${esc(p.name || '')}"><div class="tr-btns"><button class="tr-btn" id="pt-nmok">${p.name ? '바꾸기' : '이 이름으로!'}</button><button class="tr-btn g" id="pt-nmx">나중에</button></div></div></div>`);
     $q('#pt-nmx').onclick = () => { skipName = true; $q('#pt-nmbox').remove() };
     $q('#pt-nmok').onclick = () => { const n = $q('#pt-nmi').value.trim(); if (!n) { toast('이름을 적어 줘요'); return } $q('#pt-nmbox').remove(); act((x, c, t) => (!x.name || S.isAdmin) ? { name: n, log: L(x.name ? 'rename' : 'name', t) } : null) };
   }
@@ -5914,7 +5917,7 @@ const PET = (() => {
     if (a === 'wake') return act((x, cc, t) => !x.sleep ? null : ({ ...snap(cc, t), sleep: false, pt: t, log: L('wake', t) }));
     if (a === 'play') { if (c.e < 15) { toast('너무 졸려서 못 논대요. 재워 주세요'); return } playGame() }
   }
-  // 놀아 주기: 말랑몬이 왼쪽/오른쪽 중 어디로 볼지 맞히기 (3번 중 2번 맞히면 승리)
+  // 놀아 주기: 말랑이가 왼쪽/오른쪽 중 어디로 볼지 맞히기 (3번 중 2번 맞히면 승리)
   function playGame() {
     const v = $q('#pt'); if (!v) return;
     game = { r: 0, win: 0 };
@@ -5927,21 +5930,26 @@ const PET = (() => {
       v.querySelectorAll('[data-g]').forEach(b => b.onclick = () => {
         const look = Math.random() < .5 ? 'l' : 'r', ok = b.dataset.g === look; game.r++; if (ok) game.win++;
         try { navigator.vibrate?.(ok ? 25 : [10, 30, 10]) } catch { }
-        draw(game.r < 3 ? (ok ? '맞혔어요! 🎉' : '틀렸어요 ㅎㅎ') : game.win >= 2 ? `${game.win}번 맞혔어요! 말랑몬이 엄청 신났어요 ✨` : `${game.win}번 맞혔어요. 그래도 재밌었대요!`, look);
+        draw(game.r < 3 ? (ok ? '맞혔어요! 🎉' : '틀렸어요 ㅎㅎ') : game.win >= 2 ? `${game.win}번 맞혔어요! 말랑이가 엄청 신났어요 ✨` : `${game.win}번 맞혔어요. 그래도 재밌었대요!`, look);
       });
       if ($q('#pt-gok')) $q('#pt-gok').onclick = () => {
         const w = game.win >= 2; game = null; $q('#pt-game')?.remove(); cheer();
         act((x, cc, t) => ({ ...snap(cc, t), m: Math.round(clamp(cc.m + (w ? 30 : 15))), e: Math.round(clamp(cc.e - 10)), h: Math.round(clamp(cc.h - 4)), plays: (x.plays || 0) + 1, pt: cc.poop > (x.poop || 0) ? t : x.pt, log: L(w ? 'win' : 'play', t) }));
       };
     };
-    draw('말랑몬이 고개를 돌릴 쪽을 맞혀 봐요!');
+    draw('말랑이가 고개를 돌릴 쪽을 맞혀 봐요!');
   }
   function mount(v) {
     v.innerHTML = '<div class="pt" id="pt"></div>'; if (p === null && !sub) p = undefined;
     watch(); coinEnsure(); view();
     clearInterval(bt); bt = setInterval(() => { if (!$q('#pt')) { clearInterval(bt); return } if (game || $q('#pt-nmbox')) return; blink = !blink && Math.random() < .5; view(); if (blink) setTimeout(() => { blink = false; if ($q('#pt') && !game && !$q('#pt-nmbox')) view() }, 220) }, 2600);
   }
-  return { mount, watch, need: () => !!p && need(), stop: () => { clearInterval(bt); game = null } };
+  function icon() { // 홈 아이콘: 지금 모습 그대로
+    if (!p) return `<span class="pti">${svg('egg', 'egg', null, 64)}</span>`;
+    if (p.st === 'away') return '<span class="pti away">📝</span>';
+    const [k, pl] = kindPal(); return `<span class="pti">${svg(k, pl, p.sleep ? 'sleep' : 'open', 64)}</span>`;
+  }
+  return { mount, watch, icon, need: () => !!p && need(), stop: () => { clearInterval(bt); game = null } };
 })();
 
 /* ===== 게임 폴더 (아이콘 모음) ===== */
@@ -5964,8 +5972,6 @@ const GAMES = [
     px: ['............', '.s..........', '.skwkwkwkw..', '.swkwkwkwk..', '.skwkwkwkw..', '.swkwkwkwk..', '.skwkwkwkw..', '.s..........', '.s..........', '.s......yy..', '.s.....yyyy.', '............'] },
   { id: 'cat', name: '간식 냥이', bg: ['#ffe89a', '#ff9a3c'], pal: { o: '#1c1c22', e: '#ffd23f', p: '#ff7fa8', b: '#4aa3ff', k: '#123' },
     px: ['............', '.oo.....oo..', '.ooo...ooo..', '.ooooooooo..', '.ooooooooo..', '.oeoooooeo..', '.ooooppooo..', '.ooooooooo..', '..ooooooo...', '.........bb.', '.......bbbkb', '.........bb.'] },
-  { id: 'pet', name: '말랑몬', bg: ['#ffe3ef', '#ff6fa5'], pal: { o: '#5a3d52', b: '#ffc4d8', h: '#ff9cc0', c: '#ff6f9c', k: '#5a3d52', w: '#fff' },
-    px: ['............', '..oo....oo..', '.ohho..ohho.', '.ohbooooobho', '.obbbbbbbbo.', 'obbbbbbbbbbo', 'obkwbbbbkwbo', 'obkkbbbbkkbo', 'obcbbkkbbcbo', 'obbbbbbbbbbo', '.obbbbbbbbo.', '..oooooooo..'] },
   { id: 'gacha', name: '가챠 뽑기', bg: ['#ffd6ea', '#ff5f9e'], pal: { r: '#e8285f', w: '#ffffff', y: '#ffd23f', c: '#5fe0ff', p: '#c08bff', k: '#5a1d3a' },
     px: ['...rrrrrr...', '..rwwwwwwr..', '.rwywpwcwwr.', '.rwwcwywpwr.', '.rwpwwcwywr.', '..rwwwwwwr..', '..rrrrrrrr..', '..rrkkrrrr..', '..rrkkrwwr..', '..rrrrrwwr..', '..rrrrrrrr..', '..k......k..'] },
   { id: 'imgg', name: '이미지 게임', bg: ['#fff0b0', '#ff7a45'], pal: { y: '#ffd23f', k: '#4a2a10', s: '#ffe1c4', w: '#fff' },
