@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-1730">
+<meta name="build" content="20261112-1740">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1590,9 +1590,9 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .bm-top>div{display:flex;gap:6px}
 .bm-top button{border:0;border-radius:999px;padding:6px 10px;background:#ffffff26;color:#fff;font:inherit;font-size:12px;cursor:pointer;backdrop-filter:blur(4px)}
 .bm-top button:active{transform:scale(.94)}
-.bm-msgs{position:absolute;left:10px;bottom:46%;width:min(62%,250px);display:flex;flex-direction:column;justify-content:flex-end;gap:6px;z-index:3;pointer-events:none;max-height:44%;overflow:hidden;-webkit-mask:linear-gradient(transparent,#000 22%);mask:linear-gradient(transparent,#000 22%)}
-.bm-b{align-self:flex-start;max-width:100%;padding:7px 12px 8px;border-radius:16px 16px 16px 4px;background:rgba(255,255,255,.17);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);animation:bmIn .45s ease-out;transition:opacity .8s,transform .8s}
-.bm-b.me{background:rgba(255,170,90,.24)}
+.bm-msgs{position:absolute;left:10px;right:10px;bottom:46%;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;z-index:3;pointer-events:none;max-height:44%;overflow:hidden;-webkit-mask:linear-gradient(transparent,#000 22%);mask:linear-gradient(transparent,#000 22%)}
+.bm-b{align-self:flex-start;max-width:min(64%,250px);padding:7px 12px 8px;border-radius:16px 16px 16px 4px;background:rgba(255,255,255,.17);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);animation:bmIn .45s ease-out;transition:opacity .8s,transform .8s}
+.bm-b.me{align-self:flex-end;border-radius:16px 16px 4px 16px;background:rgba(255,170,90,.26);text-align:right}
 .bm-b small{display:block;font-size:10px;color:#ffd9b0;margin-bottom:2px}
 .bm-b p{margin:0;font-size:13px;line-height:1.5;word-break:break-word}
 .bm-b.out{opacity:0;transform:translateY(-14px)}
@@ -6626,10 +6626,20 @@ const FIRE = (() => {
   function sound(on) {
     if (!on) { if (snd) { try { snd.ctx.close() } catch { } snd = null } return }
     try {
-      const a = new (window.AudioContext || window.webkitAudioContext)(), len = a.sampleRate * 2, buf = a.createBuffer(1, len, a.sampleRate), ch = buf.getChannelData(0);
-      let b = 0; for (let i = 0; i < len; i++) { b = (b + .02 * (Math.random() * 2 - 1)) / 1.02; ch[i] = b * 3.5; if (Math.random() < .0009) for (let k = 0; k < 120 && i + k < len; k++) ch[i + k] += (Math.random() * 2 - 1) * (1 - k / 120) * .7 }
-      const s = a.createBufferSource(); s.buffer = buf; s.loop = true; const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400; const gn = a.createGain(); gn.gain.value = .5;
-      gn.gain.value = 0; s.connect(f).connect(gn).connect(a.destination); s.start(); snd = { ctx: a, gn }; duck(true);
+      // 타닥타닥: 아주 작은 불 소리 바탕 + 짧고 높은 '탁' 소리를 무작위로, 가끔 몰아서 '타닥타닥', 가끔 큰 '퍽'
+      const a = new (window.AudioContext || window.webkitAudioContext)(), sr = a.sampleRate, sec = 8, len = sr * sec, buf = a.createBuffer(1, len, sr), ch = buf.getChannelData(0);
+      let lp = 0; for (let i = 0; i < len; i++) { lp += (Math.random() * 2 - 1 - lp) * .02; ch[i] = lp * .35 } // 낮게 웅웅 타는 바탕
+      const tick = (at, dur, amp, bright) => { const n = Math.floor(dur * sr), st = Math.floor(at * sr); let prev = 0; for (let k = 0; k < n && st + k < len - 1; k++) { const w = Math.random() * 2 - 1, x = bright ? w - prev : w * .6 + prev * .4; prev = w; ch[st + k] += x * amp * Math.exp(-k / (n * .25)) } };
+      for (let t = .05; t < sec - .2;) {
+        const r = Math.random();
+        if (r < .12) { let tt = t; for (let c = 0, m = 3 + (Math.random() * 4 | 0); c < m; c++) { tick(tt, .004 + Math.random() * .006, .35 + Math.random() * .5, true); tt += .015 + Math.random() * .05 } t = tt } // 타닥타닥
+        else if (r < .17) tick(t, .02 + Math.random() * .02, .7 + Math.random() * .3, false); // 퍽
+        else tick(t, .002 + Math.random() * .005, .15 + Math.random() * .45, true); // 탁
+        t += .04 + Math.random() * .22;
+      }
+      const src = a.createBufferSource(); src.buffer = buf; src.loop = true;
+      const hp = a.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 120;
+      const gn = a.createGain(); gn.gain.value = 0; src.connect(hp).connect(gn).connect(a.destination); src.start(); snd = { ctx: a, gn }; duck(true);
     } catch { toast('이 기기에서는 소리를 낼 수 없어요') }
   }
   // 노래가 나오면 모닥불 소리를 줄이고, 노래가 멈추면 다시 키워요
