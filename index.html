@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-1720">
+<meta name="build" content="20261112-1730">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -6614,7 +6614,7 @@ const FIRE = (() => {
     if (t - last < 45) return; last = t;
     if (!$q('#bm-cv')) { stop(); return }
     step();
-    const w = woodNow(), g = $q('#bm-glow'); if (g) g.style.opacity = (.35 + w / 100 * .55 + Math.random() * .08).toFixed(2);
+    if (snd && Math.random() < .05) duck(); const w = woodNow(), g = $q('#bm-glow'); if (g) g.style.opacity = (.35 + w / 100 * .55 + Math.random() * .08).toFixed(2);
     if (Math.random() < .05 + w / 600) spark();
   }
   function spark() {
@@ -6629,9 +6629,13 @@ const FIRE = (() => {
       const a = new (window.AudioContext || window.webkitAudioContext)(), len = a.sampleRate * 2, buf = a.createBuffer(1, len, a.sampleRate), ch = buf.getChannelData(0);
       let b = 0; for (let i = 0; i < len; i++) { b = (b + .02 * (Math.random() * 2 - 1)) / 1.02; ch[i] = b * 3.5; if (Math.random() < .0009) for (let k = 0; k < 120 && i + k < len; k++) ch[i + k] += (Math.random() * 2 - 1) * (1 - k / 120) * .7 }
       const s = a.createBufferSource(); s.buffer = buf; s.loop = true; const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400; const gn = a.createGain(); gn.gain.value = .5;
-      s.connect(f).connect(gn).connect(a.destination); s.start(); snd = { ctx: a };
+      gn.gain.value = 0; s.connect(f).connect(gn).connect(a.destination); s.start(); snd = { ctx: a, gn }; duck(true);
     } catch { toast('이 기기에서는 소리를 낼 수 없어요') }
   }
+  // 노래가 나오면 모닥불 소리를 줄이고, 노래가 멈추면 다시 키워요
+  const musicOn = () => !!(S.joined && S.room?.videoId && S.room?.playing);
+  function duck(now) { if (!snd) return; const g = snd.gn.gain, t = snd.ctx.currentTime, v = musicOn() ? 0 : .5; try { if (now) g.setValueAtTime(v, t); else g.setTargetAtTime(v, t, .8) } catch { } }
+  const wantSnd = () => { try { return localStorage.getItem('wb_firesnd') !== '0' } catch { return true } };
   // ---------- 메시지 ----------
   function addBubble(m) {
     const box = $q('#bm-msgs'); if (!box) return;
@@ -6694,7 +6698,9 @@ const FIRE = (() => {
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     $q('#bm-f').onsubmit = e => { e.preventDefault(); send() };
     $q('#bm-wood').onclick = addWood;
-    $q('#bm-snd').onclick = () => { sound(!snd); $q('#bm-snd').textContent = snd ? '🔊' : '🔈' };
+    $q('#bm-snd').onclick = () => { sound(!snd); try { localStorage.setItem('wb_firesnd', snd ? '1' : '0') } catch { } $q('#bm-snd').textContent = snd ? '🔊' : '🔈' };
+    if (wantSnd() && !snd) { sound(true); $q('#bm-snd').textContent = snd ? '🔊' : '🔈' } // 들어오자마자 모닥불 소리 (노래가 나오면 저절로 줄어요)
+    $q('.bm').addEventListener('pointerdown', () => { try { if (snd?.ctx.state === 'suspended') snd.ctx.resume() } catch { } });
     if ($q('#bm-lg')) $q('#bm-lg').onclick = logView;
     const openMu = () => { $q('#bm-mus').hidden = false; musicPanel($q('#bm-mv')) };
     $q('#bm-mu').onclick = openMu; $q('#bm-np').onclick = openMu;
@@ -6704,7 +6710,7 @@ const FIRE = (() => {
     np(); info();
   }
   function np() { // 지금 나오는 곡
-    const b = $q('#bm-np'); if (!b) return; const r = S.room;
+    duck(); const b = $q('#bm-np'); if (!b) return; const r = S.room;
     if (!r?.videoId) { b.hidden = false; b.innerHTML = '🎵 노래 틀기'; return }
     b.hidden = false; b.innerHTML = `<span class="eq${r.playing && S.joined ? ' on' : ''}"><i></i><i></i><i></i></span>${esc(r.title || '같이 듣는 중')}${S.joined ? '' : ' · <b>같이 듣기</b>'}`;
   }
