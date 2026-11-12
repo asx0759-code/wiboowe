@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-1230">
+<meta name="build" content="20261112-1200b">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1518,6 +1518,7 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .pi-card>div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .pi-card b{font-weight:400;font-size:15px}.pi-card small{font-size:11px;opacity:.75;line-height:1.5}
 .pt-gn{font-size:11px;opacity:.7}
+.ind-ban{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:16px;background:#fff1c2;box-shadow:0 3px 0 #f0d38a;font-size:12px}.ind-ban span{flex:1}.ind-ban button{flex:none;border:0;border-radius:999px;padding:7px 12px;background:#ff6fa5;color:#fff;font:inherit;font-size:12px;cursor:pointer}
 .al-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .al-grid button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:16px;padding:8px 4px;background:#fffaf0;color:#4b3550;font:inherit;cursor:pointer;box-shadow:0 3px 0 #f0d38a}
 .al-grid b{font-weight:400;font-size:12px}.al-grid small{font-size:10px;opacity:.7}
@@ -6227,6 +6228,7 @@ const PET = (() => {
     if (!x || busy) return; const t = now();
     if (x.st === 'egg' && t - x.born >= HATCH_AUTO) return act(x.id, (y, c, tt) => y.st === 'egg' ? { st: 'pet', hatch: tt, at: tt, pt: tt, log: [{ u: '', a: 'hatch', t: tt }] } : null);
     if (x.st === 'pet' && ranAway(x)) return act(x.id, (y, c, tt) => y.st === 'pet' ? { st: 'away', ran: (y.ran || 0) + 1, back: 0, sleep: false, log: [{ u: '', a: 'ran', t: tt }] } : null);
+    if (x.st === 'pet' && x.owner === me() && x.evs && XP[x.evs] && (x.xp || 0) < XP[x.evs]) return act(x.id, (y) => y.evs && XP[y.evs] && (y.xp || 0) < XP[y.evs] ? { xp: XP[y.evs] } : null); // 예전 방식으로 이미 자란 말랑이는 그 단계 그대로
     if (x.st === 'pet' && x.owner === me()) { const sg = stage(x); if (ORD[sg] > ORD[x.evs || 'baby']) { let res = null; return act(x.id, (y, c, tt) => { const sg2 = stage(y); if (!(ORD[sg2] > ORD[y.evs || 'baby'])) return null; const { ev, lv, job } = evolve(y, sg2), gw = job && CAREER[job].gift ? { ...CAREER[job].gift, ...(y.wear || {}) } : (y.wear || {}); res = { before: eg(y), after: { ...y.g, ...ev }, to: sg2, lv, name: y.name, job, wear: gw }; return { ev, evs: sg2, ...(job ? { job, wear: gw } : {}), ck: { meals: y.meals || 0, snacks: y.snacks || 0, plays: y.plays || 0, baths: y.baths || 0, sweeps: y.sweeps || 0, ran: y.ran || 0 }, log: [{ u: '', a: sg2 === 'adult' ? 'grow' : 'kid', t: tt }] } }).then(() => { if (res) { grown = res; view() } }) } }
     if (x.st === 'away' && x.back && t >= x.back) return act(x.id, (y, c, tt) => y.st === 'away' && y.back && tt >= y.back ? { st: 'pet', back: 0, h: 50, m: 40, c: 60, e: 80, poop: 0, pt: tt, at: tt, log: [{ u: '', a: 'back', t: tt }] } : null);
   }
@@ -6272,6 +6274,7 @@ const PET = (() => {
         <div class="pt-acts"><button data-a="meal" ${x.sleep ? 'disabled' : ''}>🍙<small>밥 · ${COST.meal}</small></button><button data-a="snack" ${x.sleep ? 'disabled' : ''}>🍬<small>간식 · ${COST.snack}</small></button><button data-a="play" ${x.sleep ? 'disabled' : ''}>🎾<small>놀아 주기</small></button>
         <button data-a="bath" ${x.sleep ? 'disabled' : ''}>🛁<small>씻기기</small></button><button data-a="sweep" ${!c.poop ? 'disabled' : ''}>🧹<small>방 치우기</small></button><button data-a="${x.sleep ? 'wake' : 'sleep'}">${x.sleep ? '☀️<small>깨우기</small>' : '💡<small>재우기</small>'}</button>
         <button data-a="vit" class="wide" ${x.sleep ? 'disabled' : ''}>💊<small>비타민 · ${COST.vit} · 기운 +30</small></button></div>
+        ${sg === 'adult' ? `<div class="ind-ban"><span>🎓 다 컸어요! 독립시키면 자리가 하나 비어요</span><button id="pt-ind2">🎒 독립시키기</button></div>` : ''}
         <div class="ps-sec">🎒 활동 · 경험치를 모아서 자라요</div>
         <div class="pt-do">${Object.entries(DO).map(([k, D]) => { const n = dl(x)[k] || 0, lock = k === 'job' && sg === 'baby'; return `<button data-do="${k}" ${x.sleep || n >= DMAX || lock ? 'disabled' : ''}><span>${D.ic}</span><b>${D.n}</b><small>${lock ? '어린이부터' : `${D.cost && !((x.job === 'idol' && k === 'sing') || (x.job === 'worker' && k === 'study')) ? D.cost + '코인 · ' : ''}기운 -${x.job === 'ath' && k === 'gym' ? 10 : D.e}`}</small><em>${DMAX - n}/${DMAX}</em></button>` }).join('')}</div>`;
       body += logH(x);
@@ -6307,6 +6310,7 @@ const PET = (() => {
     if ($q('#pt-buy')) $q('#pt-buy').onclick = buyEgg;
     if ($q('#pt-bye')) $q('#pt-bye').onclick = () => bye(x);
     if ($q('#pt-ind')) $q('#pt-ind').onclick = () => indep(x);
+    if ($q('#pt-ind2')) $q('#pt-ind2').onclick = () => { tab = 'info'; view(); $q('#pt-ind')?.scrollIntoView({ block: 'center' }) };
     v.querySelectorAll('[data-al]').forEach(b => b.onclick = () => { const p = pets[b.dataset.al]; if (p) letter({ id: b.dataset.al, ...p }) });
   }
   function rename(x, first) {
