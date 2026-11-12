@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0945">
+<meta name="build" content="20261112-0955">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -999,6 +999,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .pf-av.ring{background:conic-gradient(#ffd23f,#ff8a1f,#ff4f8b,#ffd23f)}
 .pf-av .av{width:72px;height:72px;border-radius:50%;border:3px solid #0b0b0d}
 .pf-btns{display:flex;gap:6px;padding-bottom:4px}
+.pf-mom{display:flex;justify-content:flex-end;padding:6px 14px 0}
+.pf-mom button{border:0;border-radius:999px;padding:8px 14px;background:linear-gradient(180deg,#ffe08a,#ffb83d);color:#4a2c00;font-family:var(--pixel);font-size:12.5px;cursor:pointer;box-shadow:0 3px 0 #c98a10}
+.pf-mom button small{font-size:10.5px;opacity:.75;margin-left:4px}
+.pf-mom button:disabled{opacity:.55;cursor:default;box-shadow:none}
 .pf-btns button,.st-up button,.cp-bar button{border:1px solid #3a3a42;border-radius:16px;background:none;color:#eee;font:inherit;font-size:12px;padding:7px 12px;cursor:pointer}
 .pf-n{display:inline-block;min-width:16px;padding:0 4px;border-radius:8px;background:#ff4f8b;color:#fff;font-size:10px;font-weight:400}
 .pf-btns .hot,.st-up .hot,.cp-bar .hot{background:#ff4f8b;border-color:#ff4f8b;color:#fff;font-weight:700}
@@ -2223,13 +2227,14 @@ function render() {
     back(esc(S.users[u] || '(탈퇴)')); $('#back').onclick = () => go('feed', { ftab: S.ftab || 'feed' });
     const tw = F.list.filter(t => t.by === u), st = [];
     v.innerHTML = `<div class="fd"><div class="pf-cover"></div><div class="pf-top"><button class="pf-av ${st.length ? 'ring' : ''}" id="pf-av"><span class="av">${avatar(u)}</span></button>
-      <div class="pf-btns">${mine ? `<button id="pf-ak">내 질문함${ASKS.newCount() ? ` <b class="pf-n">${ASKS.newCount()}</b>` : ''}</button><button id="pf-gb" class="hot">내 방명록</button>` : `<button id="pf-ak">❓ 질문함</button><button id="pf-gb">방명록</button><button id="pf-dm" class="hot">✉ 메시지</button>`}</div></div>
+      <div class="pf-btns">${mine ? `<button id="pf-ak">내 질문함${ASKS.newCount() ? ` <b class="pf-n">${ASKS.newCount()}</b>` : ''}</button><button id="pf-gb" class="hot">내 방명록</button>` : `<button id="pf-ak">❓ 질문함</button><button id="pf-gb">방명록</button><button id="pf-dm" class="hot">✉ 메시지</button>`}</div></div>${momBtn(u)}
       <div class="pf-name"><b>${esc(S.users[u] || '(탈퇴)')}${ttl(u, 'pf')}</b><small>글 ${tw.length}개</small></div>
       <div class="fd-sect">글</div>${tw.length ? tw.map(t => twCard(t)).join('') : `<div class="empty" style="color:#888">${mine ? '아직 올린 글이 없어요' : '아직 글이 없어요'}</div>`}</div>`;
     $('#pf-gb').onclick = () => go('inbox', { owner: u });
     $('#pf-ak').onclick = () => go('asks', { askU: u, askFrom: null });
 
     if ($('#pf-dm')) $('#pf-dm').onclick = () => go('send', { to: u });
+    if ($('#pf-mom')) $('#pf-mom').onclick = momTake;
     if ($('#pf-st')) $('#pf-st').onclick = () => pickStory();
     $('#pf-av').onclick = () => st.length ? openStories(u) : null;
     bindFeed(v);
@@ -3092,6 +3097,39 @@ function watchGall() {
 function ttl(u, w) {
   const x = G.gall?.[u]; if (!x?.title || (w !== 'pf' && !x.show?.[w])) return '';
   const t = GACHA.info(x.title); return t ? `<span class="gc-tl" style="--rc:${t.fg}">${esc(t.n)}</span>` : '';
+}
+// 엄마 지갑에서 돈 빼기: [좋은아침]만, [밤티] 프로필에서 하루 5번 · 한 번에 만 코인
+// momwallet/{uid} = { d: 'YYYY-MM-DD', n: 오늘 뺀 횟수, at }
+const MOM = { NICK: '좋은아침', MAMA: '밤티', MAX: 5, GET: 10000 };
+const momOk = u => S.me?.nick === MOM.NICK && S.users[u] === MOM.MAMA;
+function momLoad() {
+  if (G.mom?.d === kstDay() || G.momLoading) return;
+  G.momLoading = 1;
+  getDoc(doc(db, 'momwallet', S.me.uid)).then(d => { const x = d.exists() ? d.data() : null; G.mom = { d: kstDay(), n: x && x.d === kstDay() ? x.n : 0 }; G.momLoading = 0; if (S.screen === 'prof') render() }).catch(() => { G.momLoading = 0 });
+}
+function momBtn(u) {
+  if (!momOk(u)) return '';
+  if (G.mom?.d !== kstDay()) { momLoad(); return '<div class="pf-mom"><button disabled>👛 엄마 지갑 찾는 중…</button></div>' }
+  const left = MOM.MAX - G.mom.n;
+  return `<div class="pf-mom"><button id="pf-mom" ${left <= 0 || G.momBusy ? 'disabled' : ''}>${left <= 0 ? '🙅 오늘은 엄마가 지갑을 숨겼어요' : `👛 엄마 지갑에서 돈 빼기 <small>오늘 ${G.mom.n}/${MOM.MAX}</small>`}</button></div>`;
+}
+async function momTake() {
+  if (G.momBusy || !G.mom || G.mom.n >= MOM.MAX) return;
+  G.momBusy = 1; render();
+  const me = S.me.uid, n = G.mom.n + 1;
+  try {
+    await setDoc(doc(db, 'momwallet', me), { d: kstDay(), n, at: serverTimestamp() });
+    G.mom = { d: kstDay(), n };
+    const cd = await getDoc(doc(db, 'coins', me)), x = cd.exists() ? cd.data() : null; // 코인은 화면 밖이라 새로 읽어서 더함
+    if (x && Number.isFinite(x.c)) G.coins[me] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null, g: Number.isFinite(x.g) ? x.g : null };
+    let base = x && Number.isFinite(x.c) ? x.c : null;
+    if (base === null) { await coinWrite({ c: 100, w: 0, k: 0, rm: 0 }); G.spendAt = Date.now(); base = 100 } // 코인 지갑이 아직 없으면 먼저 만들기
+    const w = 1150 - (Date.now() - (G.spendAt || 0)); if (w > 0) await new Promise(r => setTimeout(r, w));
+    await coinWrite({ c: base + MOM.GET }); G.spendAt = Date.now();
+    try { navigator.vibrate?.([20, 40, 20]) } catch { }
+    toast(n >= MOM.MAX ? `엄마 몰래 만 원 슬쩍… 🤫 +${MOM.GET.toLocaleString()}코인 · 오늘은 이제 끝!` : `엄마 몰래 만 원 슬쩍… 🤫 +${MOM.GET.toLocaleString()}코인 (오늘 ${MOM.MAX - n}번 남았어요)`);
+  } catch (e) { toast('엄마한테 들킬 뻔했어요! 다시 해 봐요' + (e?.code ? ' (' + e.code + ')' : '')); G.mom = null }
+  G.momBusy = 0; render();
 }
 // 쪽지 사진: 본문엔 img: true 표시만, 사진은 media/image 에 따로 (목록이 무거워지지 않게)
 const IMGC = {};
