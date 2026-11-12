@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-2230">
+<meta name="build" content="20261112-2245">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1824,10 +1824,11 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 /* ----- 트로피 뱃지 · 게임 잠금 · 명예의 전당 ----- */
 .tp{display:inline-flex;gap:1px;margin-left:4px;vertical-align:middle;font-family:var(--pixel);font-size:10.5px;line-height:1;white-space:nowrap}
 .tp i{font-style:normal;padding:1px 3px;border-radius:999px;background:#fff3c4;color:#7a5200;box-shadow:inset 0 0 0 1px #e6c25a}
-.gf-hof{position:relative;overflow:hidden;display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px;width:100%;margin:0 0 12px;padding:10px 14px;border:0;border-radius:16px;background:linear-gradient(120deg,#2a1d4d,#5a3a12 55%,#c8922a);color:#fff;font-family:var(--pixel);text-align:left;cursor:pointer;box-shadow:0 3px 0 #1a1030,inset 0 0 0 1.5px #ffd77a88}
+.gf-hof{position:relative;overflow:hidden;flex:none;display:flex;align-items:center;gap:8px;width:100%;max-width:360px;min-height:42px;box-sizing:border-box;margin:0 0 10px;padding:8px 14px;border:0;border-radius:14px;background:linear-gradient(120deg,#2a1d4d,#5a3a12 55%,#c8922a);color:#fff;font-family:var(--pixel);text-align:left;cursor:pointer;box-shadow:0 3px 0 #1a1030,inset 0 0 0 1.5px #ffd77a88}
 .gf-hof::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(100deg,transparent,#ffffff66,transparent);animation:hfShine 2.8s ease-in-out infinite}
-.gf-hof i{grid-row:1/3;font-style:normal;font-size:26px}
-.gf-hof b{font-weight:400;font-size:14px;color:#ffe08a}.gf-hof small{font-size:10.5px;opacity:.85}
+.gf-hof i{flex:none;font-style:normal;font-size:20px;line-height:1}
+.gf-hof b{flex:none;font-weight:400;font-size:14px;line-height:1.2;color:#ffe08a;white-space:nowrap}.gf-hof small{margin-left:auto;font-size:10.5px;line-height:1.2;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gf-in{justify-content:safe center;overflow-y:auto}.gf-in>*{flex-shrink:0}
 .gf-box button.lk{position:relative}.gf-box button.lk .gf-ic{filter:grayscale(1) brightness(.6)}
 .gf-box button.lk::after{content:"🔒";position:absolute;left:50%;top:18px;transform:translateX(-50%);font-size:20px}
 .ag{display:flex;flex-direction:column;gap:8px;padding:10px 12px 16px}
