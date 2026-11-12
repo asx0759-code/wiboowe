@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-1345b">
+<meta name="build" content="20261112-1720">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -796,6 +796,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .w-clock.p3f svg{box-shadow:inset 0 0 0 3px #fff}
 .c-game{--l:#b48cff;--b:#6c3ef0}
 .c-pet{--l:#ffc4dc;--b:#ff6fa5}
+.c-fire{--l:#ffb36b;--b:#ff5a1a}
+.tile.hubf{background:rgba(255,255,255,.22);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hub-ic{display:grid;grid-template-columns:repeat(3,1fr);gap:9%;width:68%;aspect-ratio:1}
+.hub-ic i{border-radius:26%;background:linear-gradient(180deg,var(--l,#ccc),var(--b,#888))}
+.hub-box button{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;color:#fff;font:inherit;cursor:pointer;padding:0;min-width:0}
+.hub-box .tile{width:80%;pointer-events:none}
+.hub-box small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-shadow:0 1px 2px #0008}
 .tile .pti{display:grid;place-items:center;width:100%;height:100%;line-height:0}.tile .pti svg{width:84%;height:84%;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}.tile .pti.away{font-size:30px;line-height:1}
 .c-friends{--l:#ffffff;--b:#dcdbe3;color:#8b93a7}
 .c-friends .vi{filter:drop-shadow(0 2px 1px rgba(0,0,0,.18))}
@@ -1553,6 +1560,66 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .pc-box small{font-size:11px;opacity:.8;line-height:1.5}
 .pc-bar{height:10px;border-radius:5px;background:#f6e6ee;overflow:hidden}.pc-bar b{display:block;height:100%;border-radius:5px;background:#ffc04d}.pc-bar b.good{background:#5fc88a}.pc-bar b.bad{background:#ff6b7a}
 
+/* ===== 불멍 ===== */
+.bm{position:relative;height:100%;min-height:100%;overflow:hidden;background:linear-gradient(180deg,#070617 0%,#151033 45%,#2a1638 70%,#1a0e1c 100%);color:#fff;font-family:var(--pixel)}
+.bm-sky{position:absolute;inset:0}
+.bm-sky i{position:absolute;width:2px;height:2px;background:#fff;animation:bmTw 3s ease-in-out infinite}
+@keyframes bmTw{0%,100%{opacity:.25}50%{opacity:1}}
+.bm-moon{position:absolute;right:14%;top:9%;width:34px;height:34px;border-radius:50%;background:#fff6d8;box-shadow:0 0 24px #fff3c480,inset -8px -4px 0 #e8dcae}
+.bm-hill{position:absolute;left:-10%;right:-10%;bottom:0;height:30%;border-radius:50% 50% 0 0/24% 24% 0 0;background:#120a14}
+.bm-trees{position:absolute;left:0;right:0;bottom:24%;height:22%;pointer-events:none}
+.bm-trees i{position:absolute;bottom:0;width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:90px solid #0d0810}
+.bm-trees i:nth-child(1){left:2%;transform:scale(1.2);transform-origin:bottom}.bm-trees i:nth-child(2){left:14%;transform:scale(.8);transform-origin:bottom}.bm-trees i:nth-child(3){right:4%;transform:scale(1.3);transform-origin:bottom}.bm-trees i:nth-child(4){right:17%;transform:scale(.9);transform-origin:bottom}.bm-trees i:nth-child(5){left:28%;transform:scale(.55);transform-origin:bottom}
+.bm-glow{position:absolute;left:50%;bottom:8%;width:150%;height:70%;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 80%,#ff8a2a66 0%,#ff5a1a33 25%,transparent 60%);pointer-events:none;transition:opacity .1s}
+.bm-pit{position:absolute;left:50%;bottom:14%;width:min(56%,230px);transform:translateX(-50%)}
+.bm-pit canvas{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;margin-bottom:-14%}
+.bm-logs{display:block;width:100%;height:auto;position:relative}
+.bm-sp{position:absolute;inset:0 0 10% 0;pointer-events:none}
+.bm-sp i{position:absolute;bottom:30%;width:3px;height:3px;background:#ffd27a;box-shadow:0 0 4px #ff9a3c;animation:bmSp 2s ease-out forwards}
+@keyframes bmSp{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),-170px);opacity:0}}
+.bm-ppl{position:absolute;left:0;right:0;bottom:calc(14% + 6px);height:0;pointer-events:none;z-index:2}
+.bm-ppl>span{position:absolute;bottom:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bm-ppl>span.l{right:calc(50% + min(25%, 105px) + 4px);transform:translateX(calc(var(--k) * -42px))}
+.bm-ppl>span.r{left:calc(50% + min(25%, 105px) + 4px);transform:translateX(calc(var(--k) * 42px))}
+.bm-ppl .mini{width:30px;height:30px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 2px #ffb36b88,0 0 12px #ff8a2a66;display:block}
+.bm-ppl .mini>*{width:100%;height:100%}
+.bm-ppl small{font-size:9.5px;color:#ffd9b0;white-space:nowrap;text-shadow:0 1px 0 #000}
+.bm-top{position:absolute;left:10px;right:10px;top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;z-index:3}
+.bm-top>span{padding:6px 10px;border-radius:999px;background:#ffffff1c;backdrop-filter:blur(4px)}
+.bm-top b{font-weight:400;color:#ffb36b}
+.bm-top>div{display:flex;gap:6px}
+.bm-top button{border:0;border-radius:999px;padding:6px 10px;background:#ffffff26;color:#fff;font:inherit;font-size:12px;cursor:pointer;backdrop-filter:blur(4px)}
+.bm-top button:active{transform:scale(.94)}
+.bm-msgs{position:absolute;left:10px;bottom:46%;width:min(62%,250px);display:flex;flex-direction:column;justify-content:flex-end;gap:6px;z-index:3;pointer-events:none;max-height:44%;overflow:hidden;-webkit-mask:linear-gradient(transparent,#000 22%);mask:linear-gradient(transparent,#000 22%)}
+.bm-b{align-self:flex-start;max-width:100%;padding:7px 12px 8px;border-radius:16px 16px 16px 4px;background:rgba(255,255,255,.17);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);animation:bmIn .45s ease-out;transition:opacity .8s,transform .8s}
+.bm-b.me{background:rgba(255,170,90,.24)}
+.bm-b small{display:block;font-size:10px;color:#ffd9b0;margin-bottom:2px}
+.bm-b p{margin:0;font-size:13px;line-height:1.5;word-break:break-word}
+.bm-b.out{opacity:0;transform:translateY(-14px)}
+@keyframes bmIn{from{opacity:0;transform:translateY(18px)}}
+.bm-bar{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:6px;z-index:3}
+.bm-bar input{flex:1;min-width:0;border:0;border-radius:999px;padding:11px 14px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:14px;backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.bm-bar input::placeholder{color:#ffffff88}
+.bm-bar button{border:0;border-radius:999px;padding:0 16px;background:#ff8a3d;color:#fff;font:inherit;font-size:13px;cursor:pointer}
+.bm-np{position:absolute;left:10px;top:48px;z-index:3;display:flex;align-items:center;gap:6px;max-width:calc(100% - 20px);border:0;border-radius:999px;padding:6px 12px;background:#ffffff1f;color:#fff;font:inherit;font-size:11.5px;backdrop-filter:blur(4px);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bm-np b{font-weight:400;color:#ffb36b}
+.bm-np .eq{display:inline-flex;align-items:flex-end;gap:2px;height:11px}.bm-np .eq i{width:2px;height:4px;background:#ffb36b}
+.bm-np .eq.on i{animation:bmEq .8s ease-in-out infinite alternate}.bm-np .eq.on i:nth-child(2){animation-delay:.2s}.bm-np .eq.on i:nth-child(3){animation-delay:.4s}
+@keyframes bmEq{from{height:3px}to{height:11px}}
+.bm-mus{position:absolute;inset:0;z-index:9;background:#0008;display:flex;align-items:flex-end}
+.bm-mus[hidden]{display:none}
+.bm-min{width:100%;max-height:86%;display:flex;flex-direction:column;border-radius:20px 20px 0 0;background:var(--lcd,#fff);color:var(--ink,#111);padding:12px 4px 10px;font-family:var(--pixel)}
+.bm-min .bm-lhd{padding:0 10px}.bm-min .bm-lhd button{background:#00000012;color:inherit}
+#bm-mv{overflow:auto;min-height:0}
+.bm-log{position:absolute;inset:0;z-index:10;background:#000a;display:flex;align-items:flex-end}
+.bm-lin{width:100%;max-height:80%;display:flex;flex-direction:column;border-radius:20px 20px 0 0;background:#1b1626;padding:14px 14px 18px}
+.bm-lhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.bm-lhd b{font-weight:400;font-size:13px}
+.bm-lhd button{border:0;border-radius:999px;padding:5px 12px;background:#ffffff1f;color:#fff;font:inherit;font-size:12px;cursor:pointer}
+#bm-ll{overflow:auto}
+#bm-ll p{display:grid;grid-template-columns:auto auto 1fr auto;align-items:baseline;gap:6px;margin:0;padding:6px 0;border-bottom:1px solid #ffffff12;font-size:12px}
+#bm-ll small{color:#8f86a0;font-size:10px}#bm-ll b{font-weight:400;color:#ffb36b}#bm-ll span{word-break:break-word}
+#bm-ll button{border:0;background:none;color:#8f86a0;font:inherit;font-size:11px;cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -1645,12 +1712,12 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').cat
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, t.length > 25 ? 4000 : 1800) }
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
-function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'fortune' && S.screen !== 'pet' && !(S.screen === 'asks' && document.activeElement?.closest?.('.ak')) && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (screen === 'send' && !talkOK()) { toast('🔒 방명록 쓰기는 지금 관리자만 할 수 있어요 · 남겨진 방명록은 볼 수 있어요'); return } if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop() } if (S.screen === 'pet' && screen !== 'pet') PET.stop(); if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); PET.watch(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'fortune' && S.screen !== 'pet' && S.screen !== 'fire' && !(S.screen === 'asks' && document.activeElement?.closest?.('.ak')) && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
+function go(screen, extra = {}) { if (screen === 'music') { screen = 'fire'; extra = { ...extra, bmMusic: true } } if (screen === 'send' && !talkOK()) { toast('🔒 방명록 쓰기는 지금 관리자만 할 수 있어요 · 남겨진 방명록은 볼 수 있어요'); return } if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop() } if (S.screen === 'pet' && screen !== 'pet') PET.stop(); if (S.screen === 'fire' && screen !== 'fire') FIRE.stop(); if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); PET.watch(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
-  if (S.screen === 'music' && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); if (S.screen === 'music') render() });
-  if (S.screen !== 'music' && subs.lis) { subs.lis(); delete subs.lis }
+  if ((S.screen === 'music' || S.screen === 'fire') && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); musicRefresh() });
+  if (S.screen !== 'music' && S.screen !== 'fire' && subs.lis) { subs.lis(); delete subs.lis }
 }
 // 실시간 연결이 끊기면(권한 오류·네트워크) 15초 뒤 다시 연결
 function retrySub(k, fn) { return e => { console.warn('sub', k, e?.code); unsub(k); setTimeout(() => { if (S.me && !subs[k]) fn() }, 15000) } }
@@ -1699,7 +1766,7 @@ async function loadMe(u) {
     if (!first) q.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (!(S.screen === 'now-chat' && S.chatWith === m.from && !document.hidden)) ping({ who: m.from, title: `${S.users[m.from] || '누군가'}님에게 쪽지가 왔어요 💬`, body: m.text || (m.st ? '🧸 스티커' : '📷 사진'), open: () => go('now-chat', { chatWith: m.from, chatAnon: false, athread: null }) }) } });
     P.dmLoaded = true; if (S.screen.startsWith('now')) render(); else if (S.screen === 'home') refresh();
   }, retrySub('dmIn', subDmIn)) })();
-  subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); if (S.screen === 'music') render() });
+  subs.room = onSnapshot(doc(db, 'room', 'main'), d => { S.room = d.exists() ? d.data() : null; followPopup(); syncPlayer(); musicRefresh() });
   go('home', { owner: u.uid });
   preparePlayer();
   getProbe().catch(() => { });
@@ -1784,23 +1851,17 @@ function render() {
         <div class="tile w-clock p3f" aria-label="시계">${clockSVG()}</div>
         ${tile('me', 'photo p3f', `<span class="appav">${avatar(S.me.uid)}</span>`, '프로필', ASKS.newCount())}
         ${tile('game', 'p3 c-game', ico('pad'), '게임')}
-        ${tile('feed', 'p3 c-friends', ico('friends'), '친구들', newNotifs())}
-        ${tile('now', 'p3 c-now', `<img class="vi jic" src="${JICON}" alt="">`, 'NOW', newTaps() + unreadDm())}
-        ${tile('sketch', 'p3 c-sketch', ico('sketch'), '낙서장')}
-        ${tile('fortune', 'p3 c-tarot', ico('tarot'), '고민 상담소')}
-        ${tile('pet', 'p3 c-pet', PET.icon(), '다마쿨찌', PET.need() ? '!' : 0)}
+        ${tile('hub', 'p3f hubf', hubIcon(), '메뉴', hubItems().reduce((t, x) => t + (+x.badge || 0), 0) || (hubItems().some(x => x.badge === '!') ? '!' : 0))}
       </div>
-      ${S.isAdmin || boatPass() ? `<div class="hs-adm"><span></span>${tile('boat', 'p3 c-boat', ico('boat'), '나룻배')}${S.isAdmin ? tile('admin', 'p3 c-admin', ico('gear'), '관리자') : '<span></span>'}</div>` : ''}
       <div class="hs-dock">
-        ${tile('inbox', 'p3 c-inbox', ico('mail'), 'INBOX', unread)}
-        ${tile('board', 'p3 c-board', ico('dial'), 'BOARD')}
-        ${tile('music', 'p3 c-music', ico('note'), 'MUSIC')}
+        ${tile('fire', 'p3 c-fire', ico('fire'), '불멍')}
       </div>
     </div>`;
     tickClock();
     v.querySelectorAll('[data-app]').forEach(b => b.onclick = () => {
       const a = b.dataset.app;
-      if (a === 'admin') { go('admin', { admUser: null }); loadAdmin() }
+      if (a === 'hub') go('hub');
+      else if (a === 'admin') { go('admin', { admUser: null }); loadAdmin() }
       else if (a === 'inbox') go('inbox', { owner: S.me.uid, itab: null });
       else if (a === 'boat' && !boatPass()) toast(G.myBoat === undefined ? '잠시 뒤 다시 눌러 주세요' : '🔒 나룻배 접근 권한이 없어요. 선장님의 탑승 허가가 필요해요');
       else go(a);
@@ -2407,6 +2468,8 @@ function render() {
 
   if (S.screen === 'asks') { ASKS.render(v, back); return }
   if (S.screen === 'pet') { back('다마쿨찌'); PET.mount(v); return }
+  if (S.screen === 'hub') { back('메뉴'); hubView(v); return }
+  if (S.screen === 'fire') { back('불멍'); FIRE.mount(v); return }
   if (S.screen === 'sketch') { back('낙서장'); SKETCH.mount(v); return }
   if (S.screen === 'boat') { back('울렁울렁 나룻배'); BOAT.mount(v); return }
   if (S.screen === 'tarot') { go('fortune', { ftab: 'tarot' }); return }
@@ -2528,8 +2591,11 @@ function render() {
     return;
   }
 
-  if (S.screen === 'music') {
-    back('Listen Together');
+  if (S.screen === 'music') { back('Listen Together'); musicPanel(v) }
+}
+
+// 같이 듣기 화면 (불멍 안의 🎵 창에서도 써요)
+function musicPanel(v) {
     // 다시 그려도 쓰던 글자와 커서가 지워지지 않게
     const keepIn = ['yturl'].map(id => { const el = $('#' + id); return el ? { id, v: el.value, f: document.activeElement === el, p: el.selectionStart } : null }).filter(Boolean);
     const r = S.room, t = r?.videoId, now = srvNow(), q = r?.queue || [];
@@ -2572,9 +2638,9 @@ function render() {
     v.querySelectorAll('.lp img').forEach(i => i.onerror = () => i.remove());
     keepIn.forEach(k => { const el = $('#' + k.id); if (!el) return; el.value = k.v; if (k.f) { el.focus(); try { el.setSelectionRange(k.p, k.p) } catch { } } });
     if ($('#join')) $('#join').onclick = joinRoom;
-    if ($('#leave')) $('#leave').onclick = () => { leaveRoom(); render() };
-    if ($('#vid')) $('#vid').onclick = () => { S.showVideo = !S.showVideo; $('#yt-box').classList.toggle('show', S.showVideo); render() };
-    $('#yt-x').onclick = () => { S.showVideo = false; $('#yt-box').classList.remove('show'); if (S.screen === 'music') render() };
+    if ($('#leave')) $('#leave').onclick = () => { leaveRoom(); musicRefresh() };
+    if ($('#vid')) $('#vid').onclick = () => { S.showVideo = !S.showVideo; $('#yt-box').classList.toggle('show', S.showVideo); musicRefresh() };
+    $('#yt-x').onclick = () => { S.showVideo = false; $('#yt-box').classList.remove('show'); musicRefresh() };
     if ($('#wake')) $('#wake').onclick = toggleWake;
     if ($('#vol')) $('#vol').oninput = e => setVol(+e.target.value);
     if ($('#play')) $('#play').onclick = togglePlay;
@@ -2595,7 +2661,7 @@ function render() {
       const pop = window.open(url, 'wiboowe_yt', `popup=yes,width=${w},height=${h},left=${left},top=${top}`);
       if (pop) { e.preventDefault(); ytPop = pop; popVid = rr.videoId; try { pop.focus() } catch { } }
     };
-    if ($('#xc')) $('#xc').onclick = () => { S.extPending = null; render() };
+    if ($('#xc')) $('#xc').onclick = () => { S.extPending = null; musicRefresh() };
     if ($('#xf')) $('#xf').onsubmit = async e => {
       e.preventDefault();
       const id = S.extPending.id, title = $('#xt').value.trim(), dur = parseDur($('#xd').value);
@@ -2609,7 +2675,7 @@ function render() {
         if (qq.length >= QMAX) { toast('다음 곡은 ' + QMAX + '곡까지예요'); return null }
         qq.push(item); return { ...cur, queue: qq };
       });
-      S.extPending = null; toast(now ? '지금 곡이에요. 유튜브에서 열어 주세요' : '다음 곡 목록에 넣었어요'); render();
+      S.extPending = null; toast(now ? '지금 곡이에요. 유튜브에서 열어 주세요' : '다음 곡 목록에 넣었어요'); musicRefresh();
     };
     v.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => roomTx(cur => {
       const qq = [...(cur.queue || [])], k = +b.dataset.rm;
@@ -2628,7 +2694,7 @@ function render() {
       // 넣기 전에 미리 확인: 막힌 영상이면 처음부터 대신 틀 영상으로 넣음
       const [info, test] = await Promise.all([ytInfo(id), testPlayable(id)]);
       $('#err').textContent = '';
-      if (info.missing || test === 'missing') { S.ytErr = '없거나 비공개인 영상이에요.'; render(); return }
+      if (info.missing || test === 'missing') { S.ytErr = '없거나 비공개인 영상이에요.'; musicRefresh(); return }
       let vid = id, title = info.title, swapped = false;
       if (info.blocked || test === 'blocked') {
         $('#err').textContent = '막힌 영상이라 같은 노래의 다른 영상을 찾는 중이에요…';
@@ -2643,7 +2709,7 @@ function render() {
           }
         }
         $('#err').textContent = '';
-        if (!alt) { S.ytErr = '이 노래는 재생할 수 있는 영상을 찾지 못해서 넣지 않았어요.'; render(); return }
+        if (!alt) { S.ytErr = '이 노래는 재생할 수 있는 영상을 찾지 못해서 넣지 않았어요.'; musicRefresh(); return }
         vid = alt.id; title = title || alt.title; swapped = true;
       }
       const idle = !S.room?.videoId || !S.room.playing;
@@ -2658,8 +2724,8 @@ function render() {
       if (!ok) return; // 저장이 안 됐으면 "넣었어요"라고 하지 않음
       toast(swapped ? '막힌 영상이라 같은 노래의 다른 영상으로 넣었어요' : idle ? '바로 재생해요' : '다음 곡 목록에 넣었어요');
     };
-  }
 }
+function musicRefresh() { if (S.screen === 'music') render(); else if (S.screen === 'fire') { FIRE.np(); if ($('#bm-mv') && !$('#bm-mus')?.hidden) musicPanel($('#bm-mv')) } }
 
 
 /* ===== 아이템 (픽셀 그림) ===== */
@@ -2718,6 +2784,7 @@ const GLYPH = {
 };
 /* ===== 홈 화면 아이콘 (흰 바탕 + 검은 그림) ===== */
 const VICON = {
+  fire: '<path d="M12 2.4c.7 3.1-1.1 4.7-2.6 6.3C7.8 10.4 6.4 12.4 6.4 15a5.6 5.6 0 0 0 11.2 0c0-2.3-1-4-2.1-5.1.1 1.6-.5 2.9-1.6 3.5.4-3.7-.8-7.7-1.9-11z" fill="currentColor"/><path d="M4 21.2l16-2.4M4 18.8l16 2.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>',
   friends: '<circle cx="9" cy="9" r="3.4" fill="currentColor"/><path d="M2.6 20c.4-3.8 3.1-6.1 6.4-6.1s6 2.3 6.4 6.1z" fill="currentColor"/><circle cx="16.4" cy="10" r="2.8" fill="currentColor" opacity=".7"/><path d="M14.2 14.6c.7-.3 1.4-.4 2.2-.4 2.8 0 4.9 2 5.2 5.8h-5.6c-.2-2.2-.8-4-1.8-5.4z" fill="currentColor" opacity=".7"/><path d="M19.3 3.2c-.9 0-1.5.6-1.8 1.2-.3-.6-.9-1.2-1.8-1.2-1.1 0-1.9.9-1.9 2 0 2 3.7 4.2 3.7 4.2s3.7-2.2 3.7-4.2c0-1.1-.8-2-1.9-2z" fill="#ff4f8b"/>',
   mail: '<rect x="2.5" y="5" width="19" height="14" rx="2.2" fill="currentColor"/><path d="M4 7.2l8 5.8 8-5.8" fill="none" style="stroke:var(--d,#fff)" stroke-width="1.7" stroke-linejoin="round"/><path d="M4.2 17.2l5.6-5M19.8 17.2l-5.6-5" style="stroke:var(--d,#fff)" stroke-width="1.3"/>',
   note: '<path d="M19.5 3.2v12.4a3.1 3.1 0 1 1-2.2-3V7.6L10 9.1v8.4a3.1 3.1 0 1 1-2.2-3V5.6z" fill="currentColor"/>',
@@ -6518,6 +6585,137 @@ const PET = (() => {
   return { mount, watch, icon, refresh: () => upd(), need: () => mine().some(needs) || reqIn.some(r => r.st === 'wait'), stop: () => { clearInterval(bt); game = null; visit = null }, _draw: draw, _rand: randGenes };
 })();
 
+/* ===== 불멍 (같이 보는 캠프파이어 · 메시지는 왼쪽에 떠올랐다 사라져요 · 관리자는 전체 기록) ===== */
+// firemsgs/{id} = { by, nick, text, at } · fire/state = { wood, at, by } · firelive/{uid} = { nick, at }
+const FIRE = (() => {
+  const W = 64, H = 96, PAL = [[0, 0, 0, 0]], LIVE_MS = 38000, SHOW = 7, $q = s => document.querySelector(s);
+  // 둠 파이어 팔레트 (검정 → 빨강 → 주황 → 노랑 → 흰색)
+  [[7, 7, 7], [31, 7, 7], [47, 15, 7], [71, 15, 7], [87, 23, 7], [103, 31, 7], [119, 31, 7], [143, 39, 7], [159, 47, 7], [175, 63, 7], [191, 71, 7], [199, 71, 7], [223, 79, 7], [223, 87, 7], [223, 87, 7], [215, 95, 7], [215, 103, 15], [207, 111, 15], [207, 119, 15], [207, 127, 15], [207, 135, 23], [199, 135, 23], [199, 143, 23], [199, 151, 31], [191, 159, 31], [191, 159, 31], [191, 167, 39], [191, 167, 39], [191, 175, 47], [183, 175, 47], [183, 183, 47], [183, 183, 55], [207, 207, 111], [223, 223, 159], [239, 239, 199], [255, 255, 255]]
+    .forEach((c, i) => PAL.push([...c, i < 3 ? 0 : Math.min(255, (i - 2) * 26)]));
+  let px = null, cv = null, ctx = null, img = null, raf = 0, last = 0, wood = 60, state = null, subM = null, subS = null, subL = null, live = [], seen = new Set(), first = true, beat = 0, ppl = {}, snd = null, lastAdd = 0, sparks = [];
+  const me = () => S.me.uid, now = () => Date.now();
+  const woodNow = () => { if (!state) return wood; const t = state.at?.toMillis ? state.at.toMillis() : now(); return Math.max(0, Math.min(100, (state.wood || 0) - 8 * (now() - t) / 3600000)) };
+  // ---------- 불꽃 ----------
+  function step() {
+    const src = Math.round(4 + woodNow() / 100 * 32); // 장작이 많을수록 불이 커요
+    for (let x = 0; x < W; x++) { const dc = Math.abs(x + .5 - W / 2) / (W * .34), f = dc >= 1 ? 0 : 1 - dc * dc; px[(H - 1) * W + x] = Math.round(src * f * (.75 + Math.random() * .25)) }
+    for (let x = 0; x < W; x++) for (let y = 1; y < H; y++) {
+      const i = y * W + x, p = px[i];
+      if (!p) { px[i - W] = 0; continue }
+      const r = Math.random() * 3 | 0, d = i - r + 1 - W;
+      px[d < 0 ? 0 : d] = Math.max(0, p - (Math.random() < .42 ? 1 : 0));
+    }
+    const d = img.data;
+    for (let i = 0; i < W * H; i++) { const c = PAL[px[i]] || PAL[0], j = i * 4; d[j] = c[0]; d[j + 1] = c[1]; d[j + 2] = c[2]; d[j + 3] = c[3] }
+    ctx.putImageData(img, 0, 0);
+  }
+  function loop(t) {
+    raf = requestAnimationFrame(loop);
+    if (t - last < 45) return; last = t;
+    if (!$q('#bm-cv')) { stop(); return }
+    step();
+    const w = woodNow(), g = $q('#bm-glow'); if (g) g.style.opacity = (.35 + w / 100 * .55 + Math.random() * .08).toFixed(2);
+    if (Math.random() < .05 + w / 600) spark();
+  }
+  function spark() {
+    const box = $q('#bm-sp'); if (!box || box.children.length > 14) return;
+    const s = document.createElement('i'); s.style.left = (44 + Math.random() * 12) + '%'; s.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px'); s.style.animationDuration = (1.4 + Math.random() * 1.4) + 's';
+    box.appendChild(s); s.addEventListener('animationend', () => s.remove());
+  }
+  // ---------- 소리 (탁탁 타는 소리) ----------
+  function sound(on) {
+    if (!on) { if (snd) { try { snd.ctx.close() } catch { } snd = null } return }
+    try {
+      const a = new (window.AudioContext || window.webkitAudioContext)(), len = a.sampleRate * 2, buf = a.createBuffer(1, len, a.sampleRate), ch = buf.getChannelData(0);
+      let b = 0; for (let i = 0; i < len; i++) { b = (b + .02 * (Math.random() * 2 - 1)) / 1.02; ch[i] = b * 3.5; if (Math.random() < .0009) for (let k = 0; k < 120 && i + k < len; k++) ch[i + k] += (Math.random() * 2 - 1) * (1 - k / 120) * .7 }
+      const s = a.createBufferSource(); s.buffer = buf; s.loop = true; const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1400; const gn = a.createGain(); gn.gain.value = .5;
+      s.connect(f).connect(gn).connect(a.destination); s.start(); snd = { ctx: a };
+    } catch { toast('이 기기에서는 소리를 낼 수 없어요') }
+  }
+  // ---------- 메시지 ----------
+  function addBubble(m) {
+    const box = $q('#bm-msgs'); if (!box) return;
+    const el = document.createElement('div'); el.className = 'bm-b' + (m.by === me() ? ' me' : '');
+    el.innerHTML = `<small>${esc(m.nick || S.users[m.by] || '누군가')}</small><p>${esc(m.text)}</p>`;
+    box.appendChild(el);
+    while (box.children.length > SHOW) box.firstChild.remove();
+    const left = Math.max(4000, LIVE_MS - (now() - (m.t || now())));
+    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 900) }, left);
+  }
+  function watch() {
+    if (!subM) subM = onSnapshot(query(collection(db, 'firemsgs'), orderBy('at', 'desc'), limit(25)), q => {
+      const add = [];
+      q.docChanges().forEach(c => { if (c.type !== 'added' || seen.has(c.doc.id)) return; seen.add(c.doc.id); const d = c.doc.data({ serverTimestamps: 'estimate' }), t = d.at?.toMillis ? d.at.toMillis() : now(); if (now() - t < (first ? 180000 : LIVE_MS)) add.push({ ...d, t }) });
+      first = false; add.sort((a, b) => a.t - b.t).forEach(addBubble);
+    }, () => { subM = null });
+    if (!subS) subS = onSnapshot(doc(db, 'fire', 'state'), d => { state = d.exists() ? d.data({ serverTimestamps: 'estimate' }) : null; info() }, () => { subS = null });
+    if (!subL) subL = onSnapshot(collection(db, 'firelive'), q => { const o = {}; q.forEach(d => { const x = d.data({ serverTimestamps: 'estimate' }), t = x.at?.toMillis ? x.at.toMillis() : 0; if (now() - t < 70000) o[d.id] = x }); ppl = o; info() }, () => { subL = null });
+  }
+  const hb = () => setDoc(doc(db, 'firelive', me()), { nick: S.me.nick || S.users[me()] || '', at: serverTimestamp() }).catch(() => { });
+  function info() {
+    const el = $q('#bm-info'); if (!el) return; const w = Math.round(woodNow()), n = Object.keys(ppl).length || 1;
+    el.innerHTML = `🔥 ${n}명이 불멍 중 · 장작 ${w}%${w < 12 ? ' · <b>불이 꺼져 가요…</b>' : ''}`;
+    const sit = $q('#bm-ppl'); if (sit) sit.innerHTML = Object.keys(ppl).slice(0, 8).map((u, i) => `<span class="${i % 2 ? 'r' : 'l'}" style="--k:${Math.floor(i / 2)}"><span class="mini">${avatar(u)}</span><small>${esc(ppl[u].nick || S.users[u] || '')}</small></span>`).join('');
+  }
+  async function send() {
+    const inp = $q('#bm-in'), text = inp.value.trim(); if (!text) return;
+    inp.value = '';
+    try { await setDoc(doc(collection(db, 'firemsgs')), { by: me(), nick: S.me.nick || S.users[me()] || '', text, at: serverTimestamp() }) } catch (e) { inp.value = text; toast('보내지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+  }
+  async function addWood() {
+    if (now() - lastAdd < 8000) { toast('장작은 8초에 한 번만 넣을 수 있어요 🪵'); return }
+    lastAdd = now(); const w = Math.min(100, Math.round(woodNow()) + 20);
+    try { await setDoc(doc(db, 'fire', 'state'), { wood: w, by: me(), at: serverTimestamp() }); toast('🪵 장작을 넣었어요! 불이 커져요'); for (let i = 0; i < 10; i++) setTimeout(spark, i * 60) } catch (e) { toast('장작을 넣지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
+  }
+  async function logView() {
+    const v = $q('.bm'); if (!v) return; $q('#bm-log')?.remove();
+    v.insertAdjacentHTML('beforeend', '<div class="bm-log" id="bm-log"><div class="bm-lin"><div class="bm-lhd"><b>📜 불멍 대화 기록 (관리자만)</b><button id="bm-lx">닫기</button></div><div id="bm-ll"><div class="empty">불러오는 중…</div></div></div></div>');
+    $q('#bm-lx').onclick = () => $q('#bm-log').remove();
+    try {
+      const q = await getDocs(query(collection(db, 'firemsgs'), orderBy('at', 'desc'), limit(500))), a = []; q.forEach(d => a.push({ id: d.id, ...d.data() }));
+      $q('#bm-ll').innerHTML = a.length ? a.map(m => `<p><small>${fmt(m.at)}</small><b>${esc(m.nick || S.users[m.by] || '?')}</b><span>${esc(m.text)}</span><button data-fd="${m.id}" aria-label="지우기">✕</button></p>`).join('') : '<div class="empty">아직 대화가 없어요</div>';
+      $q('#bm-ll').querySelectorAll('[data-fd]').forEach(b => b.onclick = async () => { if (!b.dataset.ok) { b.dataset.ok = 1; b.textContent = '지울까요?'; return } try { await deleteDoc(doc(db, 'firemsgs', b.dataset.fd)); b.parentElement.remove() } catch { toast('지우지 못했어요') } });
+    } catch (e) { $q('#bm-ll').innerHTML = `<div class="empty">불러오지 못했어요${e?.code ? ' (' + e.code + ')' : ''}</div>` }
+  }
+  const stars = () => Array.from({ length: 46 }, () => `<i style="left:${(Math.random() * 100).toFixed(1)}%;top:${(Math.random() * 58).toFixed(1)}%;animation-delay:${(Math.random() * 3).toFixed(1)}s;${Math.random() < .2 ? 'width:3px;height:3px' : ''}"></i>`).join('');
+  const LOGS = `<svg class="bm-logs" viewBox="0 0 40 10" shape-rendering="crispEdges" aria-hidden="true"><g fill="#5a3418"><rect x="4" y="5" width="32" height="3" transform="rotate(-8 20 6)"/><rect x="4" y="5" width="32" height="3" transform="rotate(8 20 6)"/></g><g fill="#8a5a2b"><rect x="5" y="5" width="30" height="1" transform="rotate(-8 20 6)"/><rect x="5" y="5" width="30" height="1" transform="rotate(8 20 6)"/></g><g fill="#3a2010"><rect x="3" y="6" width="2" height="2" transform="rotate(-8 20 6)"/><rect x="35" y="6" width="2" height="2" transform="rotate(8 20 6)"/></g>${[8, 13, 18, 23, 28, 32].map((x, i) => `<rect x="${x}" y="${8 + (i % 2)}" width="2" height="1" fill="#6b6470"/>`).join('')}</svg>`;
+  function mount(v) {
+    v.innerHTML = `<div class="bm"><div class="bm-sky">${stars()}<span class="bm-moon"></span></div><div class="bm-hill"></div><div class="bm-trees"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="bm-glow" id="bm-glow"></div><div class="bm-pit"><canvas id="bm-cv" width="${W}" height="${H}"></canvas>${LOGS}<div class="bm-sp" id="bm-sp"></div></div><div class="bm-ppl" id="bm-ppl"></div>
+      <div class="bm-top"><span id="bm-info">🔥 불 붙이는 중…</span><div><button id="bm-mu">🎵</button><button id="bm-wood">🪵 장작</button><button id="bm-snd">${snd ? '🔊' : '🔈'}</button>${S.isAdmin ? '<button id="bm-lg">📜</button>' : ''}</div></div>
+      <button class="bm-np" id="bm-np" hidden></button>
+      <div class="bm-msgs" id="bm-msgs"></div>
+      <div class="bm-mus" id="bm-mus" hidden><div class="bm-min"><div class="bm-lhd"><b>🎵 같이 듣기</b><button id="bm-mx">닫기</button></div><div id="bm-mv"></div></div></div>
+      <form class="bm-bar" id="bm-f"><input id="bm-in" maxlength="100" placeholder="불 보면서 한마디…" autocomplete="off"><button>보내기</button></form></div>`;
+    cv = $q('#bm-cv'); ctx = cv.getContext('2d'); img = ctx.createImageData(W, H); px = new Uint8Array(W * H);
+    for (let i = 0; i < 60; i++) step();
+    seen = new Set(); first = true; if (subM) { subM(); subM = null }
+    watch(); hb(); clearInterval(beat); beat = setInterval(() => { hb(); info() }, 20000);
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+    $q('#bm-f').onsubmit = e => { e.preventDefault(); send() };
+    $q('#bm-wood').onclick = addWood;
+    $q('#bm-snd').onclick = () => { sound(!snd); $q('#bm-snd').textContent = snd ? '🔊' : '🔈' };
+    if ($q('#bm-lg')) $q('#bm-lg').onclick = logView;
+    const openMu = () => { $q('#bm-mus').hidden = false; musicPanel($q('#bm-mv')) };
+    $q('#bm-mu').onclick = openMu; $q('#bm-np').onclick = openMu;
+    $q('#bm-mx').onclick = () => { $q('#bm-mus').hidden = true; np() };
+    $q('#bm-mus').onclick = e => { if (e.target.id === 'bm-mus') { $q('#bm-mus').hidden = true; np() } };
+    if (S.bmMusic) { S.bmMusic = false; openMu() }
+    np(); info();
+  }
+  function np() { // 지금 나오는 곡
+    const b = $q('#bm-np'); if (!b) return; const r = S.room;
+    if (!r?.videoId) { b.hidden = false; b.innerHTML = '🎵 노래 틀기'; return }
+    b.hidden = false; b.innerHTML = `<span class="eq${r.playing && S.joined ? ' on' : ''}"><i></i><i></i><i></i></span>${esc(r.title || '같이 듣는 중')}${S.joined ? '' : ' · <b>같이 듣기</b>'}`;
+  }
+  function stop() {
+    cancelAnimationFrame(raf); raf = 0; clearInterval(beat); sound(false);
+    if (subM) { subM(); subM = null } if (subS) { subS(); subS = null } if (subL) { subL(); subL = null }
+    if (S.me) deleteDoc(doc(db, 'firelive', me())).catch(() => { });
+  }
+  return { mount, stop, np };
+})();
+
 /* ===== 게임 폴더 (아이콘 모음) ===== */
 const GAMES = [
   { id: 'mole', name: '두더지', bg: ['#b7f06a', '#3f9a2e'], pal: { b: '#8a5a33', d: '#5c3a1e', e: '#1a1a1a', p: '#ff8fb0', w: '#fff', h: '#2c1a0c', y: '#ffd23f', r: '#e8283c' },
@@ -6595,6 +6793,35 @@ function drawCoinBoard() {
   let rank = 0, prev = null;
   el.innerHTML = `<div class="gf-tot">전체 <b>${n(total)}</b> 코인 · ${arr.filter(x => x.c !== null).length}명</div>` + arr.map((x, i) => { if (x.c !== prev) { rank = i + 1; prev = x.c }
     return `<div class="gf-rw${x.u === me ? ' gf-me' : ''}"><span class="gf-rk r${x.c !== null && rank <= 3 ? rank : ''}">${x.c === null ? '-' : rank}</span><span class="mini">${avatar(x.u)}</span><span class="gf-nm">${esc(S.users[x.u])}${x.u === me ? ' (나)' : ''}</span><b>${x.c === null ? '<small>아직 안 함</small>' : n(x.c)}</b></div>` }).join('');
+}
+// ===== 메뉴 폴더: 홈에서 자주 안 쓰는 메뉴를 한데 모아요 =====
+function hubItems() {
+  const unread = (S.mine || []).filter(m => !m.read).length;
+  const L = [
+    { id: 'inbox', cls: 'p3 c-inbox', inner: ico('mail'), label: 'INBOX', badge: unread },
+    { id: 'board', cls: 'p3 c-board', inner: ico('dial'), label: 'BOARD' },
+    { id: 'feed', cls: 'p3 c-friends', inner: ico('friends'), label: '친구들', badge: newNotifs() },
+    { id: 'now', cls: 'p3 c-now', inner: `<img class="vi jic" src="${JICON}" alt="">`, label: '잭디', badge: newTaps() + unreadDm() },
+    { id: 'sketch', cls: 'p3 c-sketch', inner: ico('sketch'), label: '낙서장' },
+    { id: 'fortune', cls: 'p3 c-tarot', inner: ico('tarot'), label: '고민 상담소' },
+    { id: 'pet', cls: 'p3 c-pet', inner: PET.icon(), label: '다마쿨찌', badge: PET.need() ? '!' : 0 }
+  ];
+  if (S.isAdmin) L.push({ id: 'admin', cls: 'p3 c-admin', inner: ico('gear'), label: '관리자' });
+  if (S.isAdmin || boatPass()) L.push({ id: 'boat', cls: 'p3 c-boat', inner: ico('boat'), label: '나룻배' });
+  return L;
+}
+const hubIcon = () => `<span class="hub-ic">${hubItems().slice(0, 9).map(x => `<i class="${x.cls.replace('p3 ', '')}"></i>`).join('')}</span>`;
+function hubView(v) {
+  const L = hubItems();
+  v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><div class="gf-hd"><h2>메뉴</h2></div>
+    <div class="gf-box hub-box">${L.map(x => `<button data-app="${x.id}" aria-label="${x.label}"><span class="tile ${x.cls}">${x.inner}${x.badge ? `<span class="badge">${x.badge > 99 ? '99+' : x.badge}</span>` : ''}</span><small>${x.label}</small></button>`).join('')}</div></div></div>`;
+  v.querySelectorAll('[data-app]').forEach(b => b.onclick = () => {
+    const a = b.dataset.app;
+    if (a === 'admin') { go('admin', { admUser: null }); loadAdmin() }
+    else if (a === 'inbox') go('inbox', { owner: S.me.uid, itab: null });
+    else if (a === 'boat' && !boatPass()) toast(G.myBoat === undefined ? '잠시 뒤 다시 눌러 주세요' : '🔒 나룻배 접근 권한이 없어요. 선장님의 탑승 허가가 필요해요');
+    else go(a);
+  });
 }
 function gameFolder(v) {
   v.innerHTML = `<div class="gf"${S.wall ? ` style="background-image:url('${S.wall}')"` : ''}><div class="gf-in"><div class="gf-hd"><h2>게임</h2><div class="gf-r"><button id="gf-all" class="gf-all" aria-label="전체 코인 현황">${GF_BOARD}</button><button id="gf-coin" class="gf-coin"></button></div></div>
@@ -7116,9 +7343,9 @@ async function preparePlayer() {
   player = new YT.Player('yt', {
     width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, origin: location.origin, widget_referrer: location.href },
     events: {
-      onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; try { player.setVolume(S.vol) } catch { } if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); if (S.screen === 'music') render() },
+      onReady: () => { playerReady = true; lastVid = null; S.loadingYT = false; try { player.setVolume(S.vol) } catch { } if (S.joined && S.room?.playing) startNow(S.room.videoId, target(S.room)); else syncPlayer(); musicRefresh() },
       onStateChange: e => {
-        if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (ytPop && !S.room?.ext) { try { ytPop.close() } catch { } ytPop = null; popVid = null } if (S.needTap) { S.needTap = false; if (S.screen === 'music') render() } }
+        if (e.data === YT.PlayerState.PLAYING) { clearTimeout(checkT); if (ytPop && !S.room?.ext) { try { ytPop.close() } catch { } ytPop = null; popVid = null } if (S.needTap) { S.needTap = false; musicRefresh() } }
         if (e.data === YT.PlayerState.ENDED) {
           // 내 플레이어에서 끝난 곡이 '지금 곡'과 같고, 서버 시간으로도 정말 끝날 때가 됐을 때만 넘김
           const r = S.room, vid = lastVid, dur = player.getDuration?.() || 0;
@@ -7141,7 +7368,7 @@ async function preparePlayer() {
           if (retryN[vid] <= 1) { S.ytErr = ''; try { player.loadVideoById({ videoId: vid, startSeconds: target(r) }) } catch { } }
           else { S.ytErr = ''; fixBlocked(vid) }
         }
-        if (S.screen === 'music') render();
+        musicRefresh();
       }
     }
   });
@@ -7158,7 +7385,7 @@ function startNow(videoId, t) { // 클릭한 순간에 바로 호출
   checkT = setTimeout(() => { // 몇 초 지나도 재생이 안 되면 플레이어를 직접 누르게 보여 줌
     const st = player?.getPlayerState?.();
     if (S.joined && S.room?.playing && !S.room.ext && st !== YT.PlayerState.PLAYING && st !== YT.PlayerState.BUFFERING) {
-      S.showVideo = true; $('#yt-box').classList.add('show'); S.needTap = true; if (S.screen === 'music') render();
+      S.showVideo = true; $('#yt-box').classList.add('show'); S.needTap = true; musicRefresh();
     }
   }, 3500);
 }
