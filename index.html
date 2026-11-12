@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-1200">
+<meta name="build" content="20261112-1230">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -1518,6 +1518,21 @@ body{height:100vh;height:100dvh;padding-block:max(12px,env(safe-area-inset-top,0
 .pi-card>div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .pi-card b{font-weight:400;font-size:15px}.pi-card small{font-size:11px;opacity:.75;line-height:1.5}
 .pt-gn{font-size:11px;opacity:.7}
+.al-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.al-grid button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:16px;padding:8px 4px;background:#fffaf0;color:#4b3550;font:inherit;cursor:pointer;box-shadow:0 3px 0 #f0d38a}
+.al-grid b{font-weight:400;font-size:12px}.al-grid small{font-size:10px;opacity:.7}
+.bye-card{max-width:320px!important;gap:10px!important}
+.bye-pet{position:relative;line-height:0;animation:byeHop 1.2s ease-in-out infinite}
+.bye-pet .bag{position:absolute;left:-14px;bottom:10px;font-size:30px;line-height:1}.bye-pet .wave{position:absolute;right:-20px;top:16px;font-size:28px;line-height:1;animation:byeWave .6s ease-in-out infinite alternate;transform-origin:20% 90%}
+@keyframes byeHop{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes byeWave{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+.bye-letter{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:14px;background:repeating-linear-gradient(180deg,#fffdf6 0 25px,#f3e6d0 25px 26px);text-align:left;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 0 0 1px #f0dcc0}
+.bye-letter p{margin:0;font-size:13px;line-height:1.75}.bye-letter small{font-size:11px;color:#d94f86}.bye-letter .sig{text-align:right;color:#8a6a50}
+.pt-jb{font-size:11px;padding:2px 8px;border-radius:999px;background:#fff1c2;color:#8a5a00}
+.pt-job{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:14px}.pt-job b{font-weight:400;color:#d94f86}.pt-job small{font-size:11px;opacity:.75;text-align:center}
+.pr-ratio{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#f6e6ee}
+.pr-ratio .study,.pr-leg .study::before{background:#6fb7ff}.pr-ratio .gym,.pr-leg .gym::before{background:#5fc88a}.pr-ratio .sing,.pr-leg .sing::before{background:#ff8fc0}.pr-ratio .job,.pr-leg .job::before{background:#ffc04d}
+.pr-leg{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px}.pr-leg small::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
 .pt-xp{display:flex;align-items:center;gap:8px}
 .pt-xp .lv{flex:none;padding:3px 9px;border-radius:999px;background:#ff6fa5;color:#fff;font-size:11px}
 .pt-xp .bar{position:relative;flex:1;height:18px;border-radius:9px;background:#fff;box-shadow:inset 0 0 0 2px #f3c3d6;overflow:hidden}
@@ -5939,6 +5954,27 @@ const PET = (() => {
     const q = (d.meals + d.plays + d.baths + d.sweeps) / need;
     return { d, q, lv: d.ran > 0 || q < .6 ? 'bad' : q >= 1.2 ? 'good' : 'ok' };
   }
+  // 어른이 될 때 활동 비율로 직업이 정해져요 (프린세스 메이커 엔딩처럼)
+  const CAREER = {
+    dr: { n: '박사 말랑', ic: '🎓', perk: '공부할 때 지능이 2 더 올라요', gift: { face: 'glasses' } },
+    ath: { n: '운동선수 말랑', ic: '🏅', perk: '운동할 때 기운이 덜 들어요 (-10)' },
+    idol: { n: '아이돌 말랑', ic: '🎤', perk: '노래·춤 연습이 공짜, 매력 +2' },
+    boss: { n: '사장님 말랑', ic: '💼', perk: '알바하면 코인을 1.5배 벌어 와요', gift: { neck: 'bow' } },
+    worker: { n: '고학생 말랑', ic: '📖', perk: '공부가 공짜, 알바 수입 +20%' },
+    dancer: { n: '댄서 말랑', ic: '💃', perk: '놀아 주면 기분이 10 더 올라요' },
+    allround: { n: '만능 말랑', ic: '🌈', perk: '모든 활동 경험치 +5' },
+    neet: { n: '백수 말랑', ic: '🛋️', perk: '기운이 천천히 닳아요 (뒹굴뒹굴)' }
+  };
+  function careerOf(x) {
+    const c = { study: 0, gym: 0, sing: 0, job: 0, ...(x.dc || {}) }, tot = c.study + c.gym + c.sing + c.job;
+    if (tot < 4) return 'neet';
+    const r = k => c[k] / tot, top = Object.keys(c).sort((a, b) => c[b] - c[a])[0];
+    if (r(top) >= .5) return { study: 'dr', gym: 'ath', sing: 'idol', job: 'boss' }[top];
+    if (r('study') >= .3 && r('job') >= .3) return 'worker';
+    if (r('gym') >= .3 && r('sing') >= .3) return 'dancer';
+    if (['study', 'gym', 'sing', 'job'].every(k => r(k) >= .15)) return 'allround';
+    return { study: 'dr', gym: 'ath', sing: 'idol', job: 'boss' }[top];
+  }
   function evolve(x, to) {
     const { d, lv } = careOf(x), ev = { ...(x.ev || {}) }, R = Math.random; // 돌봄 + 능력치로 생김새가 정해져요
     if (to === 'child' || to === 'adult' && !x.evs) {
@@ -5960,7 +5996,19 @@ const PET = (() => {
         if (top[0] === 'str') { if (R() < .45) ev.e = one(['horn', 'bear']); if (R() < .4) ev.s = 'round' }
       }
     }
-    return { ev, lv };
+    let job = null;
+    if (to === 'adult') {
+      job = careerOf(x);
+      if (job === 'dr') { if (R() < .5) ev.d = 'antenna'; if (R() < .4) ev.p = 'stripe' }
+      if (job === 'ath') { if (R() < .5) ev.e = 'horn'; if (R() < .5) ev.s = 'round' }
+      if (job === 'idol') { const r = R(); if (r < .15) ev.c = R() < .5 ? 'gold' : 'galaxy'; else if (r < .7) ev.c = one(BRIGHT); if (R() < .5) ev.p = 'star' }
+      if (job === 'boss') { if (R() < .5) ev.s = 'mochi'; if (R() < .4) ev.c = one(['butter', 'cream', 'choco']) }
+      if (job === 'worker') { if (R() < .5) ev.d = 'sprout' }
+      if (job === 'dancer') { if (R() < .6) ev.e = 'bunny'; if (R() < .4) ev.s = 'bean' }
+      if (job === 'allround') { if (R() < .2) ev.c = R() < .5 ? 'gold' : 'galaxy' }
+      if (job === 'neet') { if (R() < .4) ev.c = 'gray'; if (R() < .5) ev.s = 'mochi'; if (R() < .4) ev.e = 'droop' }
+    }
+    return { ev, lv, job };
   }
   const geneTxt = g => `${COL[g.c]?.[0] || ''} · ${SHAPE[g.s]} · ${EAR[g.e]} · ${PAT[g.p]}${g.d !== 'none' ? ' · ' + DECO[g.d] : ''}`;
   // ---------- 그림 (20x20 픽셀을 유전자대로 조립 · 테두리는 자동) ----------
@@ -6100,11 +6148,12 @@ const PET = (() => {
   let pets = {}, room = null, rooms = {}, reqIn = [], reqOut = [], sub = null, subR = null, subB1 = null, subB2 = null, loaded = false;
   let cur = null, tab = 'care', visit = null, busy = false, fx = '', blink = false, bt = 0, game = null, skipName = {};
   const $q = s => document.querySelector(s), now = () => Date.now(), clamp = x => Math.max(0, Math.min(100, x)), me = () => S.me.uid;
-  const mine = () => Object.entries(pets).filter(([, p]) => p.owner === me()).map(([id, p]) => ({ id, ...p })).sort((a, b) => a.born - b.born);
+  const album = () => Object.entries(pets).filter(([, p]) => p.owner === me() && p.st === 'indep').map(([id, p]) => ({ id, ...p })).sort((a, b) => (b.ind || 0) - (a.ind || 0));
+  const mine = () => Object.entries(pets).filter(([, p]) => p.owner === me() && p.st !== 'indep').map(([id, p]) => ({ id, ...p })).sort((a, b) => a.born - b.born);
   const myCur = () => { const L = mine(); return L.find(p => p.id === cur) || L.find(p => p.id === room?.main) || L[0] || null };
   function stats(x, t = now()) {
     const hrs = Math.max(0, (t - (x.at || t)) / HR), sl = !!x.sleep;
-    return { h: clamp(x.h - (sl ? 2 : 5) * hrs), m: clamp(x.m - 4 * hrs), c: clamp(x.c - 2.5 * hrs - (x.poop || 0) * 1.5 * hrs), e: clamp(sl ? x.e + 12 * hrs : x.e - 4 * hrs), poop: sl ? (x.poop || 0) : Math.min(4, (x.poop || 0) + Math.floor((t - (x.pt || t)) / (4 * HR))) };
+    return { h: clamp(x.h - (sl ? 2 : 5) * hrs), m: clamp(x.m - 4 * hrs), c: clamp(x.c - 2.5 * hrs - (x.poop || 0) * 1.5 * hrs), e: clamp(sl ? x.e + 12 * hrs : x.e - (x.job === 'neet' ? 2 : 4) * hrs), poop: sl ? (x.poop || 0) : Math.min(4, (x.poop || 0) + Math.floor((t - (x.pt || t)) / (4 * HR))) };
   }
   const XP = { child: 120, adult: 360 }; // 경험치가 이만큼 모이면 자라요
   const stage = x => x.st === 'egg' ? 'egg' : (x.xp || 0) < XP.child ? 'baby' : (x.xp || 0) < XP.adult ? 'child' : 'adult';
@@ -6127,7 +6176,7 @@ const PET = (() => {
   const eggSpots = x => x.ps && x.ps.length ? x.ps : [COL[x.g.c][3], '#a8dcff'];
   let grown = null;
   const art = (x, size, face) => { const sg = stage(x); return draw(eg(x), sg, { size, face, wear: x.wear || {}, spots: sg === 'egg' ? eggSpots(x) : null }) };
-  const ACT = { egg: '알을 받았어요 🥚', buy: '알을 사 왔어요 🥚', breed: '교배로 알이 생겼어요 💞', warm: '알을 품어 줬어요', hatch: '알이 깨어났어요! 🐣', name: '이름을 지어 줬어요', meal: '밥을 줬어요 🍙', snack: '간식을 줬어요 🍬', play: '놀아 줬어요 🎾', win: '놀이에서 이겼어요 ✨', bath: '씻겨 줬어요 🛁', sweep: '방을 치웠어요 🧹', sleep: '재웠어요 💤', wake: '깨웠어요 ☀️', lure: '간식을 놓아뒀어요 🍪', back: '말랑이가 돌아왔어요!', ran: '말랑이가 가출했어요… 💨', grow: '어른이 됐어요! 🎉', kid: '어린이가 됐어요! 🌱', wear: '옷을 갈아입혔어요 👗', vit: '비타민을 먹였어요 💊', do_study: '공부를 시켰어요 📚', do_gym: '운동을 시켰어요 🏃', do_sing: '노래·춤 연습을 시켰어요 🎤', do_job: '알바를 보냈어요 💼', rename: '이름을 바꿨어요' };
+  const ACT = { egg: '알을 받았어요 🥚', buy: '알을 사 왔어요 🥚', breed: '교배로 알이 생겼어요 💞', warm: '알을 품어 줬어요', hatch: '알이 깨어났어요! 🐣', name: '이름을 지어 줬어요', meal: '밥을 줬어요 🍙', snack: '간식을 줬어요 🍬', play: '놀아 줬어요 🎾', win: '놀이에서 이겼어요 ✨', bath: '씻겨 줬어요 🛁', sweep: '방을 치웠어요 🧹', sleep: '재웠어요 💤', wake: '깨웠어요 ☀️', lure: '간식을 놓아뒀어요 🍪', back: '말랑이가 돌아왔어요!', ran: '말랑이가 가출했어요… 💨', grow: '어른이 됐어요! 🎉', kid: '어린이가 됐어요! 🌱', wear: '옷을 갈아입혔어요 👗', vit: '비타민을 먹였어요 💊', indep: '독립했어요 🎒', do_study: '공부를 시켰어요 📚', do_gym: '운동을 시켰어요 🏃', do_sing: '노래·춤 연습을 시켰어요 🎤', do_job: '알바를 보냈어요 💼', rename: '이름을 바꿨어요' };
   // ---------- 저장 ----------
   function newPet(g, extra = {}) { const t = now(); return { owner: me(), name: '', g, gen: 1, par: [], ps: [], st: 'egg', warm: 0, born: t, hatch: 0, at: t, h: 80, m: 80, c: 100, e: 100, poop: 0, pt: t, sleep: false, meals: 0, snacks: 0, plays: 0, ran: 0, back: 0, lb: 0, wear: {}, log: [], ...extra } }
   async function addPet(p, a) {
@@ -6178,7 +6227,7 @@ const PET = (() => {
     if (!x || busy) return; const t = now();
     if (x.st === 'egg' && t - x.born >= HATCH_AUTO) return act(x.id, (y, c, tt) => y.st === 'egg' ? { st: 'pet', hatch: tt, at: tt, pt: tt, log: [{ u: '', a: 'hatch', t: tt }] } : null);
     if (x.st === 'pet' && ranAway(x)) return act(x.id, (y, c, tt) => y.st === 'pet' ? { st: 'away', ran: (y.ran || 0) + 1, back: 0, sleep: false, log: [{ u: '', a: 'ran', t: tt }] } : null);
-    if (x.st === 'pet' && x.owner === me()) { const sg = stage(x); if (ORD[sg] > ORD[x.evs || 'baby']) { let res = null; return act(x.id, (y, c, tt) => { const sg2 = stage(y); if (!(ORD[sg2] > ORD[y.evs || 'baby'])) return null; const { ev, lv } = evolve(y, sg2); res = { before: eg(y), after: { ...y.g, ...ev }, to: sg2, lv, name: y.name }; return { ev, evs: sg2, ck: { meals: y.meals || 0, snacks: y.snacks || 0, plays: y.plays || 0, baths: y.baths || 0, sweeps: y.sweeps || 0, ran: y.ran || 0 }, log: [{ u: '', a: sg2 === 'adult' ? 'grow' : 'kid', t: tt }] } }).then(() => { if (res) { grown = res; view() } }) } }
+    if (x.st === 'pet' && x.owner === me()) { const sg = stage(x); if (ORD[sg] > ORD[x.evs || 'baby']) { let res = null; return act(x.id, (y, c, tt) => { const sg2 = stage(y); if (!(ORD[sg2] > ORD[y.evs || 'baby'])) return null; const { ev, lv, job } = evolve(y, sg2), gw = job && CAREER[job].gift ? { ...CAREER[job].gift, ...(y.wear || {}) } : (y.wear || {}); res = { before: eg(y), after: { ...y.g, ...ev }, to: sg2, lv, name: y.name, job, wear: gw }; return { ev, evs: sg2, ...(job ? { job, wear: gw } : {}), ck: { meals: y.meals || 0, snacks: y.snacks || 0, plays: y.plays || 0, baths: y.baths || 0, sweeps: y.sweeps || 0, ran: y.ran || 0 }, log: [{ u: '', a: sg2 === 'adult' ? 'grow' : 'kid', t: tt }] } }).then(() => { if (res) { grown = res; view() } }) } }
     if (x.st === 'away' && x.back && t >= x.back) return act(x.id, (y, c, tt) => y.st === 'away' && y.back && tt >= y.back ? { st: 'pet', back: 0, h: 50, m: 40, c: 60, e: 80, poop: 0, pt: tt, at: tt, log: [{ u: '', a: 'back', t: tt }] } : null);
   }
   // ---------- 화면 ----------
@@ -6205,7 +6254,9 @@ const PET = (() => {
     const L = mine(), x = myCur(); if (x) cur = x.id;
     if (!L.length) {
       v.innerHTML = `<div class="pt-start">${draw(randGenes(), 'egg', { size: 120, spots: ['#ff9ac0', '#a8dcff'] })}<p>각자 말랑이를 키워요!<br>첫 알은 공짜예요. 무슨 색, 어떤 모양이 나올지는<br>깨어나 봐야 알아요 🥚</p><button class="tr-btn" id="pt-new">🥚 첫 알 받기</button></div>
-        ${reqIn.some(r => r.st === 'wait') ? '<p class="pt-coin">💞 교배 신청이 와 있어요. 먼저 말랑이를 키워 봐요!</p>' : ''}`;
+        ${reqIn.some(r => r.st === 'wait') ? '<p class="pt-coin">💞 교배 신청이 와 있어요. 먼저 말랑이를 키워 봐요!</p>' : ''}
+        ${album().length ? `<div class="ps-sec">📔 독립한 말랑이 앨범 (${album().length})</div><div class="al-grid">${album().map(p => `<button data-al="${p.id}">${draw(eg(p), 'adult', { size: 64, wear: p.wear || {} })}<b>${nm(p)}</b><small>${p.job ? CAREER[p.job].ic + ' ' + CAREER[p.job].n : '어른 말랑'}</small></button>`).join('')}</div>` : ''}`;
+      v.querySelectorAll('[data-al]').forEach(b => b.onclick = () => { const p = pets[b.dataset.al]; if (p) letter({ id: b.dataset.al, ...p }) });
       $q('#pt-new').onclick = async () => { if (busy) return; busy = true; try { await addPet(newPet(randGenes(), { ps: ['#ff9ac0', '#a8dcff'] }), 'egg') } catch (e) { toast('알을 받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } busy = false };
       return;
     }
@@ -6222,20 +6273,20 @@ const PET = (() => {
         <button data-a="bath" ${x.sleep ? 'disabled' : ''}>🛁<small>씻기기</small></button><button data-a="sweep" ${!c.poop ? 'disabled' : ''}>🧹<small>방 치우기</small></button><button data-a="${x.sleep ? 'wake' : 'sleep'}">${x.sleep ? '☀️<small>깨우기</small>' : '💡<small>재우기</small>'}</button>
         <button data-a="vit" class="wide" ${x.sleep ? 'disabled' : ''}>💊<small>비타민 · ${COST.vit} · 기운 +30</small></button></div>
         <div class="ps-sec">🎒 활동 · 경험치를 모아서 자라요</div>
-        <div class="pt-do">${Object.entries(DO).map(([k, D]) => { const n = dl(x)[k] || 0, lock = k === 'job' && sg === 'baby'; return `<button data-do="${k}" ${x.sleep || n >= DMAX || lock ? 'disabled' : ''}><span>${D.ic}</span><b>${D.n}</b><small>${lock ? '어린이부터' : `${D.cost ? D.cost + '코인 · ' : ''}기운 -${D.e}`}</small><em>${DMAX - n}/${DMAX}</em></button>` }).join('')}</div>`;
+        <div class="pt-do">${Object.entries(DO).map(([k, D]) => { const n = dl(x)[k] || 0, lock = k === 'job' && sg === 'baby'; return `<button data-do="${k}" ${x.sleep || n >= DMAX || lock ? 'disabled' : ''}><span>${D.ic}</span><b>${D.n}</b><small>${lock ? '어린이부터' : `${D.cost && !((x.job === 'idol' && k === 'sing') || (x.job === 'worker' && k === 'study')) ? D.cost + '코인 · ' : ''}기운 -${x.job === 'ath' && k === 'gym' ? 10 : D.e}`}</small><em>${DMAX - n}/${DMAX}</em></button>` }).join('')}</div>`;
       body += logH(x);
     } else if (tab === 'deco') body = shopHTML('room');
     else if (tab === 'wear') body = shopHTML('wear', x);
     else if (tab === 'friends') body = friendsHTML();
     else if (tab === 'breed') body = breedHTML(x);
     else if (tab === 'info') body = infoHTML(x);
-    v.innerHTML = `${chips}<div class="pt-hd"><b>${nm(x)}</b>${x.st !== 'egg' ? `<button id="pt-rn" class="pt-sm">${x.name ? '✏️' : '이름 짓기'}</button>` : ''}<small>${STG[sg]}${x.st !== 'egg' ? ' · ' + ageTxt(x) + '째' : ''}${x.gen > 1 ? ` · ${x.gen}세대` : ''}</small></div>
+    v.innerHTML = `${chips}<div class="pt-hd"><b>${nm(x)}</b>${x.job ? `<span class="pt-jb">${CAREER[x.job].ic} ${CAREER[x.job].n}</span>` : ''}${x.st !== 'egg' ? `<button id="pt-rn" class="pt-sm">${x.name ? '✏️' : '이름 짓기'}</button>` : ''}<small>${STG[sg]}${x.st !== 'egg' ? ' · ' + ageTxt(x) + '째' : ''}${x.gen > 1 ? ` · ${x.gen}세대` : ''}</small></div>
       ${x.st !== 'egg' ? (() => { const xp = x.xp || 0, nx = sg === 'baby' ? XP.child : sg === 'child' ? XP.adult : null, lo = sg === 'child' ? XP.child : 0; return `<div class="pt-xp"><span class="lv">${STG[sg]}</span><div class="bar"><b style="width:${nx ? Math.min(100, Math.round((xp - lo) / (nx - lo) * 100)) : 100}%"></b><i>${nx ? `EXP ${xp - lo} / ${nx - lo} · ${sg === 'baby' ? '어린이' : '어른'}까지 ${nx - xp}` : `EXP ${xp} · 다 컸어요! 🎉`}</i></div></div><div class="pt-st"><span>🧠 지능 <b>${x.int || 0}</b></span><span>💪 체력 <b>${x.str || 0}</b></span><span>✨ 매력 <b>${x.chm || 0}</b></span></div>` })() : ''}
       ${roomHTML(room, x)}<div class="pt-tabs">${tabs.map(([k, l]) => `<button data-tb="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}</div><div class="pt-body">${body}</div><p class="pt-coin">🪙 ${coins ?? '…'} 코인</p>`;
     bind(v, x, c);
     if (grown && !$q('.pt-pop')) { const gr = grown; grown = null; const d = stage(x); v.insertAdjacentHTML('beforeend', `<div class="pt-pop" id="pt-grow"><div><b>${iga(gr.name ? esc(gr.name) : '말랑이')} ${gr.to === 'adult' ? '어른이' : '어린이가'} 됐어요! ${gr.to === 'adult' ? '🎉' : '🌱'}</b>
-      <div class="pt-gr"><span>${draw(gr.before, gr.to === 'adult' ? 'child' : 'baby', { size: 70 })}</span><i>➜</i><span>${draw(gr.after, gr.to, { size: 96, face: 'happy', wear: x.wear })}</span></div>
-      <small class="pt-gn">${geneTxt(gr.after)}</small><p>${gr.lv === 'good' ? '정성껏 돌봐 줘서 예쁘게 자랐어요 ✨' : gr.lv === 'bad' ? '조금 외로웠나 봐요… 다음엔 더 챙겨 줘요 🥲' : '무럭무럭 자랐어요!'}</p><div class="tr-btns"><button class="tr-btn" id="pt-grok">좋아요</button></div></div></div>`); $q('#pt-grok').onclick = () => { $q('#pt-grow').remove(); view() } }
+      <div class="pt-gr"><span>${draw(gr.before, gr.to === 'adult' ? 'child' : 'baby', { size: 70 })}</span><i>➜</i><span>${draw(gr.after, gr.to, { size: 96, face: 'happy', wear: gr.wear || x.wear })}</span></div>
+      ${gr.job ? `<div class="pt-job"><span>${CAREER[gr.job].ic} <b>${CAREER[gr.job].n}</b>이 됐어요!</span><small>특기: ${CAREER[gr.job].perk}${CAREER[gr.job].gift ? ' · 졸업 선물로 ' + Object.values(CAREER[gr.job].gift).map(w => WEAR[w].n).join(', ') + '을(를) 받았어요' : ''}</small></div>` : ''}<small class="pt-gn">${geneTxt(gr.after)}</small><p>${gr.lv === 'good' ? '정성껏 돌봐 줘서 예쁘게 자랐어요 ✨' : gr.lv === 'bad' ? '조금 외로웠나 봐요… 다음엔 더 챙겨 줘요 🥲' : '무럭무럭 자랐어요!'}</p><div class="tr-btns"><button class="tr-btn" id="pt-grok">좋아요</button></div></div></div>`); $q('#pt-grok').onclick = () => { $q('#pt-grow').remove(); view() } }
     if (x.st === 'pet' && !x.name && !skipName[x.id] && !$q('#pt-nmbox')) rename(x, true);
   }
   function bind(v, x, c) {
@@ -6255,6 +6306,8 @@ const PET = (() => {
     v.querySelectorAll('[data-cx]').forEach(b => b.onclick = () => deleteDoc(doc(db, 'breed', b.dataset.cx)).catch(() => { }));
     if ($q('#pt-buy')) $q('#pt-buy').onclick = buyEgg;
     if ($q('#pt-bye')) $q('#pt-bye').onclick = () => bye(x);
+    if ($q('#pt-ind')) $q('#pt-ind').onclick = () => indep(x);
+    v.querySelectorAll('[data-al]').forEach(b => b.onclick = () => { const p = pets[b.dataset.al]; if (p) letter({ id: b.dataset.al, ...p }) });
   }
   function rename(x, first) {
     const v = $q('#pt'); if (!v || $q('#pt-nmbox')) return;
@@ -6276,7 +6329,11 @@ const PET = (() => {
     if (a === 'play') { if (c.e < 15) { toast('너무 졸려서 못 논대요. 재워 주세요'); return } playGame(x) }
   }
   async function doJob(x, k) {
-    const D = DO[k], c = stats(x), d = dl(x);
+    const J = x.job, D = { ...DO[k] }, c = stats(x), d = dl(x);
+    if (J === 'ath' && k === 'gym') D.e = 10;
+    if (J === 'idol' && k === 'sing') D.cost = 0;
+    if (J === 'worker' && k === 'study') D.cost = 0;
+    if (J === 'allround') D.xp += 5;
     if (x.sleep) { toast('자고 있어요. 깨워 주세요'); return }
     if ((d[k] || 0) >= DMAX) { toast(`${D.n}은(는) 오늘 ${DMAX}번 다 했어요. 내일 또 해요!`); return }
     if (k === 'job' && stage(x) === 'baby') { toast('알바는 어린이가 되면 할 수 있어요'); return }
@@ -6284,10 +6341,10 @@ const PET = (() => {
     if (k === 'job' && c.m < 15) { toast('기분이 너무 안 좋아서 일하기 싫대요. 놀아 주세요'); return }
     if (D.cost && !await spend(D.cost)) return;
     let job = null, gain = 0, earn = 0, txt = D.msg[Math.random() * D.msg.length | 0];
-    if (k === 'job') { job = JOBS[Math.random() * JOBS.length | 0]; earn = 150 + Math.floor(Math.random() * 151) + Math.min(250, (x[job[2]] || 0) * 4); txt = `${job[1]} ${job[0]}에서 알바를 했어요! ${earn}코인을 벌어 왔어요` }
-    else gain = 3 + Math.floor(Math.random() * 4);
+    if (k === 'job') { job = JOBS[Math.random() * JOBS.length | 0]; earn = Math.round((150 + Math.floor(Math.random() * 151) + Math.min(250, (x[job[2]] || 0) * 4)) * (J === 'boss' ? 1.5 : J === 'worker' ? 1.2 : 1)); txt = `${job[1]} ${job[0]}에서 알바를 했어요! ${earn}코인을 벌어 왔어요` }
+    else gain = 3 + Math.floor(Math.random() * 4) + ((J === 'dr' && k === 'study') || (J === 'idol' && k === 'sing') ? 2 : 0);
     let ok = false;
-    await act(x.id, (y, cc, t) => { const dd = dl(y); if ((dd[k] || 0) >= DMAX) return null; ok = true; const o = { ...snap(cc, t), e: Math.round(clamp(cc.e - D.e)), m: Math.round(clamp(cc.m + D.m)), h: Math.round(clamp(cc.h + D.h)), xp: (y.xp || 0) + D.xp, dl: { ...dd, d: kstDay(), [k]: (dd[k] || 0) + 1 }, pt: pt0(y, cc, t), log: [{ u: me(), a: 'do_' + k, t }] }; if (D.stat) o[D.stat] = (y[D.stat] || 0) + gain; return o });
+    await act(x.id, (y, cc, t) => { const dd = dl(y); if ((dd[k] || 0) >= DMAX) return null; ok = true; const o = { ...snap(cc, t), e: Math.round(clamp(cc.e - D.e)), m: Math.round(clamp(cc.m + D.m)), h: Math.round(clamp(cc.h + D.h)), xp: (y.xp || 0) + D.xp, dl: { ...dd, d: kstDay(), [k]: (dd[k] || 0) + 1 }, dc: { ...(y.dc || {}), [k]: ((y.dc || {})[k] || 0) + 1 }, pt: pt0(y, cc, t), log: [{ u: me(), a: 'do_' + k, t }] }; if (D.stat) o[D.stat] = (y[D.stat] || 0) + gain; return o });
     if (!ok) return;
     if (earn) { const w = 1150 - (Date.now() - (G.spendAt || 0)); if (w > 0) await new Promise(r => setTimeout(r, w)); try { await coinWrite({ c: (G.coins[me()]?.c || 0) + earn }); G.spendAt = Date.now() } catch (e) { toast('번 코인을 받지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } }
     try { navigator.vibrate?.(20) } catch { }
@@ -6302,7 +6359,7 @@ const PET = (() => {
       v.insertAdjacentHTML('beforeend', `<div class="pt-pop" id="pt-game"><div><b>어느 쪽을 볼까? (${game.r}/3 · 맞힘 ${game.win})</b><div class="pt-gm ${look || ''}">${art(x, 110, look ? 'happy' : 'open')}</div><p>${msg}</p>
         ${game.r < 3 ? '<div class="tr-btns"><button class="tr-btn" data-g="l">⬅ 왼쪽</button><button class="tr-btn" data-g="r">오른쪽 ➡</button></div>' : '<div class="tr-btns"><button class="tr-btn" id="pt-gok">좋아요</button></div>'}</div></div>`);
       v.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { const look = Math.random() < .5 ? 'l' : 'r', ok = b.dataset.g === look; game.r++; if (ok) game.win++; try { navigator.vibrate?.(ok ? 25 : [10, 30, 10]) } catch { } drawG(game.r < 3 ? (ok ? '맞혔어요! 🎉' : '틀렸어요 ㅎㅎ') : game.win >= 2 ? `${game.win}번 맞혔어요! 엄청 신났어요 ✨` : `${game.win}번 맞혔어요. 그래도 재밌었대요!`, look) });
-      if ($q('#pt-gok')) $q('#pt-gok').onclick = () => { const w = game.win >= 2; game = null; $q('#pt-game')?.remove(); cheer(); act(x.id, (y, cc, t) => ({ ...snap(cc, t), m: Math.round(clamp(cc.m + (w ? 30 : 15))), e: Math.round(clamp(cc.e - 10)), h: Math.round(clamp(cc.h - 4)), plays: (y.plays || 0) + 1, xp: (y.xp || 0) + (w ? XPG.win : XPG.play), pt: pt0(y, cc, t), log: L(w ? 'win' : 'play', t) })) };
+      if ($q('#pt-gok')) $q('#pt-gok').onclick = () => { const w = game.win >= 2; game = null; $q('#pt-game')?.remove(); cheer(); act(x.id, (y, cc, t) => ({ ...snap(cc, t), m: Math.round(clamp(cc.m + (w ? 30 : 15) + (y.job === 'dancer' ? 10 : 0))), e: Math.round(clamp(cc.e - 10)), h: Math.round(clamp(cc.h - 4)), plays: (y.plays || 0) + 1, xp: (y.xp || 0) + (w ? XPG.win : XPG.play), pt: pt0(y, cc, t), log: L(w ? 'win' : 'play', t) })) };
     };
     drawG('말랑이가 고개를 돌릴 쪽을 맞혀 봐요!');
   }
@@ -6343,19 +6400,19 @@ const PET = (() => {
   // ---------- 친구 펫 · 교배 ----------
   function loadRoom(u) { if (rooms[u] !== undefined) return; rooms[u] = null; getDoc(doc(db, 'rooms', u)).then(d => { rooms[u] = d.exists() ? d.data() : {}; if (visit?.u === u) view() }).catch(() => { rooms[u] = {} }) }
   function friendsHTML() {
-    const by = {}; Object.entries(pets).forEach(([id, p]) => { if (p.owner !== me() && S.users[p.owner]) (by[p.owner] = by[p.owner] || []).push({ id, ...p }) });
+    const by = {}; Object.entries(pets).forEach(([id, p]) => { if (p.owner !== me() && p.st !== 'indep' && S.users[p.owner]) (by[p.owner] = by[p.owner] || []).push({ id, ...p }) });
     const us = Object.keys(by).sort((a, b) => S.users[a].localeCompare(S.users[b]));
-    return us.length ? `<div class="pf-list">${us.map(u => `<button data-visit="${u}"><span class="pf-pets">${by[u].slice(0, 3).map(p => art(p, 40)).join('')}</span><span><b>${esc(S.users[u])}</b><small>${by[u].map(p => `${nm(p)} (${STG[stage(p)]})`).join(' · ')}</small></span><em>놀러 가기 ›</em></button>`).join('')}</div>` : '<div class="empty" style="padding:24px">아직 말랑이를 키우는 친구가 없어요</div>';
+    return us.length ? `<div class="pf-list">${us.map(u => `<button data-visit="${u}"><span class="pf-pets">${by[u].slice(0, 3).map(p => art(p, 40)).join('')}</span><span><b>${esc(S.users[u])}</b><small>${by[u].map(p => `${nm(p)} (${p.job ? CAREER[p.job].ic + ' ' + CAREER[p.job].n : STG[stage(p)]})`).join(' · ')}</small></span><em>놀러 가기 ›</em></button>`).join('')}</div>` : '<div class="empty" style="padding:24px">아직 말랑이를 키우는 친구가 없어요</div>';
   }
   function visitView(v) {
-    const u = visit.u, L = Object.entries(pets).filter(([, p]) => p.owner === u).map(([id, p]) => ({ id, ...p })).sort((a, b) => a.born - b.born);
+    const u = visit.u, L = Object.entries(pets).filter(([, p]) => p.owner === u && p.st !== 'indep').map(([id, p]) => ({ id, ...p })).sort((a, b) => a.born - b.born);
     if (!L.length) { visit = null; return view() }
     const rm = rooms[u], x = L.find(p => p.id === visit.pid) || L.find(p => p.id === rm?.main) || L[0], my = myCur();
     const ok = my && my.st === 'pet' && stage(my) === 'adult' && x.st === 'pet' && stage(x) === 'adult', gap = my && now() - (my.lb || 0) < BREED_GAP, gap2 = now() - (x.lb || 0) < BREED_GAP;
     const sent = reqOut.find(r => r.tp === x.id && r.fp === my?.id && r.st === 'wait');
     const why = !my ? '내 말랑이가 없어요' : stage(my) !== 'adult' || my.st !== 'pet' ? '내 말랑이가 어른이 돼야 해요' : stage(x) !== 'adult' || x.st !== 'pet' ? '친구 말랑이가 어른이 돼야 해요' : gap ? '내 말랑이가 쉬는 중이에요 (교배 뒤 20시간)' : gap2 ? '친구 말랑이가 쉬는 중이에요' : mine().length >= MAXP ? `말랑이는 ${MAXP}마리까지만 키울 수 있어요` : '';
     v.innerHTML = `<button class="ig-back" id="pt-vb">‹ 내 방으로</button><div class="pt-chips">${L.map(p => `<button data-vp="${p.id}" class="${p.id === x.id ? 'on' : ''}">${art(p, 30)}<span>${nm(p)}</span></button>`).join('')}</div>
-      <div class="pt-hd"><b>${esc(S.users[u])}의 ${nm(x)}</b><small>${STG[stage(x)]}${x.st !== 'egg' ? ' · ' + ageTxt(x) + '째' : ''}${x.gen > 1 ? ` · ${x.gen}세대` : ''}</small></div>
+      <div class="pt-hd"><b>${esc(S.users[u])}의 ${nm(x)}</b>${x.job ? `<span class="pt-jb">${CAREER[x.job].ic} ${CAREER[x.job].n}</span>` : ''}<small>${STG[stage(x)]}${x.st !== 'egg' ? ' · ' + ageTxt(x) + '째' : ''}${x.gen > 1 ? ` · ${x.gen}세대` : ''}</small></div>
       ${rm === null || rm === undefined ? '<div class="empty">방 문 여는 중…</div>' : roomHTML(rm, x, { visit: 1, hearts: visit.pet })}
       <p class="pt-coin">${x.st === 'egg' ? '아직 알이에요 🥚' : geneTxt(eg(x))}</p>
       <div class="tr-btns"><button class="tr-btn g" id="pt-pat" ${x.st !== 'pet' ? 'disabled' : ''}>🤚 쓰다듬기</button>${sent ? '<button class="tr-btn" disabled>💞 신청 보냄 · 기다리는 중</button>' : `<button class="tr-btn" id="pt-br" ${why ? 'disabled' : ''}>💞 교배 신청 · ${COST.breed}코인</button>`}</div>
@@ -6397,13 +6454,41 @@ const PET = (() => {
   function infoHTML(x) {
     const sg = stage(x);
     return `<div class="pi-card">${art(x, 80)}<div><b>${nm(x)}</b><small>${x.st === 'egg' ? '아직 알이라 몰라요 🥚' : geneTxt(eg(x))}</small>${x.par?.length ? `<small>엄마 아빠: ${esc(x.par.join(' × '))}</small>` : '<small>1세대 말랑이</small>'}<small>밥 ${x.meals || 0} · 간식 ${x.snacks || 0} · 놀이 ${x.plays || 0}${x.ran ? ` · 가출 ${x.ran}번` : ''}</small></div></div>
+      ${x.st === 'pet' ? (() => { const c = { study: 0, gym: 0, sing: 0, job: 0, ...(x.dc || {}) }, tot = c.study + c.gym + c.sing + c.job; return `<div class="ps-sec">${x.job ? '직업' : '활동 비율 (어른이 될 때 직업이 정해져요)'}</div><div class="pc-box">${x.job ? `<div class="pt-job"><span>${CAREER[x.job].ic} <b>${CAREER[x.job].n}</b></span><small>특기: ${CAREER[x.job].perk}</small></div>` : ''}
+        <div class="pr-ratio">${['study', 'gym', 'sing', 'job'].map(k => `<span style="flex:${c[k] || .0001}" class="${k}"></span>`).join('')}</div>
+        <div class="pr-leg">${['study', 'gym', 'sing', 'job'].map(k => `<small class="${k}">${DO[k].ic} ${DO[k].n} ${c[k]}번${tot ? ` (${Math.round(c[k] / tot * 100)}%)` : ''}</small>`).join('')}</div>
+        ${!x.job ? `<small>지금대로면 → <b>${CAREER[careerOf(x)].ic} ${CAREER[careerOf(x)].n}</b>${tot < 4 ? ' (활동을 4번은 해야 직업이 생겨요)' : ''}</small><small>한 가지를 절반 넘게 하면 그 분야 직업, 공부+알바면 고학생, 운동+노래면 댄서, 골고루 하면 만능이 돼요</small>` : ''}</div>` })() : ''}
       ${x.st === 'pet' && sg !== 'adult' ? (() => { const k = careOf(x), pc = Math.min(100, Math.round(k.q / 1.5 * 100)); return `<div class="ps-sec">돌봄 점수 (${sg === 'baby' ? '어린이' : '어른'}가 될 때 생김새에 반영돼요)</div><div class="pc-box"><div class="pc-bar"><b style="width:${pc}%" class="${k.lv}"></b></div><small>${k.lv === 'good' ? '아주 잘하고 있어요! 예쁜 색이나 희귀한 모습이 나올 확률이 올라가요 ✨' : k.lv === 'ok' ? '보통이에요. 조금 더 자주 밥 주고 놀아 주고 씻겨 줘요' : '관심이 부족해요… 이대로면 시무룩한 회색이 될지도 몰라요 🥲'}</small><small>간식만 많이 주면 통통한 찹쌀떡 몸, 많이 놀아 주면 토끼귀가 나오기 쉬워요</small></div>` })() : ''}
       <div class="ps-sec">말랑이 늘리기 (최대 ${MAXP}마리)</div>
       <div class="tr-btns"><button class="tr-btn" id="pt-buy" ${mine().length >= MAXP ? 'disabled' : ''}>🥚 랜덤 알 사기 · ${COST.egg}코인</button></div>
-      <p class="pt-coin">${mine().length >= MAXP ? '자리가 꽉 찼어요' : '교배로도 알을 받을 수 있어요 (💞 교배 탭)'}<br>경험치 120이면 어린이, 360이면 어른 · 어른이 되면 교배할 수 있어요</p>
+      <p class="pt-coin">${mine().length >= MAXP ? '자리가 꽉 찼어요 · 다 큰 말랑이를 독립시키면 자리가 생겨요 🏡' : '교배로도 알을 받을 수 있어요 (💞 교배 탭)'}<br>경험치 120이면 어린이, 360이면 어른 · 어른이 되면 교배할 수 있어요</p>
+      <div class="ps-sec">🏡 독립시키기</div>${x.st === 'pet' && sg === 'adult' ? `<div class="tr-btns"><button class="tr-btn" id="pt-ind">🎒 ${nm(x)} 독립시키기</button></div><p class="pt-coin">다 큰 말랑이를 세상으로 보내요. 자리가 하나 비고,<br>독립한 말랑이는 아래 앨범에 영원히 남아요 · 떠나면서 용돈도 두고 가요 💌</p>` : `<p class="pt-coin">어른이 되면 독립시킬 수 있어요 (지금 ${STG[sg]})</p>`}
+      ${(() => { const A = album(); return `<div class="ps-sec">📔 독립한 말랑이 앨범 (${A.length})</div>${A.length ? `<div class="al-grid">${A.map(p => `<button data-al="${p.id}">${draw(eg(p), 'adult', { size: 64, wear: p.wear || {} })}<b>${nm(p)}</b><small>${p.job ? CAREER[p.job].ic + ' ' + CAREER[p.job].n : '어른 말랑'}</small></button>`).join('')}</div>` : '<p class="pt-coin">아직 독립한 말랑이가 없어요</p>'}` })()}
       <div class="ps-sec">떠나보내기</div><div class="tr-btns"><button class="tr-btn g" id="pt-bye">👋 ${nm(x)} 떠나보내기</button></div><p class="pt-coin">떠나보내면 다시 돌아오지 않아요</p>`;
   }
   async function buyEgg() { if (busy || mine().length >= MAXP) return; if (!await spend(COST.egg)) return; busy = true; try { await addPet(newPet(randGenes(), { ps: ['#ffd23f', '#a8dcff'] }), 'buy'); tab = 'care'; toast('새 알이 왔어요! 🥚') } catch (e) { toast('알을 사지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) } busy = false; view() }
+  // 독립: 다 큰 말랑이가 인사하고 떠나요 (앨범에 남고 자리가 비어요)
+  const BYE = { dr: '세상의 모든 책을 읽으러 큰 도서관으로 떠날게요 📚', ath: '올림픽에 나가서 금메달 따 올게요! 🏅', idol: '데뷔하러 가요! 무대에서 꼭 응원해 줘요 🎤', boss: '제 가게를 차리러 가요. 개업하면 첫 손님으로 초대할게요 💼', worker: '낮엔 일하고 밤엔 공부하면서 멋지게 살아 볼게요 📖', dancer: '세계 댄스 대회에 나가러 가요 💃', allround: '뭐든 잘하는 말랑이가 돼서 세상 구경을 떠날게요 🌈', neet: '…일단 독립은 하는데요, 가끔 밥 먹으러 와도 돼요? 🛋️' };
+  const daysTxt = p => { const h = Math.max(1, Math.round(((p.ind || now()) - (p.hatch || p.born)) / HR)); return h < 24 ? `${h}시간` : `${Math.round(h / 24)}일` };
+  function letter(p, gift) {
+    const v = $q('#pt'); if (!v) return; $q('#pt-bye-l')?.remove();
+    v.insertAdjacentHTML('beforeend', `<div class="pt-pop" id="pt-bye-l"><div class="bye-card"><div class="bye-pet">${draw(eg(p), 'adult', { size: 104, face: 'happy', wear: p.wear || {} })}<span class="bag">🎒</span><span class="wave">👋</span></div>
+      <div class="bye-letter"><small>💌 ${esc(S.me.nick || '')}님께</small><p>그동안 키워 주셔서 정말 고마워요.<br>밥 ${p.meals || 0}번, 놀이 ${p.plays || 0}번… 하나도 안 잊을게요.</p><p>${BYE[p.job] || '넓은 세상으로 모험을 떠날게요 🌍'}</p><p>가끔 놀러 올게요. 사랑해요 💕</p><small class="sig">— ${nm(p)}${p.job ? ` (${CAREER[p.job].ic} ${CAREER[p.job].n})` : ''} · 함께한 지 ${daysTxt(p)}</small></div>
+      ${gift ? `<div class="do-gain"><span>🪙 독립 기념 용돈 +${gift}</span></div>` : ''}<div class="tr-btns"><button class="tr-btn" id="pt-byeok">${gift ? '잘 가, 행복해야 해!' : '닫기'}</button></div></div></div>`);
+    $q('#pt-byeok').onclick = () => { $q('#pt-bye-l').remove(); view() };
+  }
+  async function indep(x) {
+    const b = $q('#pt-ind'); if (!b.dataset.ok) { b.dataset.ok = 1; b.textContent = `정말 독립시킬까요? 한 번 더 누르면 떠나요`; return }
+    if (busy) return;
+    const gift = Math.min(1500, 500 + Math.floor((x.xp || 0) / 2)); let ok = false, t0 = now();
+    await act(x.id, (y, c, t) => { if (y.st !== 'pet' || stage(y) !== 'adult') return null; ok = true; t0 = t; return { st: 'indep', ind: t, sleep: false, log: [{ u: me(), a: 'indep', t }] } });
+    if (!ok) { toast('어른이 된 말랑이만 독립할 수 있어요'); return }
+    const rest = mine().filter(p => p.id !== x.id); cur = rest[0]?.id || null; if (room) saveRoom({ main: cur || '' }).catch(() => { });
+    const w = 1150 - (Date.now() - (G.spendAt || 0)); if (w > 0) await new Promise(r => setTimeout(r, w));
+    try { await coinWrite({ c: (G.coins[me()]?.c || 0) + gift }); G.spendAt = Date.now() } catch { }
+    try { navigator.vibrate?.([30, 60, 30]) } catch { }
+    tab = 'care'; letter({ ...x, ind: t0 }, gift);
+  }
   async function bye(x) {
     const b = $q('#pt-bye'); if (!b.dataset.ok) { b.dataset.ok = 1; b.textContent = '정말 떠나보낼까요? 한 번 더 누르면 떠나요'; return }
     try { await deleteDoc(doc(db, 'pets', x.id)); const rest = mine().filter(p => p.id !== x.id); cur = rest[0]?.id || null; if (room) saveRoom({ main: cur || '' }).catch(() => { }); tab = 'care'; toast(`${iga(x.name || '말랑이')} 손을 흔들며 떠났어요 👋`) } catch (e) { toast('떠나보내지 못했어요' + (e?.code ? ' (' + e.code + ')' : '')) }
