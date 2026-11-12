@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-1200b">
+<meta name="build" content="20261112-1205">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -6167,7 +6167,7 @@ const PET = (() => {
     sing: { n: '노래·춤', ic: '🎤', cost: 50, e: 15, m: 5, h: -5, stat: 'chm', xp: 25, from: 'baby', msg: ['노래 연습을 했어요 🎵', '춤 연습으로 땀이 뻘뻘!', '거울 보고 표정 연습을 했어요', '아이돌 안무를 따라 췄어요'] },
     job: { n: '알바', ic: '💼', cost: 0, e: 25, m: -10, h: -10, stat: null, xp: 15, from: 'child', msg: [] }
   };
-  const DMAX = 5, statN = { int: '지능', str: '체력', chm: '매력' };
+  const DMAX = Infinity, statN = { int: '지능', str: '체력', chm: '매력' };
   const dl = x => x.dl?.d === kstDay() ? x.dl : { d: kstDay() };
   const STG = { egg: '알', baby: '아기', child: '어린이', adult: '어른' };
   const ageTxt = x => { const d = (now() - x.hatch) / HR; return d < 24 ? `${Math.floor(d)}시간` : `${Math.floor(d / 24)}일` };
@@ -6275,8 +6275,8 @@ const PET = (() => {
         <button data-a="bath" ${x.sleep ? 'disabled' : ''}>🛁<small>씻기기</small></button><button data-a="sweep" ${!c.poop ? 'disabled' : ''}>🧹<small>방 치우기</small></button><button data-a="${x.sleep ? 'wake' : 'sleep'}">${x.sleep ? '☀️<small>깨우기</small>' : '💡<small>재우기</small>'}</button>
         <button data-a="vit" class="wide" ${x.sleep ? 'disabled' : ''}>💊<small>비타민 · ${COST.vit} · 기운 +30</small></button></div>
         ${sg === 'adult' ? `<div class="ind-ban"><span>🎓 다 컸어요! 독립시키면 자리가 하나 비어요</span><button id="pt-ind2">🎒 독립시키기</button></div>` : ''}
-        <div class="ps-sec">🎒 활동 · 경험치를 모아서 자라요</div>
-        <div class="pt-do">${Object.entries(DO).map(([k, D]) => { const n = dl(x)[k] || 0, lock = k === 'job' && sg === 'baby'; return `<button data-do="${k}" ${x.sleep || n >= DMAX || lock ? 'disabled' : ''}><span>${D.ic}</span><b>${D.n}</b><small>${lock ? '어린이부터' : `${D.cost && !((x.job === 'idol' && k === 'sing') || (x.job === 'worker' && k === 'study')) ? D.cost + '코인 · ' : ''}기운 -${x.job === 'ath' && k === 'gym' ? 10 : D.e}`}</small><em>${DMAX - n}/${DMAX}</em></button>` }).join('')}</div>`;
+        <div class="ps-sec">🎒 활동 · 경험치를 모아서 자라요 (횟수 제한 없음)</div>
+        <div class="pt-do">${Object.entries(DO).map(([k, D]) => { const n = dl(x)[k] || 0, lock = k === 'job' && sg === 'baby'; return `<button data-do="${k}" ${x.sleep || lock ? 'disabled' : ''}><span>${D.ic}</span><b>${D.n}</b><small>${lock ? '어린이부터' : `${D.cost && !((x.job === 'idol' && k === 'sing') || (x.job === 'worker' && k === 'study')) ? D.cost + '코인 · ' : ''}기운 -${x.job === 'ath' && k === 'gym' ? 10 : D.e}`}</small>${n ? `<em>오늘 ${n}번</em>` : ''}</button>` }).join('')}</div>`;
       body += logH(x);
     } else if (tab === 'deco') body = shopHTML('room');
     else if (tab === 'wear') body = shopHTML('wear', x);
