@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261112-0940">
+<meta name="build" content="20261112-0945">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -5949,7 +5949,7 @@ const PET = (() => {
     if (p.st === 'away') return '<span class="pti away">📝</span>';
     const [k, pl] = kindPal(); return `<span class="pti">${svg(k, pl, p.sleep ? 'sleep' : 'open', 64)}</span>`;
   }
-  return { mount, watch, icon, need: () => !!p && need(), stop: () => { clearInterval(bt); game = null } };
+  return { mount, watch, icon, refresh: () => { if ($q('#pt') && !game && !$q('#pt-nmbox')) view() }, need: () => !!p && need(), stop: () => { clearInterval(bt); game = null } };
 })();
 
 /* ===== 게임 폴더 (아이콘 모음) ===== */
@@ -6172,9 +6172,11 @@ function watchScores() {
     G.tscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.tscores[d.id] = b }); G.tloaded = true;
     if (S.screen === 'game') { drawRank(); BLOCKS.setBest() }
   }, () => { G.tloaded = true; unsub('tscores') });
-  if (on && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
+  const onC = S.me && (S.screen === 'game' || S.screen === 'pet'); // 코인은 다마쿨찌에서도 씀
+  if (onC && !subs.coins) subs.coins = onSnapshot(collection(db, 'coins'), q => {
     G.coins = {}; q.forEach(d => { const x = d.data(); if (Number.isFinite(x.c)) G.coins[d.id] = { c: x.c, w: x.w || 0, k: x.k || 0, rm: Number.isFinite(x.rm) ? x.rm : null, g: Number.isFinite(x.g) ? x.g : null } }); G.cloaded = true;
     if (S.screen === 'game') { drawRank(); ROMANCE.refresh(); FIGHT.refresh(); SUTDA.refresh(); RACE.refresh(); gfCoin() }
+    if (S.screen === 'pet') PET.refresh();
   }, () => { G.cloaded = true; unsub('coins') });
   if (on && !subs.sscores) subs.sscores = onSnapshot(collection(db, 'sscores'), q => {
     G.sscores = {}; q.forEach(d => { const b = d.data().best; if (Number.isFinite(b)) G.sscores[d.id] = b }); G.sloaded = true;
@@ -6188,7 +6190,8 @@ function watchScores() {
     G.gstats = {}; q.forEach(d => { const x = d.data(); G.gstats[d.id] = { sg: x.sg || 0, sw: x.sw || 0, rg: x.rg || 0, rw: x.rw || 0 } }); G.gloaded = true;
     if (S.screen === 'game') drawRank();
   }, () => { G.gloaded = true; unsub('gstats'); if (S.screen === 'game') drawRank() });
-  if (!on) ['scores', 'bscores', 'tscores', 'coins', 'sscores', 'cscores', 'gstats'].forEach(k => subs[k] && unsub(k));
+  if (!on) ['scores', 'bscores', 'tscores', 'sscores', 'cscores', 'gstats'].forEach(k => subs[k] && unsub(k));
+  if (!onC && subs.coins) unsub('coins');
 }
 // gstats/{uid} = { sg, sw, rg, rw, at } — 섯다(s)·달리기(r)의 판 수(g)와 이긴 판 수(w)
 async function statWrite(kind, win) {
