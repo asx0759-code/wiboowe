@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="build" content="20261113-1040">
+<meta name="build" content="20261114-1410">
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>위시 부흥 위원회</title>
 <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png">
@@ -2058,7 +2058,8 @@ function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = fals
 function fmt(ts) { if (!ts?.toDate) return '방금'; const d = ts.toDate(), p = n => String(n).padStart(2, '0'); return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}` }
 const ms = ts => ts?.toMillis ? ts.toMillis() : Date.now();
 function refresh() { if (S.screen !== 'send' && S.screen !== 'compose' && S.screen !== 'game' && S.screen !== 'fortune' && S.screen !== 'pet' && S.screen !== 'fire' && !(S.screen === 'asks' && document.activeElement?.closest?.('.ak')) && S.screen !== 'sketch' && S.screen !== 'boat' && S.screen !== 'board-write' && !S.editMsg && !S.editReply && !document.querySelector('#view .ytc iframe')) render() } // 영상 재생 중엔 화면을 다시 그리지 않음
-function go(screen, extra = {}) { if (screen === 'music') { screen = 'fire'; extra = { ...extra, bmMusic: true } } { const lk = screen === 'game' ? extra.gtab : screen === 'pet' ? 'pet' : (screen === 'fortune' || screen === 'tarot') ? 'fortune' : null; if (lk && gameOff(lk) && !S.isAdmin) { toast('🔒 지금은 관리자가 잠가 둔 곳이에요'); return } } if (screen === 'send' && !talkOK()) { toast('🔒 방명록 쓰기는 지금 관리자만 할 수 있어요 · 남겨진 방명록은 볼 수 있어요'); return } if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop(); RAID.stop(); BELL.stop(); HUNT.stop(); HOF.stop() } if (S.screen === 'pet' && screen !== 'pet') PET.stop(); if (S.screen === 'fire' && screen !== 'fire') FIRE.stop(); if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); PET.watch(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
+const USER_SCREENS = new Set(['login', 'home', 'me', 'fire', 'pet']); // 일반 사용자가 갈 수 있는 화면 (관리자는 전부)
+function go(screen, extra = {}) { if (screen === 'music') { screen = 'fire'; extra = { ...extra, bmMusic: true } } if (S.me && !S.isAdmin && !USER_SCREENS.has(screen)) { toast('지금은 프로필 · 불멍 · 다마쿨찌만 쓸 수 있어요'); if (USER_SCREENS.has(S.screen)) return; screen = 'home'; extra = {} } { const lk = screen === 'game' ? extra.gtab : screen === 'pet' ? 'pet' : (screen === 'fortune' || screen === 'tarot') ? 'fortune' : null; if (lk && gameOff(lk) && !S.isAdmin) { toast('🔒 지금은 관리자가 잠가 둔 곳이에요'); return } } if (screen === 'send' && !talkOK()) { toast('🔒 방명록 쓰기는 지금 관리자만 할 수 있어요 · 남겨진 방명록은 볼 수 있어요'); return } if ((screen === 'send' && lockedU(extra.to)) || (screen.startsWith('now-') && lockedU(extra.chatWith))) { toast('🔒 잠긴 회원이에요'); return } if (S.screen === 'sketch') SKETCH.stop(); if (S.screen === 'boat') BOAT.stop(); if (S.screen === 'game') { MOLE.stop(); BUBBLE.stop(); BLOCKS.stop(); SHOOT.stop(); CATRUN.stop(); RACE.stop(); GACHA.stop(); IMGG.stop(); RELAY.stop(); RAID.stop(); BELL.stop(); HUNT.stop(); HOF.stop() } if (S.screen === 'pet' && screen !== 'pet') PET.stop(); if (S.screen === 'fire' && screen !== 'fire') FIRE.stop(); if (S.screen === 'asks' && screen !== 'asks') ASKS.stop(); if ((S.screen === 'now-chat' || S.screen === 'now-achat') && (screen !== S.screen || extra.chatWith !== S.chatWith || extra.athread !== S.athread || extra.chatAnon !== S.chatAnon)) { typingSet(false); P.ncImg = null } if (screen === 'game' && !('gtab' in extra)) extra.gtab = null; if (screen === 'fortune' && !('ftab' in extra)) extra.ftab = null; Object.assign(S, { screen, replyTo: screen === S.screen ? S.replyTo : null, confirmDel: false, editMsg: false, editReply: false, confirmReveal: false }, extra); if (screen === 'inbox') watchOwner(); watchListeners(); watchBoard(); watchScores(); watchNow(); watchAn(); watchFeed(); watchAlerts(); ASKS.watchMine(); watchGall(); PET.watch(); if (S.screen !== 'now-chat' && S.screen !== 'now-achat') { unsub('typing'); TY.key = null } $('.st-view')?.remove(); $('.zoom')?.remove(); $('#nw-sheet')?.remove(); render(); presBeat() }
 // '같이 듣는 사람' 목록은 MUSIC 화면을 보고 있을 때만 받아 옴 (Firebase 무료 사용량 아끼기)
 function watchListeners() {
   if ((S.screen === 'music' || S.screen === 'fire') && S.me && !subs.lis) subs.lis = onSnapshot(collection(db, 'room', 'main', 'listeners'), q => { S.listeners = []; q.forEach(d => S.listeners.push({ uid: d.id, ...d.data() })); musicRefresh() });
@@ -2194,9 +2195,9 @@ function render() {
     v.innerHTML = `<div class="hs">
       <div class="hs-grid">
         <div class="tile w-clock p3f" aria-label="시계">${clockSVG()}</div>
-        ${tile('me', 'photo p3f', `<span class="appav">${avatar(S.me.uid)}</span>`, '프로필', ASKS.newCount())}
-        ${tile('game', 'p3 c-game', ico('pad'), '게임')}
-        ${tile('hub', 'p3f hubf', hubIcon(), '메뉴', hubItems().reduce((t, x) => t + (+x.badge || 0), 0) || (hubItems().some(x => x.badge === '!') ? '!' : 0))}
+        ${tile('me', 'photo p3f', `<span class="appav">${avatar(S.me.uid)}</span>`, '프로필', S.isAdmin ? ASKS.newCount() : 0)}
+        ${S.isAdmin ? tile('game', 'p3 c-game', ico('pad'), '게임') + tile('hub', 'p3f hubf', hubIcon(), '메뉴', hubItems().reduce((t, x) => t + (+x.badge || 0), 0) || (hubItems().some(x => x.badge === '!') ? '!' : 0))
+          : tile('pet', 'p3 c-pet', PET.icon(), '다마쿨찌', PET.need() ? '!' : 0)}
       </div>
       <div class="hs-dock">
         ${tile('fire', 'p3 c-fire', ico('fire'), '불멍')}
@@ -2236,11 +2237,11 @@ function render() {
       <input type="file" id="phfile" accept="image/*" hidden>
       <div class="wallset"><b>홈 배경 화면</b><div class="wallrow"><span class="wallprev" style="${S.wall ? `background-image:url('${S.wall}')` : ''}">${S.wall ? '' : '기본'}</span><div><button class="out" id="wallbtn">배경 사진 고르기</button>${S.wall ? '<button class="out" id="wallrm">기본 배경으로</button>' : ''}</div></div></div>
       <input type="file" id="wallfile" accept="image/*" hidden>
-      <div class="wallset"><b>익명 질문함</b><div class="wallrow" style="justify-content:space-between"><span style="color:var(--muted)">${ASKS.newCount() ? `❓ 새 질문 ${ASKS.newCount()}개가 기다려요` : '친구들이 익명으로 보낸 질문이 여기 모여요'}</span><button class="out" id="akbtn">열기</button></div></div>
+      ${S.isAdmin ? `<div class="wallset"><b>익명 질문함</b><div class="wallrow" style="justify-content:space-between"><span style="color:var(--muted)">${ASKS.newCount() ? `❓ 새 질문 ${ASKS.newCount()}개가 기다려요` : '친구들이 익명으로 보낸 질문이 여기 모여요'}</span><button class="out" id="akbtn">열기</button></div></div>` : ''}
       <div class="wallset"><b>알림</b><div class="wallrow" style="justify-content:space-between"><span style="color:var(--muted)">${!('Notification' in window) ? '이 브라우저는 폰 알림을 지원하지 않아요 (사이트 안 알림은 떠요)' : Notification.permission === 'granted' ? '🔔 폰 알림 켜짐 · 사이트가 뒤에 있어도 알려 줘요' : Notification.permission === 'denied' ? '알림이 차단돼 있어요. 브라우저 설정에서 허용해 주세요' : '사이트가 뒤에 있을 때도 폰 알림 받기'}</span>${'Notification' in window && Notification.permission === 'default' ? '<button class="out" id="notibtn">알림 켜기</button>' : ''}</div></div>
       <div class="foot">${S.isAdmin ? '<button class="out" id="adm">admin</button>' : ''}<button class="out" id="out">log out</button></div></div>`;
     $('#out').onclick = () => signOut(auth);
-    $('#akbtn').onclick = () => go('asks', { askU: S.me.uid, askFrom: 'me' });
+    if ($('#akbtn')) $('#akbtn').onclick = () => go('asks', { askU: S.me.uid, askFrom: 'me' });
     if ($('#adm')) $('#adm').onclick = () => { go('admin', { admUser: null }); loadAdmin() };
     $('#avbtn').onclick = () => $('#phfile').click();
     $('#wallbtn').onclick = () => $('#wallfile').click();
